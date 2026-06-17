@@ -96,3 +96,8 @@ function bootMenuRank() {
 }
 
 bootMenuRank();
+
+if (window.location.pathname.includes('admin')) {
+  import('./admin-daily-goals.css');
+  import('./admin-daily-goals.js');
+}
