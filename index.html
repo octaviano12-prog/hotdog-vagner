@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Cardapio digital, pedidos e financeiro do Hot Dog do Vagner."
+    />
+    <title>Hot Dog do Vagner</title>
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-frame">
+      <header class="topbar">
+        <a class="brand" href="#cardapio" aria-label="Hot Dog do Vagner">
+          <span class="brand-symbol" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img">
+              <path d="M10 38c3 9 15 15 29 13 12-2 20-9 18-17-2-9-15-14-29-12-12 2-21 8-18 16Z" fill="#f7b733" />
+              <path d="M15 37c6 4 27 6 37-2" fill="none" stroke="#23120b" stroke-width="5" stroke-linecap="round" />
+              <path d="M20 31c6 7 19 9 28 4" fill="none" stroke="#c81726" stroke-width="5" stroke-linecap="round" />
+              <path d="M22 27c4 3 15 5 23 2" fill="none" stroke="#f4f0e8" stroke-width="4" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span>
+            <strong data-business-name>Hot Dog do Vagner</strong>
+            <small>Prensado em Greve</small>
+          </span>
+        </a>
+
+        <nav class="main-nav" aria-label="Navegacao principal">
+          <button class="nav-button is-active" type="button" data-view="cardapio">
+            <i data-lucide="utensils"></i>
+            <span>Cardapio</span>
+          </button>
+          <button class="nav-button" type="button" data-view="pedidos">
+            <i data-lucide="clipboard-list"></i>
+            <span>Pedidos</span>
+          </button>
+          <button class="nav-button" type="button" data-view="financeiro">
+            <i data-lucide="chart-no-axes-column-increasing"></i>
+            <span>Financeiro</span>
+          </button>
+          <button class="nav-button" type="button" data-view="gestao">
+            <i data-lucide="settings"></i>
+            <span>Gestao</span>
+          </button>
+        </nav>
+
+        <div class="topbar-actions">
+          <span class="status-pill" data-store-status>Aberto</span>
+          <a class="icon-link" data-whatsapp-link href="#" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+            <i data-lucide="phone"></i>
+          </a>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="view is-active" id="view-cardapio" aria-labelledby="cardapio-title">
+          <div class="menu-layout">
+            <section class="catalog-panel">
+              <div class="catalog-toolbar">
+                <div>
+                  <p class="eyebrow">Atendimento</p>
+                  <h1 id="cardapio-title">Cardapio</h1>
+                </div>
+                <label class="search-field">
+                  <i data-lucide="search"></i>
+                  <input id="product-search" type="search" placeholder="Buscar item" autocomplete="off" />
+                </label>
+              </div>
+
+              <div class="spotlight">
+                <div class="spotlight-copy">
+                  <span class="tag">Hot dog prensado</span>
+                  <h2>Montagem rapida com adicionais e entrega</h2>
+                  <div class="spotlight-metrics">
+                    <span><strong data-delivery-fee>R$ 2,00</strong> entrega</span>
+                    <span><strong>R$ 2,00</strong> adicionais</span>
+                    <span><strong data-phone-display>(18) 99195-9898</strong></span>
+                  </div>
+                </div>
+                <div class="spotlight-art" aria-hidden="true" id="spotlight-art"></div>
+              </div>
+
+              <div class="category-strip" id="category-filters" aria-label="Categorias"></div>
+              <div class="product-grid" id="product-grid"></div>
+            </section>
+
+            <aside class="cart-panel" aria-labelledby="cart-title">
+              <div class="panel-title">
+                <div>
+                  <p class="eyebrow">Venda</p>
+                  <h2 id="cart-title">Pedido</h2>
+                </div>
+                <button class="icon-button" type="button" id="clear-cart" aria-label="Limpar carrinho" title="Limpar">
+                  <i data-lucide="trash-2"></i>
+                </button>
+              </div>
+
+              <div class="cart-items" id="cart-items"></div>
+
+              <form class="order-form" id="order-form">
+                <div class="form-grid two">
+                  <label>
+                    Cliente
+                    <input id="customer-name" name="customerName" type="text" autocomplete="name" required />
+                  </label>
+                  <label>
+                    Telefone
+                    <input id="customer-phone" name="customerPhone" type="tel" autocomplete="tel" required />
+                  </label>
+                </div>
+
+                <fieldset class="segmented-field" id="delivery-mode">
+                  <legend>Modo</legend>
+                  <label>
+                    <input type="radio" name="deliveryMode" value="entrega" checked />
+                    <span>Entrega</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="deliveryMode" value="retirada" />
+                    <span>Retirada</span>
+                  </label>
+                </fieldset>
+
+                <label id="address-field">
+                  Endereco
+                  <input id="customer-address" name="customerAddress" type="text" autocomplete="street-address" />
+                </label>
+
+                <div class="form-grid two">
+                  <label>
+                    Pagamento
+                    <select id="payment-method" name="paymentMethod">
+                      <option value="Pix">Pix</option>
+                      <option value="Dinheiro">Dinheiro</option>
+                      <option value="Cartao">Cartao</option>
+                    </select>
+                  </label>
+                  <label>
+                    Troco
+                    <input id="change-for" name="changeFor" type="text" placeholder="Sem troco" />
+                  </label>
+                </div>
+
+                <label>
+                  Observacao
+                  <textarea id="order-notes" name="orderNotes" rows="3"></textarea>
+                </label>
+
+                <div class="totals" id="cart-totals"></div>
+
+                <button class="primary-action" type="submit" id="place-order">
+                  <i data-lucide="send"></i>
+                  <span>Finalizar pedido</span>
+                </button>
+              </form>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-pedidos" aria-labelledby="pedidos-title">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Producao</p>
+              <h1 id="pedidos-title">Pedidos</h1>
+            </div>
+            <div class="toolbar-group">
+              <label class="select-shell">
+                <span>Status</span>
+                <select id="order-status-filter">
+                  <option value="todos">Todos</option>
+                  <option value="novo">Novos</option>
+                  <option value="preparo">Preparo</option>
+                  <option value="entrega">Entrega</option>
+                  <option value="concluido">Concluidos</option>
+                  <option value="cancelado">Cancelados</option>
+                </select>
+              </label>
+              <button class="secondary-action" type="button" id="print-orders">
+                <i data-lucide="printer"></i>
+                <span>Imprimir</span>
+              </button>
+            </div>
+          </div>
+          <div class="order-board" id="order-board"></div>
+        </section>
+
+        <section class="view" id="view-financeiro" aria-labelledby="financeiro-title">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Caixa</p>
+              <h1 id="financeiro-title">Financeiro</h1>
+            </div>
+            <div class="toolbar-group">
+              <button class="secondary-action" type="button" id="export-csv">
+                <i data-lucide="download"></i>
+                <span>CSV</span>
+              </button>
+              <button class="secondary-action" type="button" id="backup-json">
+                <i data-lucide="database-backup"></i>
+                <span>Backup</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="finance-metrics"></div>
+
+          <div class="finance-layout">
+            <section class="finance-panel">
+              <div class="panel-title">
+                <div>
+                  <p class="eyebrow">Hoje</p>
+                  <h2>Vendas por categoria</h2>
+                </div>
+              </div>
+              <div class="bar-list" id="category-bars"></div>
+            </section>
+
+            <section class="finance-panel">
+              <div class="panel-title">
+                <div>
+                  <p class="eyebrow">Saidas</p>
+                  <h2>Despesas</h2>
+                </div>
+              </div>
+              <form class="expense-form" id="expense-form">
+                <div class="form-grid three">
+                  <label>
+                    Data
+                    <input id="expense-date" type="date" required />
+                  </label>
+                  <label>
+                    Categoria
+                    <select id="expense-category">
+                      <option>Ingredientes</option>
+                      <option>Embalagens</option>
+                      <option>Entrega</option>
+                      <option>Taxas</option>
+                      <option>Outros</option>
+                    </select>
+                  </label>
+                  <label>
+                    Valor
+                    <input id="expense-amount" type="number" min="0" step="0.01" required />
+                  </label>
+                </div>
+                <label>
+                  Descricao
+                  <input id="expense-description" type="text" required />
+                </label>
+                <button class="secondary-action fill" type="submit">
+                  <i data-lucide="plus"></i>
+                  <span>Lancar despesa</span>
+                </button>
+              </form>
+            </section>
+          </div>
+
+          <section class="finance-panel">
+            <div class="panel-title">
+              <div>
+                <p class="eyebrow">Movimento</p>
+                <h2>Fluxo de caixa</h2>
+              </div>
+            </div>
+            <div class="cashflow-table" id="cashflow-table"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-gestao" aria-labelledby="gestao-title">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Administracao</p>
+              <h1 id="gestao-title">Gestao</h1>
+            </div>
+            <div class="toolbar-group">
+              <label class="file-action">
+                <i data-lucide="upload"></i>
+                <span>Restaurar</span>
+                <input id="restore-json" type="file" accept="application/json" />
+              </label>
+              <button class="danger-action" type="button" id="reset-data">
+                <i data-lucide="rotate-ccw"></i>
+                <span>Exemplo</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-layout">
+            <section class="admin-panel">
+              <div class="panel-title">
+                <div>
+                  <p class="eyebrow">Cardapio</p>
+                  <h2>Produtos</h2>
+                </div>
+                <button class="icon-button" type="button" id="new-product" aria-label="Novo produto" title="Novo">
+                  <i data-lucide="plus"></i>
+                </button>
+              </div>
+
+              <form class="product-form" id="product-form">
+                <input type="hidden" id="product-id" />
+                <div class="form-grid two">
+                  <label>
+                    Nome
+                    <input id="product-name" type="text" required />
+                  </label>
+                  <label>
+                    Categoria
+                    <select id="product-category">
+                      <option>Prensados</option>
+                      <option>Especiais</option>
+                      <option>Sucos</option>
+                      <option>Bebidas</option>
+                      <option>Adicionais</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="form-grid three">
+                  <label>
+                    Preco
+                    <input id="product-price" type="number" min="0" step="0.01" required />
+                  </label>
+                  <label>
+                    Custo
+                    <input id="product-cost" type="number" min="0" step="0.01" required />
+                  </label>
+                  <label>
+                    Visual
+                    <select id="product-art">
+                      <option value="hotdog">Hot dog</option>
+                      <option value="juice">Suco</option>
+                      <option value="drink">Bebida</option>
+                      <option value="side">Adicional</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  Ingredientes
+                  <textarea id="product-description" rows="3" required></textarea>
+                </label>
+                <label class="check-line">
+                  <input id="product-active" type="checkbox" checked />
+                  <span>Ativo no cardapio</span>
+                </label>
+                <button class="primary-action" type="submit">
+                  <i data-lucide="save"></i>
+                  <span>Salvar produto</span>
+                </button>
+              </form>
+
+              <div class="product-table" id="product-table"></div>
+            </section>
+
+            <section class="admin-panel">
+              <div class="panel-title">
+                <div>
+                  <p class="eyebrow">Loja</p>
+                  <h2>Configuracoes</h2>
+                </div>
+              </div>
+
+              <form class="settings-form" id="settings-form">
+                <label>
+                  Nome comercial
+                  <input id="setting-business" type="text" required />
+                </label>
+                <label>
+                  WhatsApp
+                  <input id="setting-phone" type="tel" required />
+                </label>
+                <div class="form-grid two">
+                  <label>
+                    Taxa de entrega
+                    <input id="setting-delivery" type="number" min="0" step="0.01" required />
+                  </label>
+                  <label>
+                    Meta diaria
+                    <input id="setting-target" type="number" min="0" step="0.01" required />
+                  </label>
+                </div>
+                <label>
+                  PIN administrativo
+                  <input id="setting-pin" type="password" inputmode="numeric" autocomplete="new-password" required />
+                </label>
+                <label>
+                  Chave Pix
+                  <input id="setting-pix" type="text" />
+                </label>
+                <label>
+                  Endereco base
+                  <input id="setting-address" type="text" />
+                </label>
+                <label class="check-line">
+                  <input id="setting-open" type="checkbox" checked />
+                  <span>Loja aberta</span>
+                </label>
+                <button class="primary-action" type="submit">
+                  <i data-lucide="save"></i>
+                  <span>Salvar configuracoes</span>
+                </button>
+              </form>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
