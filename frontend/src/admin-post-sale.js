@@ -238,3 +238,8 @@ function bootPostSale() {
 }
 
 bootPostSale();
+
+if (window.location.pathname.includes('admin')) {
+  import('./admin-menu-ranking.css');
+  import('./admin-menu-ranking.js');
+}
