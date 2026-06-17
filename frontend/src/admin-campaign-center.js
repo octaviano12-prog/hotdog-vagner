@@ -262,3 +262,8 @@ function bootCampaignCenter() {
 }
 
 bootCampaignCenter();
+
+if (window.location.pathname.includes('admin')) {
+  import('./admin-post-sale.css');
+  import('./admin-post-sale.js');
+}
