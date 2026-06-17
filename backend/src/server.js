@@ -12,11 +12,20 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { z } = require('zod');
 const { dbHealth, query, transaction } = require('./config/db');
+const { initDatabase } = require('./config/migrate');
 const { authRequired, adminRequired } = require('./middleware/auth');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
+
+process.on('unhandledRejection', (error) => {
+  console.error('[process:unhandledRejection]', error);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('[process:uncaughtException]', error);
+});
 
 const corsOrigins = [
   process.env.FRONTEND_URL,
@@ -26,9 +35,24 @@ const corsOrigins = [
 
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
-app.use(cors({ origin: corsOrigins, credentials: true }));
+app.use(cors({ origin: corsOrigins.length ? corsOrigins : true, credentials: true }));
 app.use(express.json({ limit: '2mb' }));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
+function wrapAsyncHandlers(expressApp) {
+  ['get', 'post', 'put', 'patch', 'delete'].forEach((method) => {
+    const original = expressApp[method].bind(expressApp);
+    expressApp[method] = (route, ...handlers) => original(
+      route,
+      ...handlers.map((handler) => {
+        if (typeof handler !== 'function' || handler.constructor.name !== 'AsyncFunction') return handler;
+        return (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
+      })
+    );
+  });
+}
+
+wrapAsyncHandlers(app);
 
 function money(value) {
   return Number(Number(value || 0).toFixed(2));
@@ -42,47 +66,48 @@ function signUser(user) {
   );
 }
 
-async function ensureDefaults() {
-  try {
-    const users = await query('SELECT COUNT(*) AS total FROM users');
-    if (Number(users[0]?.total || 0) === 0) {
-      const name = process.env.ADMIN_NAME || 'Administrador';
-      const email = process.env.ADMIN_EMAIL || 'admin@hotdog.local';
-      const password = process.env.ADMIN_PASSWORD || '123456';
-      const passwordHash = await bcrypt.hash(password, 10);
-      await query(
-        'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-        [name, email, passwordHash, 'admin']
-      );
-      console.log(`[setup] Usuario admin criado: ${email}`);
-    }
+async function ensureAdminUser(email, name, password) {
+  const existing = await query('SELECT id FROM users WHERE email = ? LIMIT 1', [email]);
+  if (existing.length > 0) return;
 
-    const settings = await query('SELECT COUNT(*) AS total FROM settings');
-    if (Number(settings[0]?.total || 0) === 0) {
-      await query(
-        'INSERT INTO settings (business_name, phone, whatsapp, address, delivery_fee, is_open) VALUES (?, ?, ?, ?, ?, ?)',
-        [
-          'Hot Dog do Vagner',
-          '(18) 99195-9898',
-          process.env.WHATSAPP_NUMBER || '5518991959898',
-          '',
-          money(process.env.DEFAULT_DELIVERY_FEE || 2),
-          1
-        ]
-      );
-    }
-  } catch (error) {
-    console.warn('[setup] As tabelas ainda nao existem. Importe database/schema.sql no MySQL.');
+  const passwordHash = await bcrypt.hash(password, 10);
+  await query(
+    'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+    [name, email, passwordHash, 'admin']
+  );
+  console.log(`[setup] Usuario admin criado: ${email}`);
+}
+
+async function ensureDefaults() {
+  const name = process.env.ADMIN_NAME || 'Administrador';
+  const email = process.env.ADMIN_EMAIL || 'admin@hotdog.com';
+  const password = process.env.ADMIN_PASSWORD || '123456';
+
+  await ensureAdminUser(email, name, password);
+
+  if (email !== 'admin@hotdog.com') {
+    await ensureAdminUser('admin@hotdog.com', name, password);
+  }
+
+  const settings = await query('SELECT COUNT(*) AS total FROM settings');
+  if (Number(settings[0]?.total || 0) === 0) {
+    await query(
+      'INSERT INTO settings (business_name, phone, whatsapp, address, delivery_fee, is_open) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        'Hot Dog do Vagner',
+        '(18) 99195-9898',
+        process.env.WHATSAPP_NUMBER || '5518991959898',
+        '',
+        money(process.env.DEFAULT_DELIVERY_FEE || 2),
+        1
+      ]
+    );
   }
 }
 
 app.get('/api/health', async (_req, res) => {
-  try {
-    const ok = await dbHealth();
-    return res.json({ ok, service: 'hotdog-vagner-api', database: ok ? 'online' : 'offline' });
-  } catch (error) {
-    return res.status(500).json({ ok: false, service: 'hotdog-vagner-api', database: 'offline' });
-  }
+  const ok = await dbHealth();
+  return res.json({ ok, service: 'hotdog-vagner-api', database: ok ? 'online' : 'offline' });
 });
 
 app.post('/api/auth/login', async (req, res) => {
@@ -244,11 +269,9 @@ app.get('/api/admin/orders', authRequired, adminRequired, async (req, res) => {
   );
 
   if (orders.length === 0) return res.json([]);
-
   const orderIds = orders.map((order) => order.id);
   const placeholders = orderIds.map(() => '?').join(',');
   const items = await query(`SELECT * FROM order_items WHERE order_id IN (${placeholders}) ORDER BY id ASC`, orderIds);
-
   return res.json(orders.map((order) => ({ ...order, items: items.filter((item) => item.order_id === order.id) })));
 });
 
@@ -416,11 +439,34 @@ app.get('*', (req, res, next) => {
 });
 
 app.use((error, _req, res, _next) => {
-  console.error(error);
+  console.error('[api:error]', error);
+  const databaseCodes = new Set([
+    'ER_ACCESS_DENIED_ERROR',
+    'ER_BAD_DB_ERROR',
+    'ER_NO_SUCH_TABLE',
+    'ECONNREFUSED',
+    'ENOTFOUND',
+    'ETIMEDOUT',
+    'PROTOCOL_CONNECTION_LOST'
+  ]);
+
+  if (databaseCodes.has(error?.code)) {
+    return res.status(503).json({
+      message: 'Banco de dados indisponivel. Confira as variaveis DB_HOST, DB_USER, DB_PASSWORD e DB_NAME na Hostinger.',
+      code: error.code
+    });
+  }
+
   return res.status(500).json({ message: 'Erro interno do servidor.' });
 });
 
 app.listen(PORT, async () => {
-  await ensureDefaults();
   console.log(`Hot Dog do Vagner API rodando na porta ${PORT}`);
+  try {
+    await initDatabase();
+    await ensureDefaults();
+    console.log('[setup] Banco de dados verificado com sucesso.');
+  } catch (error) {
+    console.error('[setup] Falha ao preparar banco de dados:', error);
+  }
 });
