@@ -7,7 +7,9 @@ import './landing-ultra.css';
 import './landing-polish.css';
 import './admin-operations.css';
 import './admin-flow.css';
+import './admin-report-tools.css';
 import './admin-flow.js';
+import './admin-report-tools.js';
 
 registerPwa();
 
