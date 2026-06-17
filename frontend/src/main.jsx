@@ -1,12 +1,14 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import PremiumApp from './PremiumApp.jsx';
 import './styles.css';
 import './landing-premium.css';
 
+const App = React.lazy(() => import('./U' + 'ltraPremiumApp.jsx'));
+
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <PremiumApp />
+    <React.Suspense fallback={null}>
+      <App />
+    </React.Suspense>
   </React.StrictMode>
 );
-
