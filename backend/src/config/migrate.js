@@ -4,6 +4,21 @@ async function run(sql, params = []) {
   await pool.query(sql, params);
 }
 
+async function columnExists(tableName, columnName) {
+  const [rows] = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+    [tableName, columnName]
+  );
+  return Number(rows[0]?.total || 0) > 0;
+}
+
+async function ensureColumn(tableName, columnName, definition) {
+  if (await columnExists(tableName, columnName)) return;
+  await run(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+}
+
 async function initDatabase() {
   await run(`CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -26,6 +41,12 @@ async function initDatabase() {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+
+  await ensureColumn('settings', 'pix_key', "VARCHAR(160) DEFAULT ''");
+  await ensureColumn('settings', 'minimum_order', 'DECIMAL(10,2) NOT NULL DEFAULT 0.00');
+  await ensureColumn('settings', 'estimated_delivery_minutes', 'INT NOT NULL DEFAULT 35');
+  await ensureColumn('settings', 'delivery_area_text', 'TEXT NULL');
+  await ensureColumn('settings', 'allow_whatsapp_redirect', 'TINYINT(1) NOT NULL DEFAULT 1');
 
   await run(`CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -81,6 +102,19 @@ async function initDatabase() {
     CONSTRAINT fk_orders_customer FOREIGN KEY (customer_id) REFERENCES customers(id)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
 
+  await ensureColumn('orders', 'order_source', "ENUM('site', 'admin', 'whatsapp', 'balcao') NOT NULL DEFAULT 'site'");
+  await ensureColumn('orders', 'public_code', 'VARCHAR(32) NULL');
+  await ensureColumn('orders', 'delivery_neighborhood', "VARCHAR(120) DEFAULT ''");
+  await ensureColumn('orders', 'estimated_minutes', 'INT NOT NULL DEFAULT 35');
+  await ensureColumn('orders', 'accepted_at', 'TIMESTAMP NULL');
+  await ensureColumn('orders', 'prepared_at', 'TIMESTAMP NULL');
+  await ensureColumn('orders', 'dispatched_at', 'TIMESTAMP NULL');
+  await ensureColumn('orders', 'completed_at', 'TIMESTAMP NULL');
+  await ensureColumn('orders', 'canceled_at', 'TIMESTAMP NULL');
+  await ensureColumn('orders', 'paid_at', 'TIMESTAMP NULL');
+  await ensureColumn('orders', 'cancellation_reason', "VARCHAR(255) DEFAULT ''");
+  await run("UPDATE orders SET public_code = CONCAT('HD', id) WHERE public_code IS NULL OR public_code = ''");
+
   await run(`CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -106,6 +140,7 @@ async function initDatabase() {
     expense_date DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+  await ensureColumn('expenses', 'payment_method', "ENUM('dinheiro', 'pix', 'cartao', 'fiado') NULL DEFAULT 'dinheiro'");
 
   await run(`CREATE TABLE IF NOT EXISTS cash_registers (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -130,10 +165,12 @@ async function initDatabase() {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_cash_movements_register FOREIGN KEY (cash_register_id) REFERENCES cash_registers(id) ON DELETE SET NULL
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+  await ensureColumn('cash_movements', 'order_id', 'INT NULL');
+  await ensureColumn('cash_movements', 'notes', 'TEXT NULL');
 
   await run(
-    `INSERT IGNORE INTO settings (id, business_name, phone, whatsapp, delivery_fee, is_open)
-     VALUES (1, 'Hot Dog do Vagner', '(18) 99195-9898', '5518991959898', 2.00, 1)`
+    `INSERT IGNORE INTO settings (id, business_name, phone, whatsapp, delivery_fee, is_open, estimated_delivery_minutes, allow_whatsapp_redirect)
+     VALUES (1, 'Hot Dog do Vagner', '(18) 99195-9898', '5518991959898', 2.00, 1, 35, 1)`
   );
 
   await run(
