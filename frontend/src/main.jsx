@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerPwa } from './pwa-register.js';
+import { installAdminApiFallback } from './admin-api-fallback.js';
 import './styles.css';
 import './landing-premium.css';
 import './landing-ultra.css';
@@ -12,6 +13,7 @@ import './admin-flow.js';
 import './admin-report-tools.js';
 
 registerPwa();
+installAdminApiFallback();
 
 const App = React.lazy(() => import('./U' + 'ltraPremiumApp.jsx'));
 
