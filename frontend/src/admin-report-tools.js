@@ -197,3 +197,8 @@ function bootReports() {
 }
 
 bootReports();
+
+if (window.location.pathname.includes('admin') || window.location.pathname.includes('entregas')) {
+  import('./admin-delivery-dispatch.css');
+  import('./admin-delivery-dispatch.js');
+}
