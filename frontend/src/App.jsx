@@ -260,7 +260,7 @@ function MenuPage({ settings }) {
 }
 
 function Login({ onLogin }) {
-  const [email, setEmail] = useState('admin@hotdog.local');
+  const [email, setEmail] = useState('admin@hotdog.com');
   const [password, setPassword] = useState('123456');
   const [message, setMessage] = useState('');
 
@@ -419,30 +419,17 @@ function AdminPage() {
               <option value="">Categoria</option>
               {categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}
             </select>
-            <input placeholder="Nome" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required />
+            <input placeholder="Nome do produto" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required />
             <textarea placeholder="Descricao" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} />
             <input placeholder="Preco" type="number" step="0.01" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} required />
             <select value={productForm.product_type} onChange={(e) => setProductForm({ ...productForm, product_type: e.target.value })}>
               <option value="hotdog">Hot dog</option>
-              <option value="bebida">Bebida</option>
               <option value="suco">Suco</option>
+              <option value="bebida">Bebida</option>
               <option value="adicional">Adicional</option>
             </select>
-            <button className="btn-primary">Adicionar produto</button>
+            <button className="btn-primary">Salvar produto</button>
           </form>
-        </div>
-
-        <div className="panel wide">
-          <div className="panel-title"><h3>Produtos cadastrados</h3></div>
-          <div className="product-table">
-            {products.map((product) => (
-              <div key={product.id} className="product-row">
-                <span>{product.name}</span>
-                <small>{product.category_name}</small>
-                <strong>{formatMoney(product.price)}</strong>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
     </main>
@@ -450,7 +437,7 @@ function AdminPage() {
 }
 
 export default function App() {
-  const [view, setView] = useState('menu');
+  const [view, setView] = useState(window.location.pathname.includes('admin') ? 'admin' : 'menu');
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
@@ -458,9 +445,9 @@ export default function App() {
   }, []);
 
   return (
-    <div className="app-shell">
+    <div>
       <Header view={view} setView={setView} settings={settings} />
-      {view === 'menu' ? <MenuPage settings={settings} /> : <AdminPage />}
+      {view === 'admin' ? <AdminPage /> : <MenuPage settings={settings} />}
     </div>
   );
 }
