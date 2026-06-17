@@ -21,10 +21,12 @@ import './admin-customer-crm.css';
 import './admin-clientes-vip.css';
 import './public-checkout-upgrade.css';
 import './public-order-rules.css';
+import './public-require-login.css';
 import './admin-customer-crm.js';
 import './admin-clientes-vip.js';
 import './public-checkout-upgrade.js';
 import './public-order-rules.js';
+import './public-require-login.js';
 import './admin-flow.js';
 import './admin-report-tools.js';
 
