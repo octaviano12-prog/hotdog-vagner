@@ -1,20 +1,27 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Bike,
+  CheckCircle2,
   ChevronRight,
   Clock,
   CreditCard,
   Flame,
+  Gift,
   Heart,
   Lock,
   MapPin,
   MessageCircle,
+  Minus,
+  Plus,
+  Search,
   ShieldCheck,
   ShoppingCart,
   Sparkles,
   Star,
   Truck,
+  Utensils,
   WalletCards,
+  X,
   Zap
 } from 'lucide-react';
 import PremiumApp from './PremiumApp.jsx';
@@ -163,7 +170,7 @@ function ProductCard({ product, extras, onAdd, featured = false }) {
 
         {allowedExtras.length > 0 && (
           <div className="ultra-extras">
-            <span>Adicionais inclusos na escolha</span>
+            <span>Adicionais para turbinar</span>
             <div>
               {allowedExtras.slice(0, 5).map((extra) => (
                 <label key={extra.id} className={selectedExtras.includes(extra.id) ? 'checked' : ''}>
@@ -176,6 +183,10 @@ function ProductCard({ product, extras, onAdd, featured = false }) {
           </div>
         )}
 
+        <div className="product-bottom-row">
+          <span>{allowedExtras.length ? `Escolha ate ${Math.min(allowedExtras.length, 5)} adicionais` : 'Pronto para adicionar'}</span>
+          <b>{formatMoney(product.price)}</b>
+        </div>
         <button className="ultra-add" onClick={submitAdd}>Adicionar ao pedido <span>+</span></button>
       </div>
     </article>
@@ -189,11 +200,14 @@ function CartPanel({ cart, setCart, settings, pulse }) {
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [lastWhatsappUrl, setLastWhatsappUrl] = useState('');
 
   const subtotal = cart.reduce((sum, item) => sum + item.quantity * (Number(item.price) + item.extras.reduce((extraSum, extra) => extraSum + Number(extra.price), 0)), 0);
   const deliveryFee = deliveryType === 'entrega' ? Number(settings?.delivery_fee || 0) : 0;
   const total = subtotal + deliveryFee;
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const minimumOrder = Number(settings?.minimum_order_amount || 0);
+  const needsMinimum = minimumOrder > 0 && subtotal > 0 && subtotal < minimumOrder;
 
   function removeItem(key) {
     setCart((current) => current.filter((item) => item.key !== key));
@@ -206,6 +220,7 @@ function CartPanel({ cart, setCart, settings, pulse }) {
   async function sendOrder(event) {
     event.preventDefault();
     if (cart.length === 0) return setMessage('Adicione pelo menos um item ao pedido.');
+    if (needsMinimum) return setMessage(`Pedido minimo para entrega: ${formatMoney(minimumOrder)}.`);
 
     const payload = {
       customer,
@@ -217,6 +232,7 @@ function CartPanel({ cart, setCart, settings, pulse }) {
 
     setLoading(true);
     setMessage('');
+    setLastWhatsappUrl('');
     try {
       const response = await api.post('/api/orders', payload);
       const whatsappPayload = { ...payload, items: cart.map((item) => ({ ...item, extraNames: item.extras.map((extra) => extra.name) })) };
@@ -229,6 +245,7 @@ function CartPanel({ cart, setCart, settings, pulse }) {
       if (canOpenWhatsApp) {
         const whatsapp = settings?.whatsapp || '5518991959898';
         const url = `https://wa.me/${whatsapp}?text=${makeWhatsAppMessage(settings, whatsappPayload, response.order.total, response.order)}`;
+        setLastWhatsappUrl(url);
         window.open(url, '_blank', 'noopener,noreferrer');
       }
     } catch (error) {
@@ -248,11 +265,24 @@ function CartPanel({ cart, setCart, settings, pulse }) {
         <b>{totalItems} {totalItems === 1 ? 'item' : 'itens'}</b>
       </div>
 
+      {message && message.includes('enviado') && (
+        <div className="cart-success-card">
+          <CheckCircle2 size={28} />
+          <div>
+            <strong>Pedido recebido!</strong>
+            <p>{message} A cozinha ja consegue acompanhar no painel administrativo.</p>
+            {lastWhatsappUrl && <a href={lastWhatsappUrl} target="_blank" rel="noreferrer"><MessageCircle size={15} /> Abrir WhatsApp</a>}
+          </div>
+          <button type="button" onClick={() => setMessage('')}><X size={18} /></button>
+        </div>
+      )}
+
       {cart.length === 0 ? (
         <div className="empty-cart">
           <ShoppingCart size={54} />
           <strong>Monte seu pedido</strong>
           <p>Adicione lanches, bebidas, sucos e adicionais para ver o resumo aqui.</p>
+          <button type="button" onClick={() => document.getElementById('cardapio')?.scrollIntoView({ behavior: 'smooth' })}>Ver cardapio</button>
         </div>
       ) : (
         <div className="cart-list">
@@ -264,30 +294,32 @@ function CartPanel({ cart, setCart, settings, pulse }) {
                 <em>{formatMoney(Number(item.price) + item.extras.reduce((sum, extra) => sum + Number(extra.price), 0))}</em>
               </div>
               <div className="cart-controls">
-                <button type="button" onClick={() => updateQty(item.key, item.quantity - 1)}>-</button>
+                <button type="button" onClick={() => updateQty(item.key, item.quantity - 1)}><Minus size={13} /></button>
                 <span>{item.quantity}</span>
-                <button type="button" onClick={() => updateQty(item.key, item.quantity + 1)}>+</button>
-                <button type="button" className="remove" onClick={() => removeItem(item.key)}>×</button>
+                <button type="button" onClick={() => updateQty(item.key, item.quantity + 1)}><Plus size={13} /></button>
+                <button type="button" className="remove" onClick={() => removeItem(item.key)}><X size={13} /></button>
               </div>
             </div>
           ))}
+          <button type="button" className="clear-cart" onClick={() => setCart([])}>Limpar pedido</button>
         </div>
       )}
 
       <div className="cart-total-box">
         <span>Subtotal <b>{formatMoney(subtotal)}</b></span>
         <span>Entrega <b>{formatMoney(deliveryFee)}</b></span>
+        {needsMinimum && <span className="minimum-alert">Faltam <b>{formatMoney(minimumOrder - subtotal)}</b> para o pedido minimo</span>}
         <strong>Total <b>{formatMoney(total)}</b></strong>
       </div>
 
       <form className="checkout-form" onSubmit={sendOrder}>
         <h3>Dados para entrega</h3>
+        <div className="choice-row">
+          <button type="button" className={deliveryType === 'entrega' ? 'active' : ''} onClick={() => setDeliveryType('entrega')}><Truck size={15} /> Entrega</button>
+          <button type="button" className={deliveryType === 'retirada' ? 'active' : ''} onClick={() => setDeliveryType('retirada')}><Utensils size={15} /> Retirada</button>
+        </div>
         <input placeholder="Nome do cliente" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} required />
         <input placeholder="WhatsApp" value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value })} required />
-        <select value={deliveryType} onChange={(e) => setDeliveryType(e.target.value)}>
-          <option value="entrega">Entrega</option>
-          <option value="retirada">Retirada no balcao</option>
-        </select>
         {deliveryType === 'entrega' && (
           <>
             <input placeholder="Endereco de entrega" value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} required />
@@ -301,9 +333,10 @@ function CartPanel({ cart, setCart, settings, pulse }) {
           <option value="cartao">Cartao</option>
           <option value="fiado">Fiado</option>
         </select>
+        {paymentMethod === 'pix' && <p className="payment-tip">O pedido entra no painel e o pagamento PIX pode ser confirmado no caixa.</p>}
         <textarea placeholder="Observacoes do pedido" value={notes} onChange={(e) => setNotes(e.target.value)} />
         <button className="send-order" disabled={loading}>{loading ? 'Enviando...' : 'Enviar pedido'}</button>
-        {message && <p className={`cart-message ${message.includes('enviado') ? 'success' : ''}`}>{message}</p>}
+        {message && !message.includes('enviado') && <p className="cart-message">{message}</p>}
       </form>
 
       <div className="secure-note"><Lock size={16} /> Pedido salvo automaticamente no painel administrativo.</div>
@@ -325,11 +358,55 @@ function MobileCartBar({ cart, settings }) {
   );
 }
 
+function WorkflowSection() {
+  const steps = [
+    { icon: <ShoppingCart size={22} />, title: 'Cliente monta o pedido', text: 'Escolhe hot dog, bebidas, sucos e adicionais direto na pagina.' },
+    { icon: <Zap size={22} />, title: 'Pedido cai no painel', text: 'O admin recebe tudo organizado: cliente, endereco, itens e pagamento.' },
+    { icon: <Bike size={22} />, title: 'Preparo e entrega', text: 'O pedido passa por novo, preparo, saiu para entrega e concluido.' },
+    { icon: <WalletCards size={22} />, title: 'Financeiro atualizado', text: 'Pedidos pagos alimentam o caixa e os relatorios do dia.' }
+  ];
+
+  return (
+    <section className="workflow-section">
+      <div className="section-heading"><span>Como funciona</span><h2>Pedido online com gestao de verdade</h2></div>
+      <div className="workflow-grid">
+        {steps.map((step, index) => (
+          <article key={step.title}>
+            <b>0{index + 1}</b>
+            <span>{step.icon}</span>
+            <strong>{step.title}</strong>
+            <p>{step.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ComboShowcase({ products, onAddCombo }) {
+  if (products.length < 2) return null;
+  const comboTotal = products.reduce((sum, product) => sum + Number(product.price), 0);
+  return (
+    <section className="combo-showcase">
+      <div>
+        <span><Gift size={16} /> Sugestao da noite</span>
+        <h2>Combo rapido para matar a fome</h2>
+        <p>{products.map((product) => product.name).join(' + ')} por {formatMoney(comboTotal)}.</p>
+      </div>
+      <div className="combo-products">
+        {products.map((product) => <FoodVisual key={product.id} product={product} />)}
+      </div>
+      <button type="button" onClick={onAddCombo}>Adicionar combo <ChevronRight size={18} /></button>
+    </section>
+  );
+}
+
 function PremiumLanding({ settings }) {
   const [menu, setMenu] = useState({ categories: [], products: [] });
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cartPulse, setCartPulse] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     api.get('/api/public/menu')
@@ -340,6 +417,22 @@ function PremiumLanding({ settings }) {
 
   const extras = useMemo(() => menu.products.filter((product) => product.product_type === 'adicional'), [menu.products]);
   const featuredProducts = useMemo(() => menu.products.filter((product) => product.product_type !== 'adicional').slice(0, 3), [menu.products]);
+  const comboProducts = useMemo(() => {
+    const hotdog = menu.products.find((product) => product.product_type === 'hotdog');
+    const drink = menu.products.find((product) => product.product_type === 'bebida');
+    const juice = menu.products.find((product) => product.product_type === 'suco');
+    return [hotdog, drink || juice].filter(Boolean);
+  }, [menu.products]);
+  const filteredCategories = useMemo(() => {
+    const query = normalizeText(searchTerm.trim());
+    if (!query) return menu.categories;
+    return menu.categories
+      .map((category) => ({
+        ...category,
+        products: category.products.filter((product) => normalizeText(`${product.name} ${product.description || ''} ${category.name}`).includes(query))
+      }))
+      .filter((category) => category.products.length > 0);
+  }, [menu.categories, searchTerm]);
 
   function addToCart(product, extraIds = []) {
     const selectedExtras = extras.filter((extra) => extraIds.includes(extra.id));
@@ -353,6 +446,11 @@ function PremiumLanding({ settings }) {
     setTimeout(() => setCartPulse(false), 700);
   }
 
+  function addComboToCart() {
+    comboProducts.forEach((product) => addToCart(product, []));
+    document.getElementById('pedido')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   return (
     <div className="ultra-page">
       <Header settings={settings} />
@@ -360,7 +458,10 @@ function PremiumLanding({ settings }) {
       <main>
         <section className="ultra-hero">
           <div className="hero-copy">
-            <span className="hero-pill"><Sparkles size={15} /> Hot dog prensado premium</span>
+            <div className="hero-badge-row">
+              <span className="hero-pill"><Sparkles size={15} /> Hot dog prensado premium</span>
+              <span className="mini-rating"><Star size={15} fill="currentColor" /> Feito na hora</span>
+            </div>
             <h1>Seu hot dog prensado favorito, pedido em poucos cliques.</h1>
             <p>Monte o lanche, escolha adicionais, envie o pedido e acompanhe pelo WhatsApp. Tudo cai automaticamente no painel do negocio.</p>
             <div className="hero-actions">
@@ -389,6 +490,8 @@ function PremiumLanding({ settings }) {
           <article><WalletCards size={25} /><div><strong>Gestao financeira</strong><span>Caixa, despesas, vendas e relatorios.</span></div><ChevronRight size={18} /></article>
         </section>
 
+        <WorkflowSection />
+
         {featuredProducts.length > 0 && (
           <section className="ultra-section">
             <div className="section-heading"><span>Mais pedidos</span><h2>Destaques da casa</h2></div>
@@ -407,17 +510,27 @@ function PremiumLanding({ settings }) {
           </section>
         )}
 
+        <ComboShowcase products={comboProducts} onAddCombo={addComboToCart} />
+
         <section id="cardapio" className="menu-zone">
           <div className="menu-main">
             <div className="section-heading big"><span>Monte seu pedido</span><h2>Cardapio completo</h2><p>Escolha os itens, adicione extras e finalize sem perder nenhuma informacao do cliente.</p></div>
-            <div className="category-tabs">
-              {menu.categories.map((category) => (
-                <button key={category.id} onClick={() => document.getElementById(`categoria-${category.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>{category.name}</button>
-              ))}
+            <div className="menu-toolbar">
+              <label className="menu-search">
+                <Search size={18} />
+                <input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Buscar hot dog, suco, bebida ou adicional" />
+                {searchTerm && <button type="button" onClick={() => setSearchTerm('')}><X size={16} /></button>}
+              </label>
+              <div className="category-tabs">
+                {menu.categories.map((category) => (
+                  <button key={category.id} onClick={() => document.getElementById(`categoria-${category.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>{category.name}</button>
+                ))}
+              </div>
             </div>
             {loading && <p className="menu-message">Carregando cardapio...</p>}
             {!loading && menu.categories.length === 0 && <p className="menu-message">Nenhum produto ativo encontrado no cardapio.</p>}
-            {menu.categories.map((category) => (
+            {!loading && menu.categories.length > 0 && filteredCategories.length === 0 && <p className="menu-message">Nenhum item encontrado para sua busca.</p>}
+            {filteredCategories.map((category) => (
               <section id={`categoria-${category.id}`} className="menu-category" key={category.id}>
                 <div className="category-title"><h3>{category.name}</h3><span>{category.description}</span></div>
                 <div className="ultra-product-grid">
@@ -441,6 +554,7 @@ function PremiumLanding({ settings }) {
         </section>
       </main>
 
+      <a className="float-contact" href={`https://wa.me/${settings?.whatsapp || '5518991959898'}`} target="_blank" rel="noreferrer" aria-label="Chamar no WhatsApp"><MessageCircle size={25} /></a>
       <MobileCartBar cart={cart} settings={settings} />
     </div>
   );
