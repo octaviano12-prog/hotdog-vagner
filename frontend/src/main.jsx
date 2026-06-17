@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import './landing-premium.css';
+import './landing-ultra.css';
 
 const App = React.lazy(() => import('./U' + 'ltraPremiumApp.jsx'));
 
