@@ -1,3 +1,4 @@
+.admin-desktop-shell,
 .ops-shell {
   background:
     radial-gradient(circle at 78% 12%, rgba(255, 122, 0, 0.14), transparent 34%),
@@ -5,16 +6,19 @@
     #070604;
 }
 
+.admin-sidebar,
 .ops-sidebar {
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 22px 0 50px rgba(0, 0, 0, 0.28);
 }
 
+.alert-strip > div,
 .ops-alerts > div {
   position: relative;
   overflow: hidden;
 }
 
+.alert-strip > div::after,
 .ops-alerts > div::after {
   content: '';
   position: absolute;
@@ -55,11 +59,13 @@
   color: #fff;
 }
 
+.kanban-card,
 .order-pro-card {
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.3);
 }
 
+.kanban-actions,
 .order-card-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -67,6 +73,7 @@
   margin-top: 12px;
 }
 
+.kanban-actions button,
 .order-card-actions button,
 .icon-action {
   border: 1px solid rgba(255, 184, 0, 0.25);
@@ -83,6 +90,7 @@
   text-decoration: none;
 }
 
+.kanban-actions .danger-link,
 .order-card-actions .danger-link,
 .danger-link {
   border-color: rgba(255, 92, 92, 0.32) !important;
@@ -99,6 +107,7 @@
   gap: 12px;
 }
 
+.extra-grid,
 .manual-extras {
   padding: 10px;
   border-radius: 14px;
@@ -115,8 +124,10 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+.product-row,
 .ops-product-row {
-  grid-template-columns: 44px 1fr auto auto auto auto;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
 }
 
 .product-mini-emoji {
@@ -150,11 +161,35 @@
   gap: 12px;
 }
 
+.panel,
+.side-panel,
+.kanban-shell {
+  backdrop-filter: blur(18px);
+}
+
+.admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(7, 6, 4, 0.82);
+  backdrop-filter: blur(18px);
+}
+
+.admin-message {
+  animation: adminFade 0.4s ease;
+}
+
+@keyframes adminFade {
+  from { transform: translateY(-6px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 @media print {
   .admin-sidebar,
   .admin-topbar,
   .admin-footer,
   .order-card-actions,
+  .kanban-actions,
   .ops-filter-bar {
     display: none !important;
   }
@@ -165,11 +200,13 @@
     grid-template-columns: 1fr;
   }
 
+  .kanban-actions,
   .order-card-actions {
     grid-template-columns: 1fr;
   }
 
+  .product-row,
   .ops-product-row {
-    grid-template-columns: 42px 1fr;
+    grid-template-columns: 1fr;
   }
 }
