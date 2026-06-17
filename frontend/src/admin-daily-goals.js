@@ -98,3 +98,8 @@ function bootDailyGoals() {
 }
 
 bootDailyGoals();
+
+if (window.location.pathname.includes('admin')) {
+  import('./admin-command-center.css');
+  import('./admin-command-center.js');
+}
