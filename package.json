@@ -1,0 +1,23 @@
+{
+  "name": "hotdog-vagner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema de pedidos e gestao financeira para Hot Dog do Vagner com Node.js, React e MySQL.",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "node server.js"
+  },
+  "keywords": ["hotdog", "delivery", "nodejs", "react", "mysql"],
+  "author": "Octaviano Ribeiro",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
