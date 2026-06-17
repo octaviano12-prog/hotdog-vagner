@@ -114,10 +114,19 @@ function installFetchGuard() {
   window.fetch = async (input, init = {}) => {
     const url = typeof input === 'string' ? input : input?.url || '';
     const method = String(init?.method || 'GET').toUpperCase();
-    if (url.includes('/api/orders') && method === 'POST' && !isLogged()) {
-      showToast('Cadastro obrigatório para fazer pedido.');
-      showLoginPrompt();
-      return new Response(JSON.stringify({ message: 'Faça login ou cadastre-se para finalizar o pedido.' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    if (url.includes('/api/orders') && method === 'POST') {
+      if (!isLogged()) {
+        showToast('Cadastro obrigatório para fazer pedido.');
+        showLoginPrompt();
+        return new Response(JSON.stringify({ message: 'Faça login ou cadastre-se para finalizar o pedido.' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      }
+      init = {
+        ...init,
+        headers: {
+          ...(init.headers || {}),
+          Authorization: `Bearer ${customerToken()}`
+        }
+      };
     }
     return originalFetch(input, init);
   };
