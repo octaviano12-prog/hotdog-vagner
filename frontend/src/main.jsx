@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { registerPwa } from './pwa-register.js';
 import { installAdminApiFallback } from './admin-api-fallback.js';
 import { bootCustomerTracking } from './customer-tracking.js';
+import { bootCustomerAccount } from './customer-account.js';
 import './styles.css';
 import './landing-premium.css';
 import './landing-ultra.css';
@@ -11,12 +12,14 @@ import './admin-operations.css';
 import './admin-flow.css';
 import './admin-report-tools.css';
 import './customer-tracking.css';
+import './customer-account.css';
 import './admin-flow.js';
 import './admin-report-tools.js';
 
 registerPwa();
 installAdminApiFallback();
 bootCustomerTracking();
+bootCustomerAccount();
 
 const App = React.lazy(() => import('./U' + 'ltraPremiumApp.jsx'));
 
