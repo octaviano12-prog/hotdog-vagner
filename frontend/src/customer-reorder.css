@@ -1,0 +1,46 @@
+.reorder-button {
+  border: 1px solid rgba(255, 184, 0, 0.35);
+  border-radius: 999px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, rgba(255, 184, 0, 0.22), rgba(255, 107, 20, 0.22));
+  color: #ffd67a;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.reorder-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.reorder-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 180;
+  max-width: min(520px, calc(100vw - 28px));
+  padding: 13px 16px;
+  border-radius: 999px;
+  background: rgba(10, 8, 5, 0.94);
+  color: #fff;
+  border: 1px solid rgba(255, 184, 0, 0.32);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+  transform: translate(-50%, 18px);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s ease;
+  text-align: center;
+  font-weight: 850;
+}
+
+.reorder-toast.show {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  .reorder-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
