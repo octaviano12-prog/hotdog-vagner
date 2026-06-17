@@ -12,6 +12,16 @@ function extractErrorMessage(data, status) {
   return text || 'Erro na comunicacao com o servidor.';
 }
 
+function normalizeResponse(path, data) {
+  if (path === '/api/public/settings' && data && typeof data === 'object') {
+    return {
+      ...data,
+      minimum_order_amount: data.minimum_order_amount ?? data.minimum_order ?? 0
+    };
+  }
+  return data;
+}
+
 async function request(path, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
@@ -30,7 +40,7 @@ async function request(path, options = {}) {
     throw new Error(extractErrorMessage(data, response.status));
   }
 
-  return data;
+  return normalizeResponse(path, data);
 }
 
 export function getToken() {
