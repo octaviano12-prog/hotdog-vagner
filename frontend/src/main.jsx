@@ -6,6 +6,8 @@ import './landing-premium.css';
 import './landing-ultra.css';
 import './landing-polish.css';
 import './admin-operations.css';
+import './admin-flow.css';
+import './admin-flow.js';
 
 registerPwa();
 
