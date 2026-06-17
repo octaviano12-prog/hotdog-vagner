@@ -199,3 +199,8 @@ function bootClientesVip() {
 }
 
 bootClientesVip();
+
+if (window.location.pathname.includes('admin')) {
+  import('./admin-campaign-center.css');
+  import('./admin-campaign-center.js');
+}
