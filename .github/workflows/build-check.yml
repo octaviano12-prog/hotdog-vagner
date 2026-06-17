@@ -20,14 +20,8 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install root dependencies
+      - name: Install dependencies
         run: npm install
-
-      - name: Install backend dependencies
-        run: npm --prefix backend install
-
-      - name: Install frontend dependencies
-        run: npm --prefix frontend install
 
       - name: Build frontend
         run: npm --prefix frontend run build
@@ -35,6 +29,7 @@ jobs:
       - name: Check project files
         run: |
           test -f server.js
-          test -f backend/server.js
+          test -f backend/src/server.js
+          test -f backend/src/config/db.js
           test -d frontend/dist
-          echo "Build concluído com sucesso."
+          echo "Build concluido com sucesso."
