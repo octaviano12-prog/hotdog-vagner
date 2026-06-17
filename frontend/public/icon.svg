@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Hot Dog do Vagner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb414"/>
+      <stop offset="1" stop-color="#ff5b14"/>
+    </linearGradient>
+    <linearGradient id="bun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd36a"/>
+      <stop offset="1" stop-color="#f58a1f"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="#080604"/>
+  <circle cx="382" cy="104" r="112" fill="url(#bg)" opacity="0.2"/>
+  <path d="M104 282c18-80 99-143 187-143 74 0 122 39 112 88-12 61-96 115-188 115-74 0-122-24-111-60Z" fill="url(#bun)"/>
+  <path d="M128 290c29-34 89-63 158-63 52 0 90 16 100 39-28 34-92 58-165 58-43 0-76-12-93-34Z" fill="#8b270f" opacity="0.3"/>
+  <path d="M145 271c39-39 148-57 211-30" fill="none" stroke="#d82b16" stroke-width="34" stroke-linecap="round"/>
+  <path d="M157 254c44-27 127-38 183-16" fill="none" stroke="#ffc629" stroke-width="12" stroke-linecap="round" stroke-dasharray="28 20"/>
+  <path d="M163 300c42 21 136 24 194-1" fill="none" stroke="#2bcc52" stroke-width="14" stroke-linecap="round" stroke-dasharray="14 17"/>
+  <path d="M157 165c-11-26 25-35 13-62M232 142c-14-28 29-39 11-73M303 152c-10-24 26-32 13-58" fill="none" stroke="#ffb414" stroke-width="18" stroke-linecap="round" opacity="0.9"/>
+  <text x="256" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="54" font-weight="900" fill="#fff">VAGNER</text>
+</svg>
