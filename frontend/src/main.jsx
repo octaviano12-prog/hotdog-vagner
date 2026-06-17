@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './styles.css';
 import './landing-premium.css';
 import './landing-ultra.css';
+import './landing-polish.css';
 
 const App = React.lazy(() => import('./U' + 'ltraPremiumApp.jsx'));
 
