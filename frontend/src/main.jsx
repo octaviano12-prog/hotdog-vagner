@@ -31,6 +31,11 @@ bootCustomerAccount();
 bootCustomerReorder();
 bootCustomerLoyalty();
 
+if (window.location.pathname.includes('admin') || window.location.pathname.includes('cozinha')) {
+  import('./admin-kitchen-board.css');
+  import('./admin-kitchen-board.js');
+}
+
 const App = React.lazy(() => import('./U' + 'ltraPremiumApp.jsx'));
 
 createRoot(document.getElementById('root')).render(
