@@ -18,7 +18,9 @@ import './customer-account.css';
 import './customer-reorder.css';
 import './customer-loyalty.css';
 import './admin-customer-crm.css';
+import './admin-clientes-vip.css';
 import './admin-customer-crm.js';
+import './admin-clientes-vip.js';
 import './admin-flow.js';
 import './admin-report-tools.js';
 
