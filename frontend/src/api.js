@@ -1,5 +1,17 @@
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
+function extractErrorMessage(data, status) {
+  if (typeof data === 'object' && data?.message) return data.message;
+
+  const text = String(data || '').trim();
+  if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
+    if (status === 503) return 'Servidor temporariamente indisponivel. Aguarde alguns segundos e tente novamente.';
+    return 'Servidor retornou uma pagina de erro. Verifique os logs de execucao na Hostinger.';
+  }
+
+  return text || 'Erro na comunicacao com o servidor.';
+}
+
 async function request(path, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
@@ -15,8 +27,7 @@ async function request(path, options = {}) {
   const data = contentType.includes('application/json') ? await response.json() : await response.text();
 
   if (!response.ok) {
-    const message = typeof data === 'object' ? data.message : data;
-    throw new Error(message || 'Erro na comunicacao com o servidor.');
+    throw new Error(extractErrorMessage(data, response.status));
   }
 
   return data;
