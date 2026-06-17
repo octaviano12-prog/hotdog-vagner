@@ -13,6 +13,7 @@ const modules = [
   { title: 'Campanhas', icon: '📣', text: 'Mensagens prontas para WhatsApp', action: () => document.querySelector('.campaign-dock')?.click() },
   { title: 'Pós-venda', icon: '⭐', text: 'Avaliação após entrega', action: () => document.querySelector('.post-sale-dock')?.click() },
   { title: 'Cardápio', icon: '🌭', text: 'Ranking de produtos', action: () => document.querySelector('.menu-rank-dock')?.click() },
+  { title: 'Disponibilidade', icon: '✅', text: 'Pausar itens esgotados', action: () => document.querySelector('.availability-dock')?.click() },
   { title: 'Financeiro', icon: '💰', text: 'Caixa, relatórios e CSV', action: () => document.querySelector('[data-report-print]')?.click() },
   { title: 'Metas', icon: '🎯', text: 'Meta diária de vendas', action: () => document.querySelector('.daily-goals-dock')?.click() }
 ];
@@ -74,3 +75,8 @@ function bootCommandCenter() {
 }
 
 bootCommandCenter();
+
+if (window.location.pathname.includes('admin')) {
+  import('./admin-product-availability.css');
+  import('./admin-product-availability.js');
+}
