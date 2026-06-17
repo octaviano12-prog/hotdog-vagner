@@ -4,6 +4,7 @@ import { registerPwa } from './pwa-register.js';
 import { installAdminApiFallback } from './admin-api-fallback.js';
 import { bootCustomerTracking } from './customer-tracking.js';
 import { bootCustomerAccount } from './customer-account.js';
+import { bootCustomerReorder } from './customer-reorder.js';
 import './styles.css';
 import './landing-premium.css';
 import './landing-ultra.css';
@@ -13,6 +14,7 @@ import './admin-flow.css';
 import './admin-report-tools.css';
 import './customer-tracking.css';
 import './customer-account.css';
+import './customer-reorder.css';
 import './admin-flow.js';
 import './admin-report-tools.js';
 
@@ -20,6 +22,7 @@ registerPwa();
 installAdminApiFallback();
 bootCustomerTracking();
 bootCustomerAccount();
+bootCustomerReorder();
 
 const App = React.lazy(() => import('./U' + 'ltraPremiumApp.jsx'));
 
