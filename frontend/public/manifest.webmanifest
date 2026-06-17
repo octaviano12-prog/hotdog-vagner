@@ -1,0 +1,20 @@
+{
+  "name": "Hot Dog do Vagner - Pedidos Online",
+  "short_name": "Hot Dog Vagner",
+  "description": "Cardapio digital, pedidos online e gestao premium do Hot Dog do Vagner.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#080604",
+  "theme_color": "#ffb414",
+  "categories": ["food", "business", "shopping"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
