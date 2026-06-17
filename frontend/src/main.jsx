@@ -5,6 +5,7 @@ import { installAdminApiFallback } from './admin-api-fallback.js';
 import { bootCustomerTracking } from './customer-tracking.js';
 import { bootCustomerAccount } from './customer-account.js';
 import { bootCustomerReorder } from './customer-reorder.js';
+import { bootCustomerLoyalty } from './customer-loyalty.js';
 import './styles.css';
 import './landing-premium.css';
 import './landing-ultra.css';
@@ -15,6 +16,7 @@ import './admin-report-tools.css';
 import './customer-tracking.css';
 import './customer-account.css';
 import './customer-reorder.css';
+import './customer-loyalty.css';
 import './admin-flow.js';
 import './admin-report-tools.js';
 
@@ -23,6 +25,7 @@ installAdminApiFallback();
 bootCustomerTracking();
 bootCustomerAccount();
 bootCustomerReorder();
+bootCustomerLoyalty();
 
 const App = React.lazy(() => import('./U' + 'ltraPremiumApp.jsx'));
 
