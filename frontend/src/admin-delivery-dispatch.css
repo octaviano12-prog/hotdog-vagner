@@ -1,0 +1,348 @@
+.delivery-route #root {
+  display: none !important;
+}
+
+.delivery-dispatch {
+  min-height: 100vh;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 82% 12%, rgba(255, 184, 0, 0.18), transparent 28%),
+    radial-gradient(circle at 12% 86%, rgba(255, 107, 20, 0.13), transparent 30%),
+    #070503;
+  color: #fff;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.delivery-top,
+.delivery-toolbar,
+.delivery-metrics article,
+.delivery-card,
+.delivery-message,
+.delivery-login,
+.delivery-empty {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+}
+
+.delivery-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 24px;
+  margin-bottom: 14px;
+}
+
+.delivery-top a {
+  color: #ffd67a;
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.delivery-top span {
+  display: inline-flex;
+  margin-top: 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(255, 184, 0, 0.12);
+  color: #ffd67a;
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.delivery-top h1 {
+  margin: 10px 0 4px;
+  font-size: clamp(34px, 6vw, 72px);
+  line-height: 0.94;
+}
+
+.delivery-top p,
+.delivery-address,
+.delivery-phone,
+.delivery-card li span,
+.delivery-note,
+.delivery-message {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.delivery-clock {
+  display: grid;
+  justify-items: end;
+  align-content: start;
+  gap: 10px;
+}
+
+.delivery-clock strong {
+  font-size: 34px;
+  color: #ffd67a;
+}
+
+.delivery-clock button,
+.delivery-actions button,
+.delivery-actions a,
+.delivery-login a {
+  min-height: 42px;
+  border: 1px solid rgba(255, 184, 0, 0.32);
+  border-radius: 14px;
+  padding: 0 13px;
+  background: rgba(255, 184, 0, 0.09);
+  color: #ffd67a;
+  font-weight: 950;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delivery-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 190px;
+  gap: 10px;
+  border-radius: 20px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.delivery-toolbar label,
+.delivery-toolbar select {
+  min-height: 46px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+.delivery-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.delivery-toolbar input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+}
+
+.delivery-toolbar select {
+  padding: 0 12px;
+}
+
+.delivery-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.delivery-metrics article {
+  padding: 14px;
+  border-radius: 18px;
+}
+
+.delivery-metrics span,
+.delivery-total span,
+.delivery-card-head span {
+  display: block;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.delivery-metrics strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 24px;
+}
+
+.delivery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.delivery-card {
+  padding: 14px;
+  border-radius: 22px;
+  background: rgba(9, 7, 4, 0.88);
+}
+
+.delivery-card.late {
+  border-color: rgba(255, 89, 89, 0.45);
+  box-shadow: 0 0 0 1px rgba(255, 89, 89, 0.14), 0 18px 45px rgba(0, 0, 0, 0.28);
+}
+
+.delivery-card-head,
+.delivery-total,
+.delivery-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.delivery-card-head strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 28px;
+}
+
+.delivery-card-head b {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 184, 0, 0.12);
+  color: #ffd67a;
+}
+
+.delivery-card h3 {
+  margin: 12px 0 2px;
+  font-size: 22px;
+}
+
+.delivery-address {
+  padding: 11px;
+  border-radius: 14px;
+  background: rgba(255, 184, 0, 0.08);
+  border: 1px solid rgba(255, 184, 0, 0.14);
+}
+
+.delivery-badges,
+.delivery-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.delivery-badges span {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.delivery-card ul {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.delivery-card li {
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.delivery-card li strong,
+.delivery-card li span {
+  display: block;
+}
+
+.delivery-note {
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.delivery-total {
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 12px;
+}
+
+.delivery-total strong {
+  color: #ffd67a;
+  font-size: 22px;
+}
+
+.delivery-actions {
+  margin-top: 12px;
+}
+
+.delivery-actions button:first-child {
+  flex: 1;
+  min-width: 120px;
+  background: linear-gradient(135deg, #ffb414, #ff6b14);
+  color: #170900;
+  border: 0;
+}
+
+.delivery-shortcut {
+  position: fixed;
+  left: 22px;
+  bottom: 206px;
+  z-index: 84;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 184, 0, 0.28);
+  border-radius: 999px;
+  padding: 12px 16px;
+  background: rgba(10, 8, 5, 0.92);
+  color: #fff;
+  font-weight: 950;
+  text-decoration: none;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(18px);
+}
+
+.delivery-shortcut span {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #ffb414, #ff6b14);
+}
+
+.delivery-message,
+.delivery-login,
+.delivery-empty {
+  padding: 18px;
+  border-radius: 18px;
+  text-align: center;
+}
+
+@media (max-width: 1180px) {
+  .delivery-grid,
+  .delivery-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .delivery-dispatch {
+    padding: 12px;
+  }
+
+  .delivery-top,
+  .delivery-toolbar,
+  .delivery-grid,
+  .delivery-metrics {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .delivery-clock {
+    justify-items: stretch;
+  }
+
+  .delivery-shortcut {
+    left: 12px;
+    right: 12px;
+    bottom: 188px;
+    justify-content: center;
+  }
+}
