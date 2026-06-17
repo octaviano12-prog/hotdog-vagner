@@ -1,0 +1,249 @@
+.post-sale-dock {
+  position: fixed;
+  right: 22px;
+  bottom: 276px;
+  z-index: 87;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 184, 0, 0.28);
+  border-radius: 999px;
+  padding: 12px 16px;
+  background: rgba(10, 8, 5, 0.92);
+  color: #fff;
+  font-weight: 950;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(18px);
+  cursor: pointer;
+}
+
+.post-sale-dock span {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #ffb414, #ff6b14);
+}
+
+.post-sale-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 184;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.74);
+  backdrop-filter: blur(18px);
+}
+
+.post-sale-panel {
+  width: min(1160px, 100%);
+  max-height: min(90vh, 900px);
+  overflow: auto;
+  position: relative;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 86% 8%, rgba(255, 184, 0, 0.16), transparent 30%),
+    rgba(10, 8, 5, 0.96);
+  color: #fff;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.52);
+}
+
+.post-sale-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.post-sale-panel header span {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 184, 0, 0.12);
+  color: #ffd67a;
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.post-sale-panel h2 {
+  margin: 12px 48px 8px 0;
+  font-size: clamp(34px, 6vw, 64px);
+  line-height: 0.96;
+}
+
+.post-sale-panel p,
+.post-sale-message,
+.post-sale-head span,
+.post-sale-items,
+.post-sale-list footer em {
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.post-sale-controls {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto auto;
+  gap: 10px;
+  margin: 22px 0 14px;
+}
+
+.post-sale-controls label {
+  display: grid;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.68);
+  font-weight: 900;
+}
+
+.post-sale-controls select,
+.post-sale-controls button {
+  min-height: 46px;
+  border-radius: 15px;
+  padding: 0 13px;
+  font-weight: 950;
+}
+
+.post-sale-controls select {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.24);
+  color: #fff;
+}
+
+.post-sale-controls button {
+  border: 1px solid rgba(255, 184, 0, 0.28);
+  background: rgba(255, 184, 0, 0.08);
+  color: #ffd67a;
+  cursor: pointer;
+}
+
+.post-sale-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.post-sale-metrics article,
+.post-sale-list article,
+.post-sale-empty {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.post-sale-metrics article {
+  padding: 14px;
+}
+
+.post-sale-metrics span {
+  display: block;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 900;
+}
+
+.post-sale-metrics strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 24px;
+}
+
+.post-sale-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.post-sale-list article,
+.post-sale-empty {
+  padding: 14px;
+}
+
+.post-sale-head,
+.post-sale-list footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.post-sale-head strong {
+  display: block;
+  font-size: 18px;
+}
+
+.post-sale-head b {
+  color: #ffd67a;
+  font-size: 18px;
+}
+
+.post-sale-items {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.post-sale-list footer a,
+.post-sale-list footer button,
+.post-sale-list footer em {
+  border-radius: 999px;
+  padding: 8px 10px;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.post-sale-list footer a {
+  background: rgba(50, 255, 125, 0.1);
+  color: #9affb8;
+  border: 1px solid rgba(50, 255, 125, 0.22);
+}
+
+.post-sale-list footer button {
+  border: 1px solid rgba(255, 184, 0, 0.28);
+  background: rgba(255, 184, 0, 0.08);
+  color: #ffd67a;
+  cursor: pointer;
+}
+
+.post-sale-list footer em {
+  background: rgba(255, 255, 255, 0.06);
+  font-style: normal;
+}
+
+.post-sale-empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+@media (max-width: 920px) {
+  .post-sale-controls,
+  .post-sale-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .post-sale-dock {
+    left: 12px;
+    right: 12px;
+    bottom: 300px;
+    justify-content: center;
+  }
+
+  .post-sale-panel {
+    padding: 18px;
+    border-radius: 20px;
+  }
+}
