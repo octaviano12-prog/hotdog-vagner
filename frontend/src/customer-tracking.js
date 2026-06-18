@@ -5,10 +5,10 @@ const trackState = {
 };
 
 const statusSteps = [
-  ['novo', 'Pedido recebido', 'Seu pedido entrou na fila da cozinha.'],
-  ['preparo', 'Em preparação', 'A equipe esta preparando seu lanche.'],
-  ['saiu_entrega', 'Saiu para entrega', 'O pedido saiu para entrega ou esta pronto para retirada.'],
-  ['concluido', 'Concluido', 'Pedido finalizado. Bom apetite!']
+  ['novo', 'Pedido recebido', 'Seu pedido entrou na fila da cozinha.', '▤'],
+  ['preparo', 'Em preparação', 'A equipe esta preparando seu lanche.', '♨'],
+  ['saiu_entrega', 'Saiu para entrega', 'O pedido saiu para entrega ou esta pronto para retirada.', '🛵'],
+  ['concluido', 'Concluido', 'Pedido finalizado. Bom apetite!', '✓']
 ];
 
 function money(value) {
@@ -46,6 +46,33 @@ function extrasFor(order, parentId) {
 function statusIndex(status) {
   if (status === 'cancelado') return -1;
   return Math.max(0, statusSteps.findIndex(([key]) => key === status));
+}
+
+function statusTitle(status) {
+  if (status === 'cancelado') return 'Cancelado';
+  const index = statusIndex(status);
+  return statusSteps[index]?.[1] || 'Pedido recebido';
+}
+
+function statusIcon(status) {
+  if (status === 'cancelado') return '×';
+  const index = statusIndex(status);
+  return statusSteps[index]?.[3] || '▤';
+}
+
+function statusMessage(status) {
+  if (status === 'cancelado') return 'Seu pedido foi cancelado.';
+  if (status === 'preparo') return 'Seu pedido está sendo preparado com carinho.';
+  if (status === 'saiu_entrega') return 'Seu pedido saiu para entrega.';
+  if (status === 'concluido') return 'Pedido finalizado. Bom apetite!';
+  return 'Seu pedido foi recebido e entrou na fila.';
+}
+
+function productIcon(name = '') {
+  const value = name.toLowerCase();
+  if (value.includes('suco')) return '🍊';
+  if (value.includes('refrigerante') || value.includes('coca') || value.includes('guarana')) return '🥤';
+  return '🌭';
 }
 
 async function fetchTrackedOrder(code, phone) {
@@ -150,6 +177,7 @@ async function loadAndRender(code, phone, shouldScroll = false) {
     }
     message.textContent = error.message;
     result.hidden = true;
+    document.body.classList.remove('tracking-order-loaded');
   }
 }
 
@@ -159,49 +187,64 @@ function renderOrder(order) {
   const activeIndex = statusIndex(order.status);
   const canceled = order.status === 'cancelado';
   const created = order.created_at ? new Date(order.created_at).toLocaleString('pt-BR') : '';
+  const activeTitle = statusTitle(order.status);
+  const activeIcon = statusIcon(order.status);
 
+  document.body.classList.add('tracking-order-loaded');
   result.hidden = false;
   result.innerHTML = `
-    <div class="tracking-result-head">
-      <div>
-        <span>Pedido</span>
+    <header class="tracking-app-head">
+      <a href="/pedir" aria-label="Voltar">←</a>
+      <div><span>🌭</span><strong>HOT DOG DO VAGNER</strong><small>Pedido mobile</small></div>
+      <button type="button" onclick="window.hotdogOpenAccountModal?.()" aria-label="Conta">♡</button>
+    </header>
+
+    <section class="tracking-focus-card">
+      <div class="tracking-code-box">
+        <span>Código do pedido</span>
         <h2>${order.public_code}</h2>
-        <p>${created}</p>
+        <p>${statusMessage(order.status)} ${!canceled && order.status === 'preparo' ? '<b>com carinho.</b>' : ''}</p>
       </div>
-      <strong class="tracking-status ${order.status}">${canceled ? 'Cancelado' : statusSteps[activeIndex]?.[1] || 'Pedido recebido'}</strong>
-    </div>
+      <div class="tracking-focus-side">
+        <strong class="tracking-status ${order.status}"><i>${activeIcon}</i>${activeTitle}</strong>
+        <div><span>Previsão de entrega</span><b>35 <small>min</small></b></div>
+      </div>
+    </section>
 
     ${canceled ? `<div class="tracking-cancel">Pedido cancelado${order.cancellation_reason ? `: ${order.cancellation_reason}` : '.'}</div>` : `
-      <div class="tracking-timeline">
-        ${statusSteps.map(([key, title, text], index) => `
+      <section class="tracking-progress-card">
+        ${statusSteps.map(([key, title, text, icon], index) => `
           <article class="${index <= activeIndex ? 'done' : ''} ${key === order.status ? 'active' : ''}">
             <b>${index + 1}</b>
-            <div><strong>${title}</strong><p>${text}</p></div>
+            <i>${icon}</i>
+            <strong>${title}</strong>
+            <p>${text}</p>
           </article>
         `).join('')}
-      </div>
+      </section>
     `}
 
-    <div class="tracking-summary">
-      <div><span>Cliente</span><strong>${order.customer_name || '-'}</strong></div>
-      <div><span>Entrega</span><strong>${order.delivery_type === 'retirada' ? 'Retirada no balcao' : 'Entrega'}</strong></div>
-      <div><span>Pagamento</span><strong>${order.payment_status === 'pago' ? 'Pago' : 'Pendente'} • ${order.payment_method || ''}</strong></div>
-      <div><span>Total</span><strong>${money(order.total)}</strong></div>
-    </div>
+    <h3 class="tracking-section-title"><span>▦</span>Detalhes do pedido</h3>
+    <section class="tracking-detail-grid">
+      <div><i>👤</i><span>Cliente</span><strong>${order.customer_name || '-'}</strong></div>
+      <div><i>🛵</i><span>Entrega</span><strong>${order.delivery_type === 'retirada' ? 'Retirada' : 'Entrega'}</strong></div>
+      <div><i>💳</i><span>Pagamento</span><strong>${order.payment_status === 'pago' ? 'Pago' : 'Pendente'} • ${order.payment_method || ''}</strong></div>
+      <div><i>💰</i><span>Total</span><strong>${money(order.total)}</strong></div>
+    </section>
 
-    ${order.customer_address ? `<div class="tracking-address"><strong>Endereco:</strong> ${order.customer_address}${order.customer_reference ? ` • ${order.customer_reference}` : ''}</div>` : ''}
+    ${order.customer_address ? `<div class="tracking-address-premium"><i>📍</i><span>Endereço de entrega</span><strong>${order.customer_address}${order.customer_reference ? ` • ${order.customer_reference}` : ''}</strong></div>` : ''}
 
-    <h3>Itens do pedido</h3>
-    <div class="tracking-items">
+    <h3 class="tracking-section-title"><span>🧺</span>Itens do pedido</h3>
+    <div class="tracking-items-premium">
       ${mainItems(order).map((item) => {
         const extras = extrasFor(order, item.id).map((extra) => extra.name).join(', ');
-        return `<div><strong>${item.quantity}x ${item.name}</strong>${extras ? `<span>Extras: ${extras}</span>` : ''}<b>${money(item.total_price)}</b></div>`;
+        return `<div><i>${productIcon(item.name)}</i><strong>${item.quantity}x ${item.name}${extras ? `<small>Extras: ${extras}</small>` : ''}</strong><b>${money(item.total_price)}</b></div>`;
       }).join('')}
     </div>
 
-    <div class="tracking-actions">
-      <button type="button" onclick="window.location.reload()">Atualizar status</button>
-      <a href="/pedir">Fazer novo pedido</a>
+    <div class="tracking-actions tracking-actions-premium">
+      <button type="button" onclick="window.location.reload()">⟳ Atualizar status</button>
+      <a href="/pedir">⊕ Fazer novo pedido</a>
     </div>
   `;
 }
