@@ -16,6 +16,7 @@ import './public-image-upgrade.css';
 import './public-offer-showcase.css';
 import './public-mobile-order.css';
 import './public-mobile-order-fix.css';
+import './mobile-app-checkout.css';
 import './admin-operations.css';
 import './admin-flow.css';
 import './admin-report-tools.css';
