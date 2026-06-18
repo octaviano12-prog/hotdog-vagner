@@ -104,6 +104,11 @@ function openAccountModal(tab = accountState.customer ? 'profile' : 'login') {
   document.body.classList.add('account-modal-open');
 }
 
+window.hotdogOpenAccountModal = openAccountModal;
+window.addEventListener('hotdog-open-account', (event) => {
+  openAccountModal(event.detail?.tab || (accountState.customer ? 'profile' : 'login'));
+});
+
 function closeAccountModal() {
   document.body.classList.remove('account-modal-open');
 }
@@ -263,6 +268,7 @@ async function renderOrdersTab() {
 export function bootCustomerAccount() {
   if (accountState.booted) return;
   accountState.booted = true;
+  window.hotdogOpenAccountModal = openAccountModal;
   setInterval(() => {
     ensureFloatButton();
     fillCheckout();
