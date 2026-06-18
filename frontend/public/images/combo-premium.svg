@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" role="img" aria-label="Combo premium Hot Dog do Vagner">
+  <defs>
+    <linearGradient id="orange" x1="0" x2="1"><stop offset="0" stop-color="#ffb414"/><stop offset="1" stop-color="#ff6418"/></linearGradient>
+    <linearGradient id="dark" x1="0" x2="1"><stop offset="0" stop-color="#160b04"/><stop offset="1" stop-color="#2a1206"/></linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="28" stdDeviation="25" flood-color="#000" flood-opacity=".45"/></filter>
+  </defs>
+  <rect width="900" height="700" rx="60" fill="#090604"/>
+  <circle cx="660" cy="160" r="250" fill="#ffb414" opacity=".12"/>
+  <circle cx="240" cy="540" r="260" fill="#ff6418" opacity=".14"/>
+  <g filter="url(#s)">
+    <rect x="118" y="205" width="390" height="260" rx="58" fill="url(#dark)" stroke="#ffb414" stroke-opacity=".22"/>
+    <path d="M166 330c38-78 188-116 294-42 48 34 24 86-76 106-104 20-230-2-218-64Z" fill="#f3a849"/>
+    <path d="M184 348c82 38 205 44 288 5-9 58-72 93-162 93-78 0-132-28-126-98Z" fill="#c86b25"/>
+    <path d="M196 330c72-34 198-36 264-4" fill="none" stroke="#f5d324" stroke-width="18" stroke-linecap="round" stroke-dasharray="32 24"/>
+    <path d="M202 360c86 24 174 18 250-6" fill="none" stroke="#dd2020" stroke-width="14" stroke-linecap="round" stroke-dasharray="28 20"/>
+  </g>
+  <g filter="url(#s)">
+    <rect x="555" y="170" width="180" height="315" rx="54" fill="url(#orange)"/>
+    <rect x="588" y="118" width="114" height="82" rx="30" fill="#222"/>
+    <rect x="574" y="248" width="142" height="118" rx="32" fill="#fff" opacity=".18"/>
+    <text x="606" y="314" fill="#180900" font-family="Arial" font-weight="900" font-size="34">SUCO</text>
+    <circle cx="680" cy="225" r="22" fill="#fff" opacity=".35"/>
+  </g>
+  <g transform="translate(148 500)">
+    <rect width="604" height="90" rx="36" fill="#120902" stroke="#ffb414" stroke-opacity=".25"/>
+    <text x="34" y="38" fill="#ffd36e" font-family="Arial" font-weight="900" font-size="18">COMBO DA NOITE</text>
+    <text x="34" y="66" fill="#fff" font-family="Arial" font-weight="900" font-size="24">Hot dog prensado + bebida gelada</text>
+  </g>
+</svg>
