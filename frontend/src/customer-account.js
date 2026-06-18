@@ -52,6 +52,7 @@ function logout() {
   localStorage.removeItem('hotdog_customer_profile');
   renderAccountModal('login');
   updateFloatButton();
+  window.dispatchEvent(new Event('hotdog-account-updated'));
 }
 
 async function api(path, options = {}) {
@@ -102,7 +103,7 @@ function updateFloatButton() {
 }
 
 function ensureFloatButton() {
-  if (isAdminPage() || isTrackingPage() || document.querySelector('.customer-account-float')) return;
+  if (isAdminPage() || isTrackingPage() || isMobileOrderPage() || document.querySelector('.customer-account-float')) return;
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'customer-account-float';
@@ -149,7 +150,7 @@ function ensureModal() {
   if (document.querySelector('.customer-account-overlay')) return;
   const overlay = document.createElement('div');
   overlay.className = 'customer-account-overlay';
-  overlay.innerHTML = '<section class="customer-account-modal"></section>';
+  overlay.innerHTML = '<section class="customer-account-modal account-polished"></section>';
   overlay.addEventListener('click', (event) => {
     if (event.target === overlay) closeAccountModal();
   });
@@ -313,3 +314,4 @@ export function bootCustomerAccount() {
     fillCheckout();
   }, 900);
 }
+

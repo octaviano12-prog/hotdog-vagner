@@ -8,6 +8,10 @@ function isPublicPage() {
   return !window.location.pathname.includes('admin') && !window.location.pathname.includes('cozinha') && !window.location.pathname.includes('entregas');
 }
 
+function isMobileOrderPage() {
+  return ['/pedir', '/pedido-mobile', '/mobile'].some((path) => window.location.pathname === path || window.location.pathname.startsWith(`${path}/`));
+}
+
 function brl(value) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
 }
@@ -123,6 +127,7 @@ async function bootPublicOrderRules() {
   orderRules.booted = true;
   await getSettings();
   installFetchRules();
+  if (isMobileOrderPage()) return;
   setInterval(() => {
     injectStatusBanner();
     injectChangeInput();
@@ -132,3 +137,4 @@ async function bootPublicOrderRules() {
 }
 
 bootPublicOrderRules();
+

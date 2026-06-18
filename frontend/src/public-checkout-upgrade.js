@@ -1,7 +1,8 @@
 const checkoutUx = { booted: false, settings: null };
 
 function isPublicPage() {
-  return !window.location.pathname.includes('admin') && !window.location.pathname.includes('cozinha') && !window.location.pathname.includes('entregas');
+  return !['/pedir', '/pedido-mobile', '/mobile'].some((path) => window.location.pathname === path || window.location.pathname.startsWith(`${path}/`))
+    && !window.location.pathname.includes('admin') && !window.location.pathname.includes('cozinha') && !window.location.pathname.includes('entregas');
 }
 
 function digits(value = '') {
@@ -140,3 +141,4 @@ function bootPublicCheckoutUpgrade() {
 }
 
 bootPublicCheckoutUpgrade();
+

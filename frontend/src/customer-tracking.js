@@ -23,6 +23,10 @@ function isAdminPage() {
   return window.location.pathname.includes('admin');
 }
 
+function isMobileOrderPage() {
+  return ['/pedir', '/pedido-mobile', '/mobile'].some((path) => window.location.pathname === path || window.location.pathname.startsWith(`${path}/`));
+}
+
 function params() {
   return new URLSearchParams(window.location.search);
 }
@@ -250,7 +254,7 @@ function renderOrder(order) {
 }
 
 function installFloatingTrackingLink() {
-  if (isAdminPage() || isTrackingPage() || document.querySelector('.track-order-float')) return;
+  if (isAdminPage() || isTrackingPage() || isMobileOrderPage() || document.querySelector('.track-order-float')) return;
   const link = document.createElement('a');
   link.className = 'track-order-float';
   link.href = '/acompanhar';
@@ -269,3 +273,4 @@ export function bootCustomerTracking() {
 
   setTimeout(installFloatingTrackingLink, 1200);
 }
+
