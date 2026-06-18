@@ -18,6 +18,7 @@ import './public-mobile-order.css';
 import './public-mobile-order-fix.css';
 import './mobile-app-checkout.css';
 import './mobile-menu-first.css';
+import './mobile-hide-back.css';
 import './admin-operations.css';
 import './admin-flow.css';
 import './admin-report-tools.css';
