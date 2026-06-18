@@ -10,15 +10,28 @@ function isBlockedRoute() {
   return window.location.pathname.includes('admin') || window.location.pathname.includes('cozinha') || window.location.pathname.includes('acompanhar') || window.location.pathname.includes('pedido-status') || window.location.pathname.startsWith('/api');
 }
 
-function openCustomerModalSafely() {
+function openCustomerModalSafely(tab = 'login') {
+  if (window.hotdogOpenAccountModal) {
+    window.hotdogOpenAccountModal(tab);
+    return;
+  }
+
+  window.dispatchEvent(new CustomEvent('hotdog-open-account', { detail: { tab } }));
+
   const float = document.querySelector('.customer-account-float');
   if (float) {
     float.click();
     return;
   }
+
   let attempts = 0;
   const timer = setInterval(() => {
     attempts += 1;
+    if (window.hotdogOpenAccountModal) {
+      clearInterval(timer);
+      window.hotdogOpenAccountModal(tab);
+      return;
+    }
     const nextFloat = document.querySelector('.customer-account-float');
     if (nextFloat) {
       clearInterval(timer);
@@ -41,14 +54,14 @@ function routeAccountClick(event) {
     return;
   }
 
-  openCustomerModalSafely();
+  openCustomerModalSafely('login');
 }
 
 function autoOpenLoginOnMobileOrder() {
   if (!isMobileOrderRoute()) return;
   const params = new URLSearchParams(window.location.search);
   if (!params.has('login')) return;
-  setTimeout(openCustomerModalSafely, 700);
+  setTimeout(() => openCustomerModalSafely('login'), 700);
   const clean = new URL(window.location.href);
   clean.searchParams.delete('login');
   window.history.replaceState({}, '', clean);
