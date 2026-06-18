@@ -72,6 +72,7 @@ import './public-order-rules.js';
 import './public-require-login.js';
 import './admin-flow.js';
 import './admin-report-tools.js';
+import './admin-dashboard-clean.js';
 
 registerPwa();
 installAdminApiFallback();
