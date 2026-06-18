@@ -22,7 +22,7 @@ function isLogged() {
 
 function removeMobileNoise() {
   if (!isMobileOrderRoute()) return;
-  document.querySelectorAll('.customer-account-float,.track-order-float,.loyalty-mini-badge,.home-v2-sticky-cta,.mobile-premium-shortcuts').forEach((node) => node.remove());
+  document.querySelectorAll('.track-order-float,.loyalty-mini-badge,.home-v2-sticky-cta,.mobile-premium-shortcuts').forEach((node) => node.remove());
 }
 
 function refineMobileHeader() {
@@ -34,7 +34,7 @@ function refineMobileHeader() {
   title.textContent = 'Pedido mobile';
   if (isLogged()) {
     account.classList.add('mobile-account-orders-button');
-    account.innerHTML = '<span>Conta</span><small>Meus pedidos</small>';
+    account.textContent = 'Meus pedidos';
   } else {
     account.classList.remove('mobile-account-orders-button');
     account.textContent = 'Entrar';
