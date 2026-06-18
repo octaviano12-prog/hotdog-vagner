@@ -39,7 +39,8 @@ const offers = [
 ];
 
 function isPublicHome() {
-  return !window.location.pathname.includes('admin') && !window.location.pathname.includes('cozinha') && !window.location.pathname.includes('entregas') && !window.location.pathname.includes('acompanhar');
+  return !['/pedir', '/pedido-mobile', '/mobile'].some((path) => window.location.pathname === path || window.location.pathname.startsWith(`${path}/`))
+    && !window.location.pathname.includes('admin') && !window.location.pathname.includes('cozinha') && !window.location.pathname.includes('entregas') && !window.location.pathname.includes('acompanhar');
 }
 
 function scrollToMenu() {
@@ -92,3 +93,4 @@ function bootOfferShowcase() {
 }
 
 bootOfferShowcase();
+
