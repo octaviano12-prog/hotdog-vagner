@@ -2,7 +2,8 @@ const loyaltyState = {
   booted: false,
   loading: false,
   orders: [],
-  lastLoaded: 0
+  lastLoaded: 0,
+  observer: null
 };
 
 const GOAL = 5;
@@ -100,9 +101,17 @@ function findAccountModal() {
 }
 
 function attachLoyaltyTab(button) {
-  if (!button || button.dataset.loyaltyReady) return;
+  if (!button) return;
+  button.dataset.loyaltyTab = 'true';
+  button.dataset.tab = 'loyalty';
+  button.textContent = 'Fidelidade';
+  if (button.dataset.loyaltyReady) return;
   button.dataset.loyaltyReady = 'true';
-  button.addEventListener('click', () => renderLoyaltyPanel());
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    renderLoyaltyPanel();
+  });
 }
 
 function ensureLoyaltyTab() {
@@ -111,18 +120,17 @@ function ensureLoyaltyTab() {
   const tabs = modal.querySelector('.account-tabs');
   if (!tabs) return;
 
-  const existing = tabs.querySelector('[data-loyalty-tab]');
-  if (existing) {
-    attachLoyaltyTab(existing);
-    return;
-  }
+  const profileButton = tabs.querySelector('[data-tab="profile"]');
+  const ordersButton = tabs.querySelector('[data-tab="orders"]');
+  if (!profileButton || !ordersButton) return;
 
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.dataset.loyaltyTab = 'true';
-  button.textContent = 'Fidelidade';
-  attachLoyaltyTab(button);
-  tabs.appendChild(button);
+  let existing = tabs.querySelector('[data-loyalty-tab], [data-tab="loyalty"]');
+  if (!existing) {
+    existing = document.createElement('button');
+    existing.type = 'button';
+    tabs.appendChild(existing);
+  }
+  attachLoyaltyTab(existing);
 }
 
 async function renderLoyaltyPanel() {
@@ -131,6 +139,7 @@ async function renderLoyaltyPanel() {
   const message = modal?.querySelector('.account-message');
   if (!body) return;
 
+  ensureLoyaltyTab();
   body.innerHTML = '<p class="account-loading">Carregando fidelidade...</p>';
   if (message) message.textContent = '';
 
@@ -187,17 +196,25 @@ function ensureMiniBadge() {
   badge.addEventListener('click', () => {
     const accountButton = document.querySelector('.customer-account-float');
     accountButton?.click();
-    setTimeout(renderLoyaltyPanel, 250);
+    setTimeout(renderLoyaltyPanel, 120);
   });
   document.body.appendChild(badge);
+}
+
+function installModalObserver() {
+  if (loyaltyState.observer) return;
+  loyaltyState.observer = new MutationObserver(() => ensureLoyaltyTab());
+  loyaltyState.observer.observe(document.body, { childList: true, subtree: true });
 }
 
 export function bootCustomerLoyalty() {
   if (loyaltyState.booted) return;
   loyaltyState.booted = true;
+  installModalObserver();
+  ensureLoyaltyTab();
 
   setInterval(() => {
     ensureLoyaltyTab();
     ensureMiniBadge();
-  }, 500);
+  }, 120);
 }
