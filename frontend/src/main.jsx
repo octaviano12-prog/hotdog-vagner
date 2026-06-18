@@ -20,6 +20,7 @@ import './mobile-app-checkout.css';
 import './mobile-menu-first.css';
 import './mobile-hide-back.css';
 import './mobile-premium-redesign.css';
+import './mobile-final-polish.css';
 import './admin-operations.css';
 import './admin-flow.css';
 import './admin-report-tools.css';
