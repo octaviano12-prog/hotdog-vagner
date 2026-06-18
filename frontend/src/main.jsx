@@ -26,6 +26,7 @@ import './mobile-account-orders.css';
 import './mobile-logout-top.css';
 import './site-final-review.css';
 import './mobile-guided-order.css';
+import './mobile-checkout-professional.css';
 import './admin-operations.css';
 import './admin-flow.css';
 import './admin-report-tools.css';
