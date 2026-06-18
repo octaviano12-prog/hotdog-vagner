@@ -2,8 +2,7 @@ const loyaltyState = {
   booted: false,
   loading: false,
   orders: [],
-  lastLoaded: 0,
-  observer: null
+  lastLoaded: 0
 };
 
 const GOAL = 5;
@@ -102,9 +101,9 @@ function findAccountModal() {
 
 function attachLoyaltyTab(button) {
   if (!button) return;
-  button.dataset.loyaltyTab = 'true';
-  button.dataset.tab = 'loyalty';
-  button.textContent = 'Fidelidade';
+  if (button.dataset.loyaltyTab !== 'true') button.dataset.loyaltyTab = 'true';
+  if (button.dataset.tab !== 'loyalty') button.dataset.tab = 'loyalty';
+  if (button.textContent.trim() !== 'Fidelidade') button.textContent = 'Fidelidade';
   if (button.dataset.loyaltyReady) return;
   button.dataset.loyaltyReady = 'true';
   button.addEventListener('click', (event) => {
@@ -128,6 +127,9 @@ function ensureLoyaltyTab() {
   if (!existing) {
     existing = document.createElement('button');
     existing.type = 'button';
+    existing.textContent = 'Fidelidade';
+    existing.dataset.tab = 'loyalty';
+    existing.dataset.loyaltyTab = 'true';
     tabs.appendChild(existing);
   }
   attachLoyaltyTab(existing);
@@ -201,20 +203,13 @@ function ensureMiniBadge() {
   document.body.appendChild(badge);
 }
 
-function installModalObserver() {
-  if (loyaltyState.observer) return;
-  loyaltyState.observer = new MutationObserver(() => ensureLoyaltyTab());
-  loyaltyState.observer.observe(document.body, { childList: true, subtree: true });
-}
-
 export function bootCustomerLoyalty() {
   if (loyaltyState.booted) return;
   loyaltyState.booted = true;
-  installModalObserver();
   ensureLoyaltyTab();
 
   setInterval(() => {
     ensureLoyaltyTab();
     ensureMiniBadge();
-  }, 120);
+  }, 1200);
 }
