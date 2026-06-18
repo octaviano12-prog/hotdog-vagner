@@ -17,6 +17,18 @@ function isMobileOrderPage() {
   return ['/pedir', '/pedido-mobile', '/mobile'].some((path) => window.location.pathname === path || window.location.pathname.startsWith(`${path}/`));
 }
 
+function syncSessionFromStorage() {
+  let storedCustomer = null;
+  try {
+    storedCustomer = JSON.parse(localStorage.getItem('hotdog_customer_profile') || 'null');
+  } catch {
+    storedCustomer = null;
+  }
+  accountState.token = localStorage.getItem('hotdog_customer_token') || '';
+  accountState.customer = accountState.token && storedCustomer ? storedCustomer : null;
+  if (!accountState.customer) accountState.orders = [];
+}
+
 function money(value) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
 }
@@ -65,6 +77,7 @@ function setInputValue(input, value) {
 }
 
 function fillCheckout() {
+  syncSessionFromStorage();
   const customer = accountState.customer;
   if (!customer || isAdminPage() || isTrackingPage()) return;
 
@@ -83,6 +96,7 @@ function fillCheckout() {
 }
 
 function updateFloatButton() {
+  syncSessionFromStorage();
   const button = document.querySelector('.customer-account-float strong');
   if (button) button.textContent = accountState.customer ? 'Minha conta' : 'Entrar / cadastrar';
 }
@@ -98,15 +112,25 @@ function ensureFloatButton() {
   updateFloatButton();
 }
 
-function openAccountModal(tab = accountState.customer ? 'profile' : 'login') {
+function openAccountModal(tab) {
+  syncSessionFromStorage();
+  const nextTab = tab || (accountState.customer ? 'profile' : 'login');
   ensureModal();
-  renderAccountModal(tab);
+  renderAccountModal(nextTab);
   document.body.classList.add('account-modal-open');
 }
 
 window.hotdogOpenAccountModal = openAccountModal;
 window.addEventListener('hotdog-open-account', (event) => {
+  syncSessionFromStorage();
   openAccountModal(event.detail?.tab || (accountState.customer ? 'profile' : 'login'));
+});
+window.addEventListener('hotdog-customer-logout', () => {
+  accountState.token = '';
+  accountState.customer = null;
+  accountState.orders = [];
+  closeAccountModal();
+  updateFloatButton();
 });
 
 function closeAccountModal() {
@@ -133,6 +157,7 @@ function ensureModal() {
 }
 
 function renderAccountModal(tab = 'login', message = '') {
+  syncSessionFromStorage();
   ensureModal();
   const modal = document.querySelector('.customer-account-modal');
   const logged = Boolean(accountState.customer);
@@ -270,10 +295,12 @@ export function bootCustomerAccount() {
   accountState.booted = true;
   window.hotdogOpenAccountModal = openAccountModal;
   setInterval(() => {
+    syncSessionFromStorage();
     ensureFloatButton();
     fillCheckout();
   }, 1600);
   setTimeout(() => {
+    syncSessionFromStorage();
     ensureFloatButton();
     fillCheckout();
   }, 900);
