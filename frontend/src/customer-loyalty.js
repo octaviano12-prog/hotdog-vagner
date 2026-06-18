@@ -99,17 +99,29 @@ function findAccountModal() {
   return document.querySelector('.customer-account-modal');
 }
 
+function attachLoyaltyTab(button) {
+  if (!button || button.dataset.loyaltyReady) return;
+  button.dataset.loyaltyReady = 'true';
+  button.addEventListener('click', () => renderLoyaltyPanel());
+}
+
 function ensureLoyaltyTab() {
   const modal = findAccountModal();
   if (!modal || !customer() || !token()) return;
   const tabs = modal.querySelector('.account-tabs');
-  if (!tabs || tabs.querySelector('[data-loyalty-tab]')) return;
+  if (!tabs) return;
+
+  const existing = tabs.querySelector('[data-loyalty-tab]');
+  if (existing) {
+    attachLoyaltyTab(existing);
+    return;
+  }
 
   const button = document.createElement('button');
   button.type = 'button';
   button.dataset.loyaltyTab = 'true';
   button.textContent = 'Fidelidade';
-  button.addEventListener('click', () => renderLoyaltyPanel());
+  attachLoyaltyTab(button);
   tabs.appendChild(button);
 }
 
@@ -160,6 +172,9 @@ async function renderLoyaltyPanel() {
   }
 }
 
+window.hotdogRenderLoyaltyPanel = renderLoyaltyPanel;
+window.addEventListener('hotdog-render-loyalty', () => renderLoyaltyPanel());
+
 function ensureMiniBadge() {
   if (isAdminPage() || isTrackingPage() || !token() || document.querySelector('.loyalty-mini-badge')) return;
   const profile = customer();
@@ -184,5 +199,5 @@ export function bootCustomerLoyalty() {
   setInterval(() => {
     ensureLoyaltyTab();
     ensureMiniBadge();
-  }, 1300);
+  }, 500);
 }
