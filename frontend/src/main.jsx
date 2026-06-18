@@ -1,4 +1,5 @@
 import './mobile-auto-redirect.js';
+import './mobile-preflight.js';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerPwa } from './pwa-register.js';
