@@ -39,6 +39,8 @@ import './mobile-order-stable.css';
 import './admin-counter-reference.css';
 import './admin-products-reference.css';
 import './admin-finance-reference.css';
+import './admin-customers-settings-reference.css';
+import './home-reference-final.css';
 import './admin-customer-crm.js';
 import './admin-clientes-vip.js';
 import './home-v2.js';
@@ -73,4 +75,3 @@ createRoot(document.getElementById('root')).render(
     </React.Suspense>
   </React.StrictMode>
 );
-
