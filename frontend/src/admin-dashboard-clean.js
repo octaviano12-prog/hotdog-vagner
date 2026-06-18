@@ -1,3 +1,6 @@
+import './admin-executive-dashboard.css';
+import './admin-executive-dashboard.js';
+
 function isAdminPage(){return window.location.pathname.includes('admin')}
 function token(){return localStorage.getItem('hotdog_token')||''}
 function clickFirst(selector){document.querySelector(selector)?.click()}
