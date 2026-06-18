@@ -35,6 +35,7 @@ import './admin-report-tools.css';
 import './customer-tracking.css';
 import './customer-account.css';
 import './account-login-redesign.css';
+import './account-orders-redesign.css';
 import './customer-reorder.css';
 import './customer-loyalty.css';
 import './admin-customer-crm.css';
