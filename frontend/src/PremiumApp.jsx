@@ -454,7 +454,268 @@ function AdminCounterToolbar({ onRefresh }) {
       <select aria-label="Filtrar por pagamento" defaultValue=""><option value="">Todos pagamentos</option><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="cartao">Cartão</option><option value="fiado">Fiado</option></select>
       <button type="button" className={sound ? 'sound-on' : ''} onClick={() => setSound((current) => !current)}><Volume2 size={18} /> Som {sound ? 'ligado' : 'desligado'}</button>
       <button type="button" onClick={() => window.print()}><Printer size={18} /> Imprimir pedidos</button>
-     …3179 tokens truncated…   await api.admin.post('/api/admin/orders', { ...manualOrder, customer: manualCustomer, items: manualOrder.items.map((item) => ({ product_id: Number(item.product_id), quantity: Number(item.quantity || 1), extras: [], notes: '' })) });
+      <button type="button" className="counter-refresh" onClick={onRefresh}><RefreshCw size={18} /> Atualizar</button>
+    </section>
+  );
+}
+
+function adminProductImage(product = {}) {
+  return product.product_type === 'hotdog' ? '/images/hotdog-premium.svg' : '/images/drink-premium.svg';
+}
+
+function MetricCard({ icon, label, value, accent = 'gold', footer }) {
+  return (
+    <article className={`metric-card ${accent}`}>
+      <span className="metric-icon">{icon}</span>
+      <div>
+        <small>{label}</small>
+        <strong>{value}</strong>
+        {footer && <em>{footer}</em>}
+      </div>
+    </article>
+  );
+}
+
+function OrderKanban({ orders, onMove, onCancel, setActiveTab }) {
+  const grouped = statusFlow.reduce((acc, status) => ({ ...acc, [status]: orders.filter((order) => order.status === status) }), {});
+
+  return (
+    <section className="kanban-shell">
+      <div className="section-toolbar">
+        <div><h3>Pedidos do dia</h3><span>{orders.length} pedidos</span></div>
+        <div className="toolbar-actions"><Search size={18} /><select><option>Filtrar pedidos</option></select></div>
+      </div>
+      <div className="kanban-board">
+        {statusFlow.map((status) => {
+          const meta = statusMeta[status];
+          const Icon = meta.icon;
+          return (
+            <div className={`kanban-column ${status}`} key={status}>
+              <div className="kanban-title"><span>{meta.title}</span><b>{grouped[status]?.length || 0}</b></div>
+              <div className="kanban-cards">
+                {(grouped[status] || []).map((order) => (
+                  <article className="kanban-card" key={order.id}>
+                    <div className="order-head">
+                      <strong>{order.public_code || `#${order.id}`}</strong>
+                      <small>{order.created_at ? new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''}</small>
+                    </div>
+                    <h4>{order.customer_name}</h4>
+                    <div className="order-items">
+                      {order.items?.filter((item) => item.item_type === 'produto').slice(0, 4).map((item) => <span key={item.id}>{item.quantity}x {item.name}</span>)}
+                    </div>
+                    <small>Pagamento</small>
+                    <p>{paymentLabels[order.payment_method] || order.payment_method} • {order.payment_status === 'pago' ? 'Pago' : 'Pendente'}</p>
+                    <strong className="order-price">{formatMoney(order.total)}</strong>
+                    <div className="kanban-actions">
+                      {status !== 'concluido' && status !== 'cancelado' && <button onClick={() => onMove(order.id, meta.next)}><Icon size={15} /> {meta.action}</button>}
+                      {status !== 'cancelado' && <button className="danger-link" onClick={() => onCancel(order.id)}>Cancelar</button>}
+                    </div>
+                  </article>
+                ))}
+                {(grouped[status] || []).length === 0 && <div className="empty-column">Nenhum pedido nesta etapa</div>}
+              </div>
+              <button className="add-order-link" onClick={() => setActiveTab('new-order')}>+ Novo pedido</button>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function TopProducts({ orders, dashboard }) {
+  const ranking = useMemo(() => {
+    if (dashboard?.top_products?.length) return dashboard.top_products.map((item) => [item.name, Number(item.quantity || 0)]);
+    const map = new Map();
+    orders.forEach((order) => {
+      order.items?.filter((item) => item.item_type === 'produto').forEach((item) => {
+        map.set(item.name, (map.get(item.name) || 0) + Number(item.quantity || 0));
+      });
+    });
+    return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  }, [orders, dashboard]);
+  const max = Math.max(1, ...ranking.map(([, qty]) => qty));
+
+  return (
+    <section className="side-panel">
+      <div className="panel-title"><h3>🔥 Produtos mais vendidos hoje</h3><select><option>Hoje</option></select></div>
+      <div className="ranking-list">
+        {ranking.map(([name, qty], index) => (
+          <div className="ranking-row" key={name}>
+            <span>{index + 1}</span>
+            <div><strong>{name}</strong><i style={{ width: `${(qty / max) * 100}%` }} /></div>
+            <b>{qty}x</b>
+          </div>
+        ))}
+        {ranking.length === 0 && <p className="muted">Ainda nao ha vendas hoje.</p>}
+      </div>
+      <a className="report-link">Ver relatorio completo →</a>
+    </section>
+  );
+}
+
+function DashboardTab({ orders, summary, dashboard, onMove, onCancel, setActiveTab }) {
+  const todayOrders = Number(summary?.orders_today || orders.length || 0);
+  const ticket = todayOrders ? Number(summary?.gross_today || 0) / todayOrders : 0;
+  const inPrep = orders.filter((order) => order.status === 'preparo').length;
+
+  return (
+    <>
+      <section className="alert-strip">
+        <div><Bell size={20} /><strong>{inPrep} pedido em preparo</strong><span>Acompanhe a coluna Em preparo</span></div>
+        <div><ShoppingBag size={20} /><strong>Novo pedido recebido!</strong><span>Painel atualizado automaticamente</span></div>
+        <div><CheckCircle size={20} /><strong>Dica do dia</strong><span>Mantenha o tempo medio abaixo de 25 min</span></div>
+      </section>
+      <section className="metric-grid">
+        <MetricCard icon="💰" label="Faturamento hoje" value={formatMoney(summary?.gross_today)} footer="▲ 12% vs ontem" />
+        <MetricCard icon="💳" label="Recebido hoje" value={formatMoney(summary?.paid_today)} accent="green" footer="— 0% vs ontem" />
+        <MetricCard icon="⏱" label="Pendente" value={formatMoney(summary?.pending_today)} accent="orange" footer="— 0% vs ontem" />
+        <MetricCard icon="📈" label="Liquido hoje" value={formatMoney(summary?.net_today)} footer="▲ 12% vs ontem" />
+        <MetricCard icon="📋" label="Pedidos do dia" value={todayOrders} accent="red" footer="▲ 2 vs ontem" />
+        <MetricCard icon="📊" label="Ticket medio" value={formatMoney(ticket)} accent="purple" footer="▲ 10% vs ontem" />
+      </section>
+      <section className="admin-dashboard-grid">
+        <OrderKanban orders={orders} onMove={onMove} onCancel={onCancel} setActiveTab={setActiveTab} />
+        <div className="right-stack">
+          <TopProducts orders={orders} dashboard={dashboard} />
+          <section className="side-panel quick-summary">
+            <h3>Resumo rapido</h3>
+            <div><span>⏱ Tempo medio preparo</span><strong>18 min</strong></div>
+            <div><span>⭐ Avaliacao media</span><strong>4,8</strong></div>
+            <div><span>👥 Clientes atendidos</span><strong>{todayOrders}</strong></div>
+            <div><span>📈 Taxa de conclusao</span><strong>100%</strong></div>
+          </section>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function AdminPremium() {
+  const [tab, setTab] = useState('dashboard');
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [dashboard, setDashboard] = useState(null);
+  const [expenses, setExpenses] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [cash, setCash] = useState({ register: null, totals: null, movements: [] });
+  const [settings, setSettings] = useState(null);
+  const [report, setReport] = useState(null);
+  const [message, setMessage] = useState('');
+  const [expense, setExpense] = useState({ description: '', amount: '', category: 'Geral', payment_method: 'dinheiro' });
+  const [movement, setMovement] = useState({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
+  const [openValue, setOpenValue] = useState('0');
+  const [closeValue, setCloseValue] = useState('0');
+  const [productForm, setProductForm] = useState({ category_id: '', name: '', description: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
+  const [manualCustomer, setManualCustomer] = useState({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
+  const [manualOrder, setManualOrder] = useState({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
+  const activeProducts = useMemo(() => products.filter((p) => Number(p.is_active) === 1 && p.product_type !== 'adicional'), [products]);
+
+  async function loadAdmin() {
+    try {
+      const [orderData, productData, categoryData, summaryData, dashboardData, settingsData, expenseData, cashData, customerData, reportData] = await Promise.all([
+        api.admin.get('/api/admin/orders'),
+        api.admin.get('/api/admin/products'),
+        api.admin.get('/api/admin/categories'),
+        api.admin.get('/api/admin/finance/summary'),
+        api.admin.get('/api/admin/dashboard'),
+        api.admin.get('/api/admin/settings'),
+        api.admin.get('/api/admin/finance/expenses'),
+        api.admin.get('/api/admin/finance/cash/current'),
+        api.admin.get('/api/admin/customers'),
+        api.admin.get('/api/admin/reports/sales')
+      ]);
+      setOrders(orderData);
+      setProducts(productData);
+      setCategories(categoryData);
+      setSummary(summaryData);
+      setDashboard(dashboardData);
+      setSettings(settingsData);
+      setExpenses(expenseData);
+      setCash(cashData);
+      setCustomers(customerData);
+      setReport(reportData);
+    } catch (error) {
+      setMessage(error.message);
+    }
+  }
+
+  useEffect(() => {
+    loadAdmin();
+    const timer = setInterval(loadAdmin, 15000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const referenceMode = ['new-order', 'products', 'finance'].includes(tab);
+    document.body.classList.toggle('admin-counter-mode', referenceMode);
+    document.body.classList.toggle('admin-products-mode', tab === 'products');
+    document.body.classList.toggle('admin-finance-mode', tab === 'finance');
+    return () => document.body.classList.remove('admin-counter-mode', 'admin-products-mode', 'admin-finance-mode');
+  }, [tab]);
+
+  async function updateStatus(orderId, status, payment_status) {
+    await api.admin.patch(`/api/admin/orders/${orderId}/status-flow`, { status, payment_status });
+    await loadAdmin();
+  }
+
+  async function updatePayment(orderId, payment_status) {
+    await api.admin.patch(`/api/admin/orders/${orderId}/payment-flow`, { payment_status });
+    await loadAdmin();
+  }
+
+  async function saveProduct(event) {
+    event.preventDefault();
+    await api.admin.post('/api/admin/products', { ...productForm, category_id: Number(productForm.category_id), price: Number(productForm.price), sort_order: Number(productForm.sort_order || 0), is_active: true });
+    setProductForm({ category_id: '', name: '', description: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
+    await loadAdmin();
+  }
+
+  async function saveExpense(event) {
+    event.preventDefault();
+    await api.admin.post('/api/admin/finance/expenses', { ...expense, amount: Number(expense.amount) });
+    setExpense({ description: '', amount: '', category: 'Geral', payment_method: 'dinheiro' });
+    await loadAdmin();
+  }
+
+  async function saveMovement(event) {
+    event.preventDefault();
+    await api.admin.post('/api/admin/finance/cash/movements', { ...movement, amount: Number(movement.amount) });
+    setMovement({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
+    await loadAdmin();
+  }
+
+  async function openCash(event) {
+    event.preventDefault();
+    await api.admin.post('/api/admin/finance/cash/open', { opening_amount: Number(openValue || 0) });
+    await loadAdmin();
+  }
+
+  async function closeCash(event) {
+    event.preventDefault();
+    await api.admin.post('/api/admin/finance/cash/close', { closing_amount: Number(closeValue || 0) });
+    await loadAdmin();
+  }
+
+  async function saveSettings(event) {
+    event.preventDefault();
+    await api.admin.put('/api/admin/settings/premium', {
+      ...settings,
+      delivery_fee: Number(settings.delivery_fee || 0),
+      minimum_order: Number(settings.minimum_order || 0),
+      estimated_delivery_minutes: Number(settings.estimated_delivery_minutes || 35),
+      is_open: Boolean(Number(settings.is_open ?? 1)),
+      allow_whatsapp_redirect: Boolean(Number(settings.allow_whatsapp_redirect ?? 1))
+    });
+    setMessage('Configuracoes salvas.');
+    await loadAdmin();
+  }
+
+  async function createManualOrder(event) {
+    event.preventDefault();
+    await api.admin.post('/api/admin/orders', { ...manualOrder, customer: manualCustomer, items: manualOrder.items.map((item) => ({ product_id: Number(item.product_id), quantity: Number(item.quantity || 1), extras: [], notes: '' })) });
     setManualCustomer({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
     setManualOrder({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
     setMessage('Pedido criado no painel.');
@@ -648,4 +909,3 @@ export default function PremiumApp() {
     </div>
   );
 }
-
