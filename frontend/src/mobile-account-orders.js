@@ -33,7 +33,7 @@ function enhanceHeaderAccount() {
   const logged = isLogged();
   button.classList.toggle('mobile-account-orders-button', logged);
   if (logged) {
-    button.innerHTML = '<span>Conta</span><small>Meus pedidos</small>';
+    button.textContent = 'Meus pedidos';
     button.setAttribute('aria-label', 'Abrir meus pedidos');
   } else {
     button.textContent = 'Entrar';
