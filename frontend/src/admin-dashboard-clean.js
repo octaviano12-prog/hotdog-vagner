@@ -1,11 +1,20 @@
 import './admin-executive-dashboard.css';
 import './admin-executive-dashboard.js';
 
+function installCounterOrderStyles(){
+  if(document.getElementById('counter-order-styles'))return
+  const style=document.createElement('style')
+  style.id='counter-order-styles'
+  style.textContent='[class~=big-form-panel]{padding:28px;border-radius:22px;border:1px solid #c48a18;background:#0b0c0d}'
+  document.head.appendChild(style)
+}
+
 function isAdminPage(){return window.location.pathname.includes('admin')}
 function token(){return localStorage.getItem('hotdog_token')||''}
 function clickFirst(selector){document.querySelector(selector)?.click()}
 function ensureCleanAdminWidgets(){
   if(!isAdminPage()||!token())return
+  installCounterOrderStyles()
   const right=document.querySelector('.right-stack')
   if(!right)return
   if(!right.querySelector('.admin-actions-panel-final')){
@@ -50,6 +59,7 @@ function ensureCleanAdminWidgets(){
   }
 }
 function bootCleanAdmin(){
+  installCounterOrderStyles()
   setInterval(ensureCleanAdminWidgets,1200)
   setTimeout(ensureCleanAdminWidgets,500)
 }
