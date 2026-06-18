@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" role="img" aria-label="Cadastro e fidelidade premium">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ffb414"/><stop offset="1" stop-color="#ff6418"/></linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="30" stdDeviation="26" flood-color="#000" flood-opacity=".44"/></filter>
+  </defs>
+  <rect width="900" height="700" rx="60" fill="#090604"/>
+  <circle cx="450" cy="350" r="310" fill="#ffb414" opacity=".10"/>
+  <g filter="url(#sh)">
+    <rect x="255" y="105" width="390" height="490" rx="56" fill="#120902" stroke="#ffb414" stroke-opacity=".26" stroke-width="4"/>
+    <rect x="315" y="156" width="270" height="60" rx="24" fill="url(#g)"/>
+    <text x="350" y="195" fill="#180900" font-family="Arial" font-weight="900" font-size="26">MINHA CONTA</text>
+    <circle cx="450" cy="296" r="72" fill="url(#g)"/>
+    <circle cx="450" cy="278" r="28" fill="#190a00" opacity=".84"/>
+    <path d="M394 350c24-42 88-42 112 0" fill="#190a00" opacity=".84"/>
+    <rect x="320" y="406" width="260" height="34" rx="17" fill="#fff" opacity=".10"/>
+    <rect x="320" y="458" width="200" height="34" rx="17" fill="#fff" opacity=".10"/>
+    <g transform="translate(320 510)">
+      <rect width="260" height="58" rx="22" fill="#201006" stroke="#ffb414" stroke-opacity=".22"/>
+      <text x="24" y="37" fill="#ffd36e" font-family="Arial" font-weight="900" font-size="22">⭐ Fidelidade ativa</text>
+    </g>
+  </g>
+  <g transform="translate(96 484)">
+    <rect width="238" height="86" rx="30" fill="#120902" stroke="#ffb414" stroke-opacity=".22"/>
+    <text x="24" y="36" fill="#ffd36e" font-family="Arial" font-weight="900" font-size="18">PEÇA MAIS RÁPIDO</text>
+    <text x="24" y="62" fill="#fff" font-family="Arial" font-weight="800" font-size="20">endereço salvo</text>
+  </g>
+  <g transform="translate(606 115)">
+    <rect width="210" height="86" rx="30" fill="#120902" stroke="#ffb414" stroke-opacity=".22"/>
+    <text x="24" y="36" fill="#ffd36e" font-family="Arial" font-weight="900" font-size="18">HISTÓRICO</text>
+    <text x="24" y="62" fill="#fff" font-family="Arial" font-weight="800" font-size="20">pedir novamente</text>
+  </g>
+</svg>
