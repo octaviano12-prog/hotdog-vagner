@@ -9,10 +9,13 @@ import {
   Flame,
   Home,
   LogOut,
+  MapPin,
   Menu,
+  Minus,
   Package,
   Phone,
   Plus,
+  Printer,
   RefreshCw,
   Search,
   Settings,
@@ -24,6 +27,7 @@ import {
   Trash2,
   Truck,
   Users,
+  Volume2,
   WalletCards,
   XCircle
 } from 'lucide-react';
@@ -414,7 +418,10 @@ function PremiumLogin({ onLogin }) {
 function AdminSidebar({ activeTab, setActiveTab }) {
   return (
     <aside className="admin-sidebar">
-      <div className="sidebar-logo">🌭</div>
+      <div className="sidebar-brand">
+        <div className="sidebar-logo">🌭</div>
+        <div className="sidebar-brand-copy"><strong>Hot Dog do Vagner</strong><span>Pedidos Online</span></div>
+      </div>
       <nav className="sidebar-nav">
         {adminTabs.map(([key, label, Icon]) => (
           <button key={key} className={activeTab === key ? 'active' : ''} onClick={() => setActiveTab(key)}>
@@ -422,6 +429,14 @@ function AdminSidebar({ activeTab, setActiveTab }) {
           </button>
         ))}
       </nav>
+      <div className="sidebar-shortcuts">
+        <button type="button" onClick={() => {
+          const shortcut = document.querySelector('.delivery-dock,[data-delivery-open]');
+          if (shortcut) shortcut.click();
+          else setActiveTab('orders');
+        }}><Bike size={19} /> Entregas</button>
+        <button type="button" onClick={() => { window.location.href = '/cozinha'; }}><ChefHat size={19} /> Modo cozinha</button>
+      </div>
       <div className="sidebar-user">
         <div className="avatar">AD</div>
         <div><strong>Administrador</strong><small>admin@hotdog.com</small></div>
@@ -430,251 +445,16 @@ function AdminSidebar({ activeTab, setActiveTab }) {
   );
 }
 
-function MetricCard({ icon, label, value, accent = 'gold', footer }) {
+function AdminCounterToolbar({ onRefresh }) {
+  const [sound, setSound] = useState(true);
   return (
-    <article className={`metric-card ${accent}`}>
-      <span className="metric-icon">{icon}</span>
-      <div>
-        <small>{label}</small>
-        <strong>{value}</strong>
-        {footer && <em>{footer}</em>}
-      </div>
-    </article>
-  );
-}
-
-function OrderKanban({ orders, onMove, onCancel, setActiveTab }) {
-  const grouped = statusFlow.reduce((acc, status) => ({ ...acc, [status]: orders.filter((order) => order.status === status) }), {});
-
-  return (
-    <section className="kanban-shell">
-      <div className="section-toolbar">
-        <div><h3>Pedidos do dia</h3><span>{orders.length} pedidos</span></div>
-        <div className="toolbar-actions"><Search size={18} /><select><option>Filtrar pedidos</option></select></div>
-      </div>
-      <div className="kanban-board">
-        {statusFlow.map((status) => {
-          const meta = statusMeta[status];
-          const Icon = meta.icon;
-          return (
-            <div className={`kanban-column ${status}`} key={status}>
-              <div className="kanban-title"><span>{meta.title}</span><b>{grouped[status]?.length || 0}</b></div>
-              <div className="kanban-cards">
-                {(grouped[status] || []).map((order) => (
-                  <article className="kanban-card" key={order.id}>
-                    <div className="order-head">
-                      <strong>{order.public_code || `#${order.id}`}</strong>
-                      <small>{order.created_at ? new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''}</small>
-                    </div>
-                    <h4>{order.customer_name}</h4>
-                    <div className="order-items">
-                      {order.items?.filter((item) => item.item_type === 'produto').slice(0, 4).map((item) => <span key={item.id}>{item.quantity}x {item.name}</span>)}
-                    </div>
-                    <small>Pagamento</small>
-                    <p>{paymentLabels[order.payment_method] || order.payment_method} • {order.payment_status === 'pago' ? 'Pago' : 'Pendente'}</p>
-                    <strong className="order-price">{formatMoney(order.total)}</strong>
-                    <div className="kanban-actions">
-                      {status !== 'concluido' && status !== 'cancelado' && <button onClick={() => onMove(order.id, meta.next)}><Icon size={15} /> {meta.action}</button>}
-                      {status !== 'cancelado' && <button className="danger-link" onClick={() => onCancel(order.id)}>Cancelar</button>}
-                    </div>
-                  </article>
-                ))}
-                {(grouped[status] || []).length === 0 && <div className="empty-column">Nenhum pedido nesta etapa</div>}
-              </div>
-              <button className="add-order-link" onClick={() => setActiveTab('new-order')}>+ Novo pedido</button>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function TopProducts({ orders, dashboard }) {
-  const ranking = useMemo(() => {
-    if (dashboard?.top_products?.length) return dashboard.top_products.map((item) => [item.name, Number(item.quantity || 0)]);
-    const map = new Map();
-    orders.forEach((order) => {
-      order.items?.filter((item) => item.item_type === 'produto').forEach((item) => {
-        map.set(item.name, (map.get(item.name) || 0) + Number(item.quantity || 0));
-      });
-    });
-    return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
-  }, [orders, dashboard]);
-  const max = Math.max(1, ...ranking.map(([, qty]) => qty));
-
-  return (
-    <section className="side-panel">
-      <div className="panel-title"><h3>🔥 Produtos mais vendidos hoje</h3><select><option>Hoje</option></select></div>
-      <div className="ranking-list">
-        {ranking.map(([name, qty], index) => (
-          <div className="ranking-row" key={name}>
-            <span>{index + 1}</span>
-            <div><strong>{name}</strong><i style={{ width: `${(qty / max) * 100}%` }} /></div>
-            <b>{qty}x</b>
-          </div>
-        ))}
-        {ranking.length === 0 && <p className="muted">Ainda nao ha vendas hoje.</p>}
-      </div>
-      <a className="report-link">Ver relatorio completo →</a>
-    </section>
-  );
-}
-
-function DashboardTab({ orders, summary, dashboard, onMove, onCancel, setActiveTab }) {
-  const todayOrders = Number(summary?.orders_today || orders.length || 0);
-  const ticket = todayOrders ? Number(summary?.gross_today || 0) / todayOrders : 0;
-  const inPrep = orders.filter((order) => order.status === 'preparo').length;
-
-  return (
-    <>
-      <section className="alert-strip">
-        <div><Bell size={20} /><strong>{inPrep} pedido em preparo</strong><span>Acompanhe a coluna Em preparo</span></div>
-        <div><ShoppingBag size={20} /><strong>Novo pedido recebido!</strong><span>Painel atualizado automaticamente</span></div>
-        <div><CheckCircle size={20} /><strong>Dica do dia</strong><span>Mantenha o tempo medio abaixo de 25 min</span></div>
-      </section>
-      <section className="metric-grid">
-        <MetricCard icon="💰" label="Faturamento hoje" value={formatMoney(summary?.gross_today)} footer="▲ 12% vs ontem" />
-        <MetricCard icon="💳" label="Recebido hoje" value={formatMoney(summary?.paid_today)} accent="green" footer="— 0% vs ontem" />
-        <MetricCard icon="⏱" label="Pendente" value={formatMoney(summary?.pending_today)} accent="orange" footer="— 0% vs ontem" />
-        <MetricCard icon="📈" label="Liquido hoje" value={formatMoney(summary?.net_today)} footer="▲ 12% vs ontem" />
-        <MetricCard icon="📋" label="Pedidos do dia" value={todayOrders} accent="red" footer="▲ 2 vs ontem" />
-        <MetricCard icon="📊" label="Ticket medio" value={formatMoney(ticket)} accent="purple" footer="▲ 10% vs ontem" />
-      </section>
-      <section className="admin-dashboard-grid">
-        <OrderKanban orders={orders} onMove={onMove} onCancel={onCancel} setActiveTab={setActiveTab} />
-        <div className="right-stack">
-          <TopProducts orders={orders} dashboard={dashboard} />
-          <section className="side-panel quick-summary">
-            <h3>Resumo rapido</h3>
-            <div><span>⏱ Tempo medio preparo</span><strong>18 min</strong></div>
-            <div><span>⭐ Avaliacao media</span><strong>4,8</strong></div>
-            <div><span>👥 Clientes atendidos</span><strong>{todayOrders}</strong></div>
-            <div><span>📈 Taxa de conclusao</span><strong>100%</strong></div>
-          </section>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function AdminPremium() {
-  const [tab, setTab] = useState('dashboard');
-  const [orders, setOrders] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [summary, setSummary] = useState(null);
-  const [dashboard, setDashboard] = useState(null);
-  const [expenses, setExpenses] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [cash, setCash] = useState({ register: null, totals: null, movements: [] });
-  const [settings, setSettings] = useState(null);
-  const [report, setReport] = useState(null);
-  const [message, setMessage] = useState('');
-  const [expense, setExpense] = useState({ description: '', amount: '', category: 'Geral', payment_method: 'dinheiro' });
-  const [movement, setMovement] = useState({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
-  const [openValue, setOpenValue] = useState('0');
-  const [closeValue, setCloseValue] = useState('0');
-  const [productForm, setProductForm] = useState({ category_id: '', name: '', description: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
-  const [manualCustomer, setManualCustomer] = useState({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
-  const [manualOrder, setManualOrder] = useState({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
-  const activeProducts = useMemo(() => products.filter((p) => Number(p.is_active) === 1 && p.product_type !== 'adicional'), [products]);
-
-  async function loadAdmin() {
-    try {
-      const [orderData, productData, categoryData, summaryData, dashboardData, settingsData, expenseData, cashData, customerData, reportData] = await Promise.all([
-        api.admin.get('/api/admin/orders'),
-        api.admin.get('/api/admin/products'),
-        api.admin.get('/api/admin/categories'),
-        api.admin.get('/api/admin/finance/summary'),
-        api.admin.get('/api/admin/dashboard'),
-        api.admin.get('/api/admin/settings'),
-        api.admin.get('/api/admin/finance/expenses'),
-        api.admin.get('/api/admin/finance/cash/current'),
-        api.admin.get('/api/admin/customers'),
-        api.admin.get('/api/admin/reports/sales')
-      ]);
-      setOrders(orderData);
-      setProducts(productData);
-      setCategories(categoryData);
-      setSummary(summaryData);
-      setDashboard(dashboardData);
-      setSettings(settingsData);
-      setExpenses(expenseData);
-      setCash(cashData);
-      setCustomers(customerData);
-      setReport(reportData);
-    } catch (error) {
-      setMessage(error.message);
-    }
-  }
-
-  useEffect(() => {
-    loadAdmin();
-    const timer = setInterval(loadAdmin, 15000);
-    return () => clearInterval(timer);
-  }, []);
-
-  async function updateStatus(orderId, status, payment_status) {
-    await api.admin.patch(`/api/admin/orders/${orderId}/status-flow`, { status, payment_status });
-    await loadAdmin();
-  }
-
-  async function updatePayment(orderId, payment_status) {
-    await api.admin.patch(`/api/admin/orders/${orderId}/payment-flow`, { payment_status });
-    await loadAdmin();
-  }
-
-  async function saveProduct(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/products', { ...productForm, category_id: Number(productForm.category_id), price: Number(productForm.price), sort_order: Number(productForm.sort_order || 0), is_active: true });
-    setProductForm({ category_id: '', name: '', description: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
-    await loadAdmin();
-  }
-
-  async function saveExpense(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/finance/expenses', { ...expense, amount: Number(expense.amount) });
-    setExpense({ description: '', amount: '', category: 'Geral', payment_method: 'dinheiro' });
-    await loadAdmin();
-  }
-
-  async function saveMovement(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/finance/cash/movements', { ...movement, amount: Number(movement.amount) });
-    setMovement({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
-    await loadAdmin();
-  }
-
-  async function openCash(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/finance/cash/open', { opening_amount: Number(openValue || 0) });
-    await loadAdmin();
-  }
-
-  async function closeCash(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/finance/cash/close', { closing_amount: Number(closeValue || 0) });
-    await loadAdmin();
-  }
-
-  async function saveSettings(event) {
-    event.preventDefault();
-    await api.admin.put('/api/admin/settings/premium', {
-      ...settings,
-      delivery_fee: Number(settings.delivery_fee || 0),
-      minimum_order: Number(settings.minimum_order || 0),
-      estimated_delivery_minutes: Number(settings.estimated_delivery_minutes || 35),
-      is_open: Boolean(Number(settings.is_open ?? 1)),
-      allow_whatsapp_redirect: Boolean(Number(settings.allow_whatsapp_redirect ?? 1))
-    });
-    setMessage('Configuracoes salvas.');
-    await loadAdmin();
-  }
-
-  async function createManualOrder(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/orders', { ...manualOrder, customer: manualCustomer, items: manualOrder.items.map((item) => ({ product_id: Number(item.product_id), quantity: Number(item.quantity || 1), extras: [], notes: '' })) });
+    <section className="admin-counter-toolbar" aria-label="Ferramentas do balcão">
+      <label className="counter-search"><Search size={19} /><input placeholder="Buscar por cliente, telefone, código ou item" /></label>
+      <select aria-label="Filtrar por status" defaultValue=""><option value="">Todos os status</option><option value="novo">Novos</option><option value="preparo">Em preparo</option><option value="saiu_entrega">Em entrega</option><option value="concluido">Concluídos</option></select>
+      <select aria-label="Filtrar por pagamento" defaultValue=""><option value="">Todos pagamentos</option><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="cartao">Cartão</option><option value="fiado">Fiado</option></select>
+      <button type="button" className={sound ? 'sound-on' : ''} onClick={() => setSound((current) => !current)}><Volume2 size={18} /> Som {sound ? 'ligado' : 'desligado'}</button>
+      <button type="button" onClick={() => window.print()}><Printer size={18} /> Imprimir pedidos</button>
+     …3179 tokens truncated…   await api.admin.post('/api/admin/orders', { ...manualOrder, customer: manualCustomer, items: manualOrder.items.map((item) => ({ product_id: Number(item.product_id), quantity: Number(item.quantity || 1), extras: [], notes: '' })) });
     setManualCustomer({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
     setManualOrder({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
     setMessage('Pedido criado no painel.');
@@ -696,33 +476,33 @@ function AdminPremium() {
 
     if (tab === 'new-order') {
       return (
-        <section className="panel big-form-panel">
-          <div className="panel-title"><h3><Plus size={18} /> Pedido manual / balcao</h3><span>Venda presencial, WhatsApp ou telefone</span></div>
+        <section className="panel big-form-panel counter-order-panel">
+          <div className="panel-title"><h3><Store size={21} /> Pedido manual / balcão</h3><span>Venda presencial, WhatsApp ou telefone</span></div>
           <form onSubmit={createManualOrder} className="stack-form">
-            <div className="form-grid">
-              <input placeholder="Nome do cliente" value={manualCustomer.name} onChange={(e) => setManualCustomer({ ...manualCustomer, name: e.target.value })} required />
-              <input placeholder="Telefone" value={manualCustomer.phone} onChange={(e) => setManualCustomer({ ...manualCustomer, phone: e.target.value })} required />
-              <input placeholder="Endereco" value={manualCustomer.address} onChange={(e) => setManualCustomer({ ...manualCustomer, address: e.target.value })} />
-              <input placeholder="Bairro" value={manualCustomer.neighborhood} onChange={(e) => setManualCustomer({ ...manualCustomer, neighborhood: e.target.value })} />
+            <div className="form-grid counter-customer-grid">
+              <label className="counter-field"><span><Users size={17} /> Nome do cliente</span><input placeholder="Digite o nome do cliente" value={manualCustomer.name} onChange={(e) => setManualCustomer({ ...manualCustomer, name: e.target.value })} required /></label>
+              <label className="counter-field"><span><Phone size={17} /> Telefone</span><input placeholder="(00) 00000-0000" value={manualCustomer.phone} onChange={(e) => setManualCustomer({ ...manualCustomer, phone: e.target.value })} required /></label>
+              <label className="counter-field"><span><MapPin size={17} /> Endereço</span><input placeholder="Rua, número, complemento" value={manualCustomer.address} onChange={(e) => setManualCustomer({ ...manualCustomer, address: e.target.value })} /></label>
+              <label className="counter-field"><span><Home size={17} /> Bairro</span><input placeholder="Digite o bairro" value={manualCustomer.neighborhood} onChange={(e) => setManualCustomer({ ...manualCustomer, neighborhood: e.target.value })} /></label>
             </div>
             {manualOrder.items.map((item, index) => (
-              <div className="form-grid" key={index}>
-                <select value={item.product_id} onChange={(e) => updateManualItem(index, 'product_id', e.target.value)} required>
-                  <option value="">Produto</option>
+              <div className="form-grid counter-product-grid" key={index}>
+                <label className="counter-field"><span><Package size={17} /> Produto</span><select value={item.product_id} onChange={(e) => updateManualItem(index, 'product_id', e.target.value)} required>
+                  <option value="">Selecione o produto</option>
                   {activeProducts.map((product) => <option key={product.id} value={product.id}>{product.name} - {formatMoney(product.price)}</option>)}
-                </select>
-                <input type="number" min="1" value={item.quantity} onChange={(e) => updateManualItem(index, 'quantity', e.target.value)} />
+                </select></label>
+                <div className="counter-field counter-quantity"><span>Quantidade</span><div><button type="button" aria-label="Diminuir quantidade" onClick={() => updateManualItem(index, 'quantity', Math.max(1, Number(item.quantity || 1) - 1))}><Minus size={17} /></button><b>{item.quantity}</b><button type="button" aria-label="Aumentar quantidade" onClick={() => updateManualItem(index, 'quantity', Number(item.quantity || 1) + 1)}><Plus size={17} /></button></div></div>
               </div>
             ))}
             <button type="button" className="btn-secondary" onClick={() => setManualOrder((current) => ({ ...current, items: [...current.items, { product_id: '', quantity: 1, extras: [] }] }))}>Adicionar item</button>
-            <div className="form-grid">
-              <select value={manualOrder.delivery_type} onChange={(e) => setManualOrder({ ...manualOrder, delivery_type: e.target.value })}><option value="entrega">Entrega</option><option value="retirada">Retirada</option></select>
-              <select value={manualOrder.payment_method} onChange={(e) => setManualOrder({ ...manualOrder, payment_method: e.target.value })}><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="cartao">Cartao</option><option value="fiado">Fiado</option></select>
-              <select value={manualOrder.payment_status} onChange={(e) => setManualOrder({ ...manualOrder, payment_status: e.target.value })}><option value="pendente">Pendente</option><option value="pago">Pago</option></select>
-              <select value={manualOrder.order_source} onChange={(e) => setManualOrder({ ...manualOrder, order_source: e.target.value })}><option value="balcao">Balcao</option><option value="admin">Admin</option><option value="whatsapp">WhatsApp</option></select>
+            <div className="form-grid counter-options-grid">
+              <label className="counter-field"><span><Truck size={17} /> Entrega</span><select value={manualOrder.delivery_type} onChange={(e) => setManualOrder({ ...manualOrder, delivery_type: e.target.value })}><option value="entrega">Entrega</option><option value="retirada">Retirada</option></select></label>
+              <label className="counter-field"><span><DollarSign size={17} /> Pagamento</span><select value={manualOrder.payment_method} onChange={(e) => setManualOrder({ ...manualOrder, payment_method: e.target.value })}><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="cartao">Cartão</option><option value="fiado">Fiado</option></select></label>
+              <label className="counter-field"><span><Clock size={17} /> Status</span><select value={manualOrder.payment_status} onChange={(e) => setManualOrder({ ...manualOrder, payment_status: e.target.value })}><option value="pendente">Pendente</option><option value="pago">Pago</option></select></label>
+              <label className="counter-field"><span><Store size={17} /> Origem</span><select value={manualOrder.order_source} onChange={(e) => setManualOrder({ ...manualOrder, order_source: e.target.value })}><option value="balcao">Balcão</option><option value="admin">Admin</option><option value="whatsapp">WhatsApp</option></select></label>
             </div>
-            <textarea placeholder="Observacoes" value={manualOrder.notes} onChange={(e) => setManualOrder({ ...manualOrder, notes: e.target.value })} />
-            <button className="btn-primary">Criar pedido</button>
+            <label className="counter-field counter-notes"><span><Plus size={17} /> Observações</span><textarea placeholder="Informações adicionais sobre o pedido (opcional)" value={manualOrder.notes} onChange={(e) => setManualOrder({ ...manualOrder, notes: e.target.value })} /></label>
+            <button className="btn-primary"><ShoppingBag size={20} /> Criar pedido</button>
           </form>
         </section>
       );
@@ -730,49 +510,61 @@ function AdminPremium() {
 
     if (tab === 'products') {
       return (
-        <section className="admin-dashboard-grid products-view">
-          <div className="panel">
-            <div className="panel-title"><h3><Plus size={18} /> Novo produto</h3></div>
-            <form onSubmit={saveProduct} className="stack-form">
-              <select value={productForm.category_id} onChange={(e) => setProductForm({ ...productForm, category_id: e.target.value })} required><option value="">Categoria</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select>
-              <input placeholder="Nome do produto" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required />
-              <textarea placeholder="Descricao" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} />
-              <input placeholder="Preco" type="number" step="0.01" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} required />
-              <select value={productForm.product_type} onChange={(e) => setProductForm({ ...productForm, product_type: e.target.value })}><option value="hotdog">Hot dog</option><option value="suco">Suco</option><option value="bebida">Bebida</option><option value="adicional">Adicional</option></select>
-              <button className="btn-primary">Salvar produto</button>
+        <section className="admin-products-reference">
+          <div className="panel product-create-panel">
+            <div className="panel-title"><h3><Package size={22} /> Novo produto</h3></div>
+            <form onSubmit={saveProduct} className="product-reference-form">
+              <label><span>Categoria</span><div className="product-input"><Package size={18} /><select value={productForm.category_id} onChange={(e) => setProductForm({ ...productForm, category_id: e.target.value })} required><option value="">Selecione a categoria</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></div></label>
+              <label><span>Nome do produto</span><div className="product-input"><ShoppingBag size={18} /><input placeholder="Digite o nome do produto" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required /></div></label>
+              <label><span>Descrição</span><div className="product-input product-description"><Menu size={18} /><textarea placeholder="Digite a descrição do produto" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} /></div></label>
+              <label><span>Preço</span><div className="product-input"><DollarSign size={18} /><input placeholder="R$ 0,00" type="number" step="0.01" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} required /></div></label>
+              <label><span>Tipo</span><div className="product-input"><Sparkles size={18} /><select value={productForm.product_type} onChange={(e) => setProductForm({ ...productForm, product_type: e.target.value })}><option value="hotdog">Hot dog</option><option value="suco">Suco</option><option value="bebida">Bebida</option><option value="adicional">Adicional</option></select></div></label>
+              <button className="btn-primary"><CheckCircle size={20} /> Salvar produto</button>
             </form>
           </div>
-          <div className="panel">
+          <div className="panel product-list-panel">
             <div className="panel-title"><h3>Produtos cadastrados</h3><span>{products.length} itens</span></div>
-            <div className="product-table">{products.map((product) => <div className="product-row" key={product.id}><div><strong>{product.name}</strong><small>{product.category_name} • {product.product_type}</small></div><strong>{formatMoney(product.price)}</strong><span className={product.is_active ? 'badge concluido' : 'badge cancelado'}>{product.is_active ? 'Ativo' : 'Inativo'}</span></div>)}</div>
+            <div className="reference-product-list">{products.map((product) => <article className="reference-product-row" key={product.id}><img src={adminProductImage(product)} alt="" /><div><strong>{product.name}</strong><small>{product.category_name} • {product.product_type}</small></div><div className="reference-product-price"><strong>{formatMoney(product.price)}</strong><span className={product.is_active ? 'active' : 'inactive'}>{product.is_active ? 'Ativo' : 'Inativo'}</span></div></article>)}{!products.length && <p className="reference-empty">Nenhum produto cadastrado.</p>}</div>
           </div>
         </section>
       );
     }
 
     if (tab === 'finance') {
+      const entries = Number(cash?.totals?.entradas || summary?.paid_today || 0);
+      const exits = Number(cash?.totals?.saidas || summary?.expenses_today || 0);
+      const balance = Number(cash?.totals?.saldo || 0);
+      const net = Number(summary?.net_today || entries - exits);
       return (
-        <section className="admin-dashboard-grid products-view">
-          <div className="panel">
-            <div className="panel-title"><h3>Caixa</h3></div>
-            {cash?.register ? (
-              <>
-                <p className="notice">Caixa aberto. Saldo previsto: <strong>{formatMoney(cash.totals?.saldo)}</strong></p>
-                <section className="metric-grid compact">
-                  <MetricCard icon="➕" label="Entradas" value={formatMoney(cash.totals?.entradas)} accent="green" />
-                  <MetricCard icon="➖" label="Saidas" value={formatMoney(cash.totals?.saidas)} accent="red" />
-                  <MetricCard icon="💵" label="Saldo" value={formatMoney(cash.totals?.saldo)} />
-                  <MetricCard icon="🧾" label="Movimentos" value={cash.movements?.length || 0} accent="purple" />
-                </section>
-                <form onSubmit={closeCash} className="stack-form"><input type="number" step="0.01" value={closeValue} onChange={(e) => setCloseValue(e.target.value)} placeholder="Valor contado no fechamento" /><button className="btn-primary">Fechar caixa</button></form>
-              </>
-            ) : (
-              <form onSubmit={openCash} className="stack-form"><input type="number" step="0.01" value={openValue} onChange={(e) => setOpenValue(e.target.value)} placeholder="Troco inicial" /><button className="btn-primary">Abrir caixa</button></form>
-            )}
-            <hr />
-            <form onSubmit={saveMovement} className="stack-form"><select value={movement.movement_type} onChange={(e) => setMovement({ ...movement, movement_type: e.target.value })}><option value="entrada">Entrada</option><option value="saida">Saida</option></select><input placeholder="Descricao" value={movement.description} onChange={(e) => setMovement({ ...movement, description: e.target.value })} required /><input placeholder="Valor" type="number" step="0.01" value={movement.amount} onChange={(e) => setMovement({ ...movement, amount: e.target.value })} required /><button className="btn-secondary">Registrar movimento</button></form>
+        <section className="admin-finance-reference">
+          <div className="finance-reference-metrics">
+            <article className="balance"><span><WalletCards size={28} /></span><div><small>Saldo em caixa</small><strong>{formatMoney(balance)}</strong><em>Atualizado agora</em></div></article>
+            <article className="entries"><span><RefreshCw size={28} /></span><div><small>Entradas hoje</small><strong>{formatMoney(entries)}</strong><em>Recebimentos confirmados</em></div></article>
+            <article className="exits"><span><LogOut size={28} /></span><div><small>Saídas hoje</small><strong>{formatMoney(exits)}</strong><em>Despesas e retiradas</em></div></article>
+            <article className="net"><span><DollarSign size={28} /></span><div><small>Lucro líquido</small><strong>{formatMoney(net)}</strong><em>Resultado estimado</em></div></article>
           </div>
-          <div className="panel"><div className="panel-title"><h3><WalletCards size={18} /> Nova despesa</h3></div><form onSubmit={saveExpense} className="stack-form"><input placeholder="Descricao" value={expense.description} onChange={(e) => setExpense({ ...expense, description: e.target.value })} required /><input placeholder="Valor" type="number" step="0.01" value={expense.amount} onChange={(e) => setExpense({ ...expense, amount: e.target.value })} required /><input placeholder="Categoria" value={expense.category} onChange={(e) => setExpense({ ...expense, category: e.target.value })} /><button className="btn-primary">Cadastrar saida</button></form><div className="mini-list">{expenses.slice(0, 8).map((item) => <span key={item.id}>{item.description} <strong>{formatMoney(item.amount)}</strong></span>)}</div></div>
+          <div className="finance-reference-grid">
+            <section className="panel finance-cash-panel">
+              <div className="panel-title"><h3><WalletCards size={20} /> Caixa</h3></div>
+              {cash?.register ? (
+                <form onSubmit={closeCash} className="finance-open-form"><label>Valor contado no fechamento<div><span>R$</span><input type="number" step="0.01" value={closeValue} onChange={(e) => setCloseValue(e.target.value)} /></div></label><button className="btn-primary"><WalletCards size={19} /> Fechar caixa</button></form>
+              ) : (
+                <form onSubmit={openCash} className="finance-open-form"><label>Valor atual de abertura<div><span>R$</span><input type="number" step="0.01" value={openValue} onChange={(e) => setOpenValue(e.target.value)} /></div></label><button className="btn-primary"><WalletCards size={19} /> Abrir caixa</button></form>
+              )}
+              <div className="finance-divider" />
+              <div className="panel-title movement-title"><h3><RefreshCw size={20} /> Registrar movimento</h3></div>
+              <form onSubmit={saveMovement} className="finance-movement-form">
+                <label>Tipo de movimento<select value={movement.movement_type} onChange={(e) => setMovement({ ...movement, movement_type: e.target.value })}><option value="entrada">Entrada</option><option value="saida">Saída</option></select></label>
+                <label>Descrição<input placeholder="Ex.: Venda balcão, suprimento..." value={movement.description} onChange={(e) => setMovement({ ...movement, description: e.target.value })} required /></label>
+                <label className="movement-value">Valor<div><span>R$</span><input placeholder="0,00" type="number" step="0.01" value={movement.amount} onChange={(e) => setMovement({ ...movement, amount: e.target.value })} required /></div></label>
+                <button className="btn-secondary"><Plus size={18} /> Registrar movimento</button>
+              </form>
+            </section>
+            <div className="finance-reference-side">
+              <section className="panel finance-expense-panel"><div className="panel-title"><h3><WalletCards size={20} /> Nova despesa</h3></div><form onSubmit={saveExpense} className="finance-expense-form"><label>Descrição<input placeholder="Ex.: Compra de ingredientes" value={expense.description} onChange={(e) => setExpense({ ...expense, description: e.target.value })} required /></label><label>Valor<div><span>R$</span><input placeholder="0,00" type="number" step="0.01" value={expense.amount} onChange={(e) => setExpense({ ...expense, amount: e.target.value })} required /></div></label><label>Categoria<input placeholder="Geral" value={expense.category} onChange={(e) => setExpense({ ...expense, category: e.target.value })} /></label><button className="btn-primary"><Plus size={18} /> Cadastrar saída</button></form></section>
+              <section className="panel finance-movements-panel"><div className="panel-title"><h3><Clock size={20} /> Últimas movimentações</h3><span>{cash.movements?.length || 0} itens</span></div><div className="finance-movement-list">{(cash.movements || []).slice(0, 6).map((item) => <article key={item.id}><span className={item.movement_type === 'saida' ? 'out' : 'in'}>{item.movement_type === 'saida' ? '↑' : '↓'}</span><div><strong>{item.description}</strong><small>{item.movement_type === 'saida' ? 'Saída' : 'Entrada'}</small></div><b className={item.movement_type === 'saida' ? 'out' : 'in'}>{item.movement_type === 'saida' ? '- ' : ''}{formatMoney(item.amount)}</b></article>)}{!(cash.movements || []).length && <p className="reference-empty">Nenhuma movimentação registrada.</p>}</div></section>
+            </div>
+          </div>
         </section>
       );
     }
@@ -796,20 +588,21 @@ function AdminPremium() {
   return (
     <div className="admin-desktop-shell">
       <AdminSidebar activeTab={tab} setActiveTab={setTab} />
-      <main className="admin-workspace">
+      <main className={`admin-workspace ${['new-order', 'products', 'finance'].includes(tab) ? 'counter-workspace' : ''}`}>
         <header className="admin-topbar">
           <div className="admin-title-block">
             <button className="hamburger"><Menu size={28} /></button>
             <div><h1>Hot Dog do Vagner</h1><span>Pedidos Online</span></div>
           </div>
           <div className="admin-top-actions">
-            <button className="store-open"><span />Loja aberta</button>
+            <button className={Number(settings?.is_open ?? 1) === 1 ? 'store-open' : 'store-closed'}><span />{Number(settings?.is_open ?? 1) === 1 ? 'Loja aberta' : 'Loja fechada'}</button>
             <button className="outline-gold" onClick={() => { window.history.pushState({}, '', '/'); window.location.reload(); }}><ShoppingBag size={16} /> Cardapio</button>
             <button className="btn-secondary" onClick={loadAdmin}><RefreshCw size={16} /> Atualizar</button>
             <button className="danger-button" onClick={() => { clearToken(); window.location.reload(); }}><LogOut size={16} /> Sair</button>
           </div>
         </header>
 
+        {['new-order', 'products', 'finance'].includes(tab) && <AdminCounterToolbar onRefresh={loadAdmin} />}
         {message && <p className="notice admin-message">{message}</p>}
         {renderContent()}
         <footer className="admin-footer">© 2026 Hot Dog do Vagner • Painel Premium de Pedidos e Gestao</footer>
@@ -855,3 +648,4 @@ export default function PremiumApp() {
     </div>
   );
 }
+
