@@ -60,6 +60,60 @@
   transform: translate(-50%, 0);
 }
 
+.admin-dashboard-grid {
+  grid-template-columns: minmax(0, 1fr) 340px !important;
+  gap: 18px !important;
+}
+
+.kanban-shell {
+  padding: 16px !important;
+  border-radius: 24px !important;
+}
+
+.kanban-board {
+  grid-template-columns: repeat(5, minmax(220px, 1fr)) !important;
+  gap: 12px !important;
+  min-width: 1100px !important;
+}
+
+.kanban-column {
+  min-height: calc(100dvh - 190px) !important;
+  max-height: calc(100dvh - 190px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.kanban-cards {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.kanban-card {
+  padding: 12px !important;
+  border-radius: 18px !important;
+}
+
+.order-items span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.right-stack {
+  position: sticky !important;
+  top: 78px !important;
+}
+
+@media (max-width: 1500px) {
+  .admin-dashboard-grid { grid-template-columns: 1fr !important; }
+  .kanban-shell { overflow-x: auto !important; }
+  .right-stack { position: relative !important; top: auto !important; grid-template-columns: 1fr 1fr !important; }
+}
+
 @media (max-width: 760px) {
   .report-dock {
     left: 12px;
