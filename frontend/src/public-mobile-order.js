@@ -4,15 +4,22 @@ const mobileOrder = {
   menu: { categories: [], products: [] },
   settings: {},
   cart: [],
-  category: 'todos',
   payment: 'dinheiro',
   delivery: 'entrega',
   notes: '',
-  message: ''
+  changeFor: '',
+  message: '',
+  step: 1,
+  sending: false,
+  favorites: loadFavorites()
 };
 
 function isMobileOrderRoute() {
   return ['/pedir', '/pedido-mobile', '/mobile'].some((path) => window.location.pathname === path || window.location.pathname.startsWith(`${path}/`));
+}
+
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
 }
 
 function brl(value) {
@@ -31,6 +38,14 @@ function isLogged() {
   return Boolean(customerToken() && customerProfile());
 }
 
+function loadFavorites() {
+  try { return new Set(JSON.parse(localStorage.getItem('hotdog_mobile_favorites') || '[]').map(String)); } catch { return new Set(); }
+}
+
+function saveFavorites() {
+  localStorage.setItem('hotdog_mobile_favorites', JSON.stringify([...mobileOrder.favorites]));
+}
+
 function uid() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
@@ -42,10 +57,18 @@ function imageFor(product = {}) {
   return '/images/hotdog-premium.svg';
 }
 
+function productKind(product = {}) {
+  const type = String(product.product_type || '').toLowerCase();
+  const text = `${product.category_name || ''} ${product.name || ''}`.toLowerCase();
+  if (type === 'hotdog' || text.includes('hot dog') || text.includes('hotdog') || text.includes('lanche')) return 'snack';
+  if (type === 'bebida' || type === 'suco' || text.includes('bebida') || text.includes('refrigerante') || text.includes('suco')) return 'drink';
+  return 'other';
+}
+
 async function loadMobileData() {
   const [settings, menu] = await Promise.all([
-    fetch('/api/public/settings').then((r) => r.json()).catch(() => ({})),
-    fetch('/api/public/menu').then((r) => r.json()).catch(() => ({ categories: [], products: [] }))
+    fetch('/api/public/settings').then((response) => response.ok ? response.json() : {}).catch(() => ({})),
+    fetch('/api/public/menu').then((response) => response.ok ? response.json() : { categories: [], products: [] }).catch(() => ({ categories: [], products: [] }))
   ]);
   mobileOrder.settings = settings || {};
   mobileOrder.menu = menu || { categories: [], products: [] };
@@ -53,34 +76,78 @@ async function loadMobileData() {
 }
 
 function extras() {
-  return mobileOrder.menu.products.filter((p) => p.product_type === 'adicional');
+  return (mobileOrder.menu.products || []).filter((product) => product.product_type === 'adicional');
 }
 
-function visibleProducts() {
-  const products = mobileOrder.menu.products.filter((p) => p.product_type !== 'adicional');
-  if (mobileOrder.category === 'todos') return products;
-  return products.filter((p) => String(p.category_id) === String(mobileOrder.category));
+function productsForStep() {
+  const products = (mobileOrder.menu.products || []).filter((product) => product.product_type !== 'adicional');
+  if (mobileOrder.step === 1) return products.filter((product) => productKind(product) === 'snack');
+  if (mobileOrder.step === 3) return products.filter((product) => productKind(product) === 'drink');
+  return [];
 }
 
 function subtotal() {
-  return mobileOrder.cart.reduce((sum, item) => sum + item.quantity * (Number(item.price || 0) + item.extras.reduce((s, e) => s + Number(e.price || 0), 0)), 0);
+  return mobileOrder.cart.reduce((sum, item) => sum + item.quantity * (Number(item.price || 0) + item.extras.reduce((extraSum, extra) => extraSum + Number(extra.price || 0), 0)), 0);
 }
 
 function deliveryFee() {
-  if (!mobileOrder.cart.length) return 0;
-  return mobileOrder.delivery === 'entrega' ? Number(mobileOrder.settings?.delivery_fee || 0) : 0;
+  if (!mobileOrder.cart.length || mobileOrder.delivery !== 'entrega') return 0;
+  return Number(mobileOrder.settings?.delivery_fee || 0);
 }
 
 function total() {
   return subtotal() + deliveryFee();
 }
 
+function openAccount(tab) {
+  if (window.hotdogOpenAccountModal) {
+    window.hotdogOpenAccountModal(tab || (isLogged() ? 'profile' : 'login'));
+    return;
+  }
+  window.dispatchEvent(new CustomEvent('hotdog-open-account', { detail: { tab: tab || 'login' } }));
+}
+
+function logoutCustomer() {
+  localStorage.removeItem('hotdog_customer_token');
+  localStorage.removeItem('hotdog_customer_profile');
+  mobileOrder.cart = [];
+  mobileOrder.step = 1;
+  mobileOrder.message = 'Você saiu da conta.';
+  document.body.classList.remove('account-modal-open');
+  window.dispatchEvent(new Event('hotdog-customer-logout'));
+  renderMobilePage();
+}
+
+function normalizeStep() {
+  if (!mobileOrder.cart.length && mobileOrder.step > 1) mobileOrder.step = 1;
+  mobileOrder.step = Math.max(1, Math.min(4, Number(mobileOrder.step) || 1));
+}
+
+function setStep(step, focus = true) {
+  mobileOrder.step = step;
+  normalizeStep();
+  renderMobilePage();
+  if (!focus) return;
+  requestAnimationFrame(() => {
+    const selector = mobileOrder.step === 1 || mobileOrder.step === 3 ? '.mobile-product-list' : '.mobile-order-cart';
+    document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
 function addProduct(productId) {
-  const product = mobileOrder.menu.products.find((p) => Number(p.id) === Number(productId));
+  const product = (mobileOrder.menu.products || []).find((entry) => Number(entry.id) === Number(productId));
   if (!product) return;
   mobileOrder.cart.push({ key: uid(), ...product, quantity: 1, extras: [] });
-  renderMobilePage('Produto adicionado.');
-  document.querySelector('.mobile-order-cart')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  mobileOrder.message = '';
+  setStep(productKind(product) === 'drink' ? 4 : 2);
+}
+
+function toggleFavorite(productId) {
+  const key = String(productId);
+  if (mobileOrder.favorites.has(key)) mobileOrder.favorites.delete(key);
+  else mobileOrder.favorites.add(key);
+  saveFavorites();
+  renderMobilePage();
 }
 
 function addExtra(key, extraId) {
@@ -97,38 +164,65 @@ function changeQty(key, delta) {
   if (!item) return;
   item.quantity += delta;
   if (item.quantity <= 0) mobileOrder.cart = mobileOrder.cart.filter((entry) => entry.key !== key);
+  normalizeStep();
   renderMobilePage();
 }
 
-function openAccount() {
-  const button = document.querySelector('.customer-account-float');
-  if (button) button.click();
-  else window.location.href = '/?normal=1';
+function stepContent() {
+  const content = {
+    1: ['Etapa 1 de 4', 'Escolha seu lanche', 'Comece pelo hot dog prensado. Depois você poderá escolher os adicionais.'],
+    2: ['Etapa 2 de 4', 'Personalize seu lanche', 'Escolha os adicionais que desejar e continue para as bebidas.'],
+    3: ['Etapa 3 de 4', 'Quer uma bebida?', 'Adicione refrigerante ou suco, ou avance sem bebida.'],
+    4: ['Etapa 4 de 4', 'Revise e finalize', 'Confira os itens, escolha a entrega e envie seu pedido.']
+  };
+  return content[mobileOrder.step] || content[1];
 }
 
-function logoutCustomer() {
-  localStorage.removeItem('hotdog_customer_token');
-  localStorage.removeItem('hotdog_customer_profile');
-  mobileOrder.cart = [];
-  mobileOrder.message = 'Você saiu da conta.';
-  document.body.classList.remove('account-modal-open');
-  renderMobilePage('Você saiu da conta.');
+function stepPanel() {
+  const [eyebrow, title, text] = stepContent();
+  const previous = mobileOrder.step > 1 ? `<button type="button" class="guided-secondary" data-step="${mobileOrder.step - 1}">Voltar</button>` : '';
+  let next = '';
+  if (mobileOrder.step === 2) next = '<button type="button" class="guided-primary" data-step="3">Continuar para bebida</button>';
+  if (mobileOrder.step === 3) next = '<button type="button" class="guided-primary" data-step="4">Continuar sem bebida</button>';
+  if (mobileOrder.step === 4) next = '<button type="button" class="guided-secondary" data-step="1">Adicionar mais itens</button>';
+  return `<section class="mobile-guided-panel" aria-labelledby="guided-title"><div class="guided-progress" aria-label="${eyebrow}">${[1, 2, 3, 4].map((step) => `<i class="${step <= mobileOrder.step ? 'done' : ''}"></i>`).join('')}</div><span>${eyebrow}</span><h2 id="guided-title">${title}</h2><p>${text}</p>${previous || next ? `<div class="guided-actions">${previous}${next}</div>` : ''}</section>`;
+}
+
+function productCard(product) {
+  const favorite = mobileOrder.favorites.has(String(product.id));
+  return `<article class="mobile-product-card"><div class="mobile-product-image"><img src="${escapeHtml(imageFor(product))}" alt="${escapeHtml(product.name)}" width="128" height="128" loading="lazy" /></div><div class="mobile-product-copy"><span>${escapeHtml(product.category_name || product.product_type || 'Produto')}</span><h3>${escapeHtml(product.name)}</h3><p>${escapeHtml(product.description || 'Feito na hora.')}</p><footer><strong>${brl(product.price)}</strong><button type="button" data-add-product="${Number(product.id)}">Adicionar <b>+</b></button></footer></div><button type="button" class="premium-heart ${favorite ? 'active' : ''}" data-favorite-product="${Number(product.id)}" aria-label="${favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}" aria-pressed="${favorite}">${favorite ? '♥' : '♡'}</button></article>`;
+}
+
+function cartLine(item) {
+  const itemExtras = extras();
+  const extraButtons = mobileOrder.step === 2 && item.product_type === 'hotdog' && itemExtras.length
+    ? `<div class="mobile-extra-list">${itemExtras.map((extra) => `<button type="button" class="${item.extras.some((entry) => Number(entry.id) === Number(extra.id)) ? 'active' : ''}" data-extra-key="${escapeHtml(item.key)}" data-extra-id="${Number(extra.id)}">${escapeHtml(extra.name)} <b>+${brl(extra.price)}</b></button>`).join('')}</div>`
+    : '';
+  return `<article class="mobile-cart-line"><div class="mobile-cart-item-copy"><strong>${item.quantity}x ${escapeHtml(item.name)}</strong><small>${item.extras.length ? `+ ${item.extras.map((extra) => escapeHtml(extra.name)).join(', ')}` : 'Sem adicionais'}</small></div><div class="mobile-qty"><button type="button" data-qty="${escapeHtml(item.key)}" data-delta="-1" aria-label="Diminuir quantidade">−</button><b>${item.quantity}</b><button type="button" data-qty="${escapeHtml(item.key)}" data-delta="1" aria-label="Aumentar quantidade">+</button></div>${extraButtons}</article>`;
+}
+
+function checkoutForm() {
+  if (mobileOrder.step !== 4) return '';
+  const logged = isLogged();
+  return `<form class="mobile-checkout-form"><fieldset><legend>Como você quer receber?</legend><div class="mobile-choice"><button type="button" class="${mobileOrder.delivery === 'entrega' ? 'active' : ''}" data-delivery="entrega">Entrega</button><button type="button" class="${mobileOrder.delivery === 'retirada' ? 'active' : ''}" data-delivery="retirada">Retirada</button></div></fieldset><label class="mobile-field">Forma de pagamento<select data-payment><option value="dinheiro" ${mobileOrder.payment === 'dinheiro' ? 'selected' : ''}>Dinheiro</option><option value="pix" ${mobileOrder.payment === 'pix' ? 'selected' : ''}>PIX</option><option value="cartao" ${mobileOrder.payment === 'cartao' ? 'selected' : ''}>Cartão</option><option value="fiado" ${mobileOrder.payment === 'fiado' ? 'selected' : ''}>Fiado</option></select></label>${mobileOrder.payment === 'dinheiro' ? `<label class="mobile-field">Troco para quanto?<input data-mobile-change type="number" step="0.01" inputmode="decimal" value="${escapeHtml(mobileOrder.changeFor)}" placeholder="Ex.: 50,00" /></label>` : ''}<label class="mobile-field">Observações<textarea data-mobile-notes placeholder="Ex.: retirar milho">${escapeHtml(mobileOrder.notes)}</textarea></label><div class="mobile-total-box"><span>Subtotal <b>${brl(subtotal())}</b></span><span>Entrega <b>${brl(deliveryFee())}</b></span><strong>Total <b>${brl(total())}</b></strong></div><button class="mobile-send-order" type="submit" ${mobileOrder.sending ? 'disabled' : ''}>${mobileOrder.sending ? 'Enviando pedido…' : logged ? 'Finalizar pedido' : 'Entrar para finalizar'}</button></form>`;
 }
 
 async function sendMobileOrder(event) {
   event.preventDefault();
+  if (mobileOrder.sending) return;
   if (!isLogged()) {
     mobileOrder.message = 'Entre ou cadastre-se para finalizar o pedido.';
     renderMobilePage();
-    openAccount();
+    openAccount('login');
     return;
   }
   if (!mobileOrder.cart.length) {
     mobileOrder.message = 'Adicione pelo menos um produto ao pedido.';
-    return renderMobilePage();
+    renderMobilePage();
+    return;
   }
   const profile = customerProfile() || {};
-  const changeFor = Number(document.querySelector('[data-mobile-change]')?.value || 0);
+  const changeFor = Number(String(mobileOrder.changeFor || '').replace(',', '.'));
   const payload = {
     customer: {
       name: profile.name || 'Cliente',
@@ -140,10 +234,11 @@ async function sendMobileOrder(event) {
     delivery_type: mobileOrder.delivery,
     payment_method: mobileOrder.payment,
     change_for: mobileOrder.payment === 'dinheiro' && changeFor > 0 ? changeFor : null,
-    notes: document.querySelector('[data-mobile-notes]')?.value || '',
+    notes: mobileOrder.notes,
     items: mobileOrder.cart.map((item) => ({ product_id: Number(item.id), quantity: Number(item.quantity), extras: item.extras.map((extra) => Number(extra.id)), notes: '' }))
   };
-  mobileOrder.message = 'Enviando pedido...';
+  mobileOrder.sending = true;
+  mobileOrder.message = '';
   renderMobilePage();
   try {
     const response = await fetch('/api/orders', {
@@ -152,62 +247,87 @@ async function sendMobileOrder(event) {
       body: JSON.stringify(payload)
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data?.message || 'Nao foi possivel enviar o pedido.');
-    mobileOrder.cart = [];
+    if (!response.ok) throw new Error(data?.message || 'Não foi possível enviar o pedido.');
     const code = data?.order?.public_code || (data?.order?.id ? `HD${String(data.order.id).padStart(4, '0')}` : 'pedido');
+    mobileOrder.cart = [];
     mobileOrder.message = `Pedido ${code} enviado com sucesso!`;
     renderMobilePage();
-    setTimeout(() => { window.location.href = `/acompanhar?codigo=${encodeURIComponent(code)}&phone=${encodeURIComponent(profile.phone || '')}`; }, 900);
+    window.setTimeout(() => { window.location.href = `/acompanhar?codigo=${encodeURIComponent(code)}&phone=${encodeURIComponent(profile.phone || '')}`; }, 900);
   } catch (error) {
+    mobileOrder.sending = false;
     mobileOrder.message = error.message;
     renderMobilePage();
   }
 }
 
-function productCard(product) {
-  return `<article class="mobile-product-card"><img src="${imageFor(product)}" alt="${product.name}" loading="lazy" /><div><span>${product.category_name || product.product_type || 'Produto'}</span><h3>${product.name}</h3><p>${product.description || 'Feito na hora.'}</p><footer><strong>${brl(product.price)}</strong><button type="button" data-add-product="${product.id}">Adicionar</button></footer></div></article>`;
-}
-
-function cartLine(item) {
-  const itemExtras = extras();
-  return `<article class="mobile-cart-line"><div><strong>${item.quantity}x ${item.name}</strong><small>${item.extras.length ? `+ ${item.extras.map((e) => e.name).join(', ')}` : 'Sem adicionais'}</small></div><div class="mobile-qty"><button type="button" data-qty="${item.key}" data-delta="-1">-</button><b>${item.quantity}</b><button type="button" data-qty="${item.key}" data-delta="1">+</button></div>${item.product_type === 'hotdog' && itemExtras.length ? `<div class="mobile-extra-list">${itemExtras.map((extra) => `<button type="button" class="${item.extras.some((e) => Number(e.id) === Number(extra.id)) ? 'active' : ''}" data-extra-key="${item.key}" data-extra-id="${extra.id}">${extra.name} +${brl(extra.price)}</button>`).join('')}</div>` : ''}</article>`;
-}
-
-function renderMobilePage(message = mobileOrder.message) {
-  document.body.classList.add('mobile-order-page', 'mobile-menu-first', 'mobile-premium-v2', 'mobile-final-layout');
+function renderMobilePage() {
+  if (!isMobileOrderRoute()) return;
+  normalizeStep();
+  document.body.classList.add('mobile-order-page', 'mobile-order-stable');
+  document.body.dataset.guidedStep = String(mobileOrder.step);
   let root = document.querySelector('.mobile-order-app');
   if (!root) {
     root = document.createElement('main');
     root.className = 'mobile-order-app';
+    root.addEventListener('click', handleClick);
+    root.addEventListener('input', handleInput);
+    root.addEventListener('change', handleInput);
+    root.addEventListener('submit', (event) => {
+      if (event.target.matches('.mobile-checkout-form')) sendMobileOrder(event);
+    });
     document.body.appendChild(root);
   }
-  const profile = customerProfile();
   const logged = isLogged();
-  const count = mobileOrder.cart.reduce((sum, item) => sum + item.quantity, 0);
-  const bottomLabel = count ? `Pedido • ${brl(total())}` : 'Pedido';
-  const headerActions = `<div class="mobile-header-actions"><button type="button" data-account class="${logged ? 'mobile-account-orders-button' : ''}">${logged ? 'Meus pedidos' : 'Entrar'}</button>${logged ? '<button type="button" class="mobile-logout-top" data-mobile-logout>Sair</button>' : ''}</div>`;
-  root.innerHTML = `<header class="mobile-order-header ${logged ? 'has-mobile-logout' : ''}"><button type="button" data-back>←</button><div><span>Hot Dog do Vagner</span><strong>Pedido mobile</strong></div>${headerActions}</header><section class="mobile-order-hero"><div><span>🌭 Cardápio online</span><h1>Escolha seu pedido</h1><p>Cardápio simples, rápido e direto para pedir pelo celular.</p></div></section><section class="mobile-login-card ${logged ? 'logged' : ''}">${logged ? `<strong>✅ Pedido liberado</strong><p>Comprando como <b>${profile?.name || 'cliente'}</b>.</p>` : '<strong>🔒 Entre para finalizar</strong><p>Você pode escolher os produtos agora. Para enviar, faça login/cadastro.</p><button type="button" data-account>Entrar</button>'}</section><nav class="mobile-category-tabs"><button class="${mobileOrder.category === 'todos' ? 'active' : ''}" data-cat="todos">Todos</button>${mobileOrder.menu.categories.map((cat) => `<button class="${String(mobileOrder.category) === String(cat.id) ? 'active' : ''}" data-cat="${cat.id}">${cat.name}</button>`).join('')}</nav><section class="mobile-product-list">${mobileOrder.loaded ? visibleProducts().map(productCard).join('') : '<div class="mobile-loading">Carregando cardápio...</div>'}</section><section class="mobile-order-cart"><div class="mobile-cart-head"><div><span>${count} item(ns)</span><h2>Seu pedido</h2></div><strong>${brl(total())}</strong></div>${mobileOrder.cart.length ? mobileOrder.cart.map(cartLine).join('') : '<div class="mobile-empty-cart">Adicione produtos para começar.</div>'}<form class="mobile-checkout-form"><div class="mobile-choice"><button type="button" class="${mobileOrder.delivery === 'entrega' ? 'active' : ''}" data-delivery="entrega">Entrega</button><button type="button" class="${mobileOrder.delivery === 'retirada' ? 'active' : ''}" data-delivery="retirada">Retirada</button></div><select data-payment><option value="dinheiro" ${mobileOrder.payment === 'dinheiro' ? 'selected' : ''}>Dinheiro</option><option value="pix" ${mobileOrder.payment === 'pix' ? 'selected' : ''}>PIX</option><option value="cartao" ${mobileOrder.payment === 'cartao' ? 'selected' : ''}>Cartão</option><option value="fiado" ${mobileOrder.payment === 'fiado' ? 'selected' : ''}>Fiado</option></select>${mobileOrder.payment === 'dinheiro' ? '<input data-mobile-change type="number" step="0.01" placeholder="Troco para quanto?" />' : ''}<textarea data-mobile-notes placeholder="Observações do pedido"></textarea><div class="mobile-total-box"><span>Subtotal <b>${brl(subtotal())}</b></span><span>Entrega <b>${brl(deliveryFee())}</b></span><strong>Total <b>${brl(total())}</b></strong></div><button class="mobile-send-order" type="submit">${logged ? 'Finalizar pedido' : 'Entrar para finalizar'}</button>${message ? `<p class="mobile-order-message">${message}</p>` : ''}</form></section><div class="mobile-bottom-bar"><button type="button" data-menu>Cardápio</button><button type="button" data-cart>${bottomLabel}</button></div>`;
-  root.querySelector('[data-back]').addEventListener('click', () => { root.querySelector('.mobile-product-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-  root.querySelectorAll('[data-account]').forEach((btn) => btn.addEventListener('click', openAccount));
-  root.querySelector('[data-mobile-logout]')?.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); logoutCustomer(); });
-  root.querySelectorAll('[data-cat]').forEach((btn) => btn.addEventListener('click', () => { mobileOrder.category = btn.dataset.cat; renderMobilePage(); }));
-  root.querySelectorAll('[data-add-product]').forEach((btn) => btn.addEventListener('click', () => addProduct(btn.dataset.addProduct)));
-  root.querySelectorAll('[data-qty]').forEach((btn) => btn.addEventListener('click', () => changeQty(btn.dataset.qty, Number(btn.dataset.delta))));
-  root.querySelectorAll('[data-extra-key]').forEach((btn) => btn.addEventListener('click', () => addExtra(btn.dataset.extraKey, btn.dataset.extraId)));
-  root.querySelectorAll('[data-delivery]').forEach((btn) => btn.addEventListener('click', () => { mobileOrder.delivery = btn.dataset.delivery; renderMobilePage(); }));
-  root.querySelector('[data-payment]')?.addEventListener('change', (event) => { mobileOrder.payment = event.target.value; renderMobilePage(); });
-  root.querySelector('.mobile-checkout-form')?.addEventListener('submit', sendMobileOrder);
-  root.querySelector('[data-menu]')?.addEventListener('click', () => root.querySelector('.mobile-product-list')?.scrollIntoView({ behavior: 'smooth' }));
-  root.querySelector('[data-cart]')?.addEventListener('click', () => root.querySelector('.mobile-order-cart')?.scrollIntoView({ behavior: 'smooth' }));
+  const profile = customerProfile();
+  const products = productsForStep();
+  const productList = !mobileOrder.loaded
+    ? '<div class="mobile-loading">Carregando cardápio…</div>'
+    : products.length ? products.map(productCard).join('') : '<div class="mobile-empty-products">Nenhum produto disponível nesta etapa.</div>';
+  const cart = mobileOrder.cart.length ? mobileOrder.cart.map(cartLine).join('') : '<div class="mobile-empty-cart">Adicione produtos para começar.</div>';
+  root.innerHTML = `<header class="mobile-order-header"><div class="mobile-brand"><span>HOT DOG DO VAGNER</span><strong>Pedido mobile</strong></div><div class="mobile-header-actions"><button type="button" data-account="${logged ? 'orders' : 'login'}">${logged ? 'Meus pedidos' : 'Entrar'}</button>${logged ? '<button type="button" class="mobile-logout-top" data-mobile-logout>Sair</button>' : ''}</div></header><section class="mobile-order-hero"><span>🌭 Cardápio online</span><h1>Escolha seu pedido</h1><p>Hot dog prensado, feito na hora e do seu jeito.</p></section><section class="mobile-login-card ${logged ? 'logged' : ''}">${logged ? `<div><strong>Pedido liberado</strong><p>Comprando como <b>${escapeHtml(profile?.name || 'cliente')}</b>.</p></div>` : '<div><strong>Entre para finalizar</strong><p>Escolha os produtos agora e faça login antes de enviar.</p></div><button type="button" data-account="login">Entrar</button>'}</section>${stepPanel()}${mobileOrder.step === 1 || mobileOrder.step === 3 ? `<section class="mobile-product-list" aria-live="polite">${productList}</section>` : ''}${mobileOrder.step === 2 || mobileOrder.step === 4 ? `<section class="mobile-order-cart"><div class="mobile-cart-head"><div><span>${mobileOrder.cart.reduce((sum, item) => sum + item.quantity, 0)} item(ns)</span><h2>Seu pedido</h2></div><strong>${brl(total())}</strong></div>${cart}${checkoutForm()}</section>` : ''}${mobileOrder.message ? `<p class="mobile-order-message" role="status">${escapeHtml(mobileOrder.message)}</p>` : ''}`;
+}
+
+function handleClick(event) {
+  const button = event.target.closest('button');
+  if (!button) return;
+  if (button.dataset.account) return openAccount(button.dataset.account);
+  if (button.hasAttribute('data-mobile-logout')) return logoutCustomer();
+  if (button.dataset.favoriteProduct) return toggleFavorite(button.dataset.favoriteProduct);
+  if (button.dataset.addProduct) return addProduct(button.dataset.addProduct);
+  if (button.dataset.qty) return changeQty(button.dataset.qty, Number(button.dataset.delta));
+  if (button.dataset.extraKey) return addExtra(button.dataset.extraKey, button.dataset.extraId);
+  if (button.dataset.delivery) {
+    mobileOrder.delivery = button.dataset.delivery;
+    renderMobilePage();
+    return;
+  }
+  if (button.dataset.step) setStep(Number(button.dataset.step));
+}
+
+function handleInput(event) {
+  if (event.target.matches('[data-payment]')) {
+    mobileOrder.payment = event.target.value;
+    renderMobilePage();
+  } else if (event.target.matches('[data-mobile-change]')) {
+    mobileOrder.changeFor = event.target.value;
+  } else if (event.target.matches('[data-mobile-notes]')) {
+    mobileOrder.notes = event.target.value;
+  }
 }
 
 async function bootMobileOrder() {
   if (mobileOrder.booted || !isMobileOrderRoute()) return;
   mobileOrder.booted = true;
-  document.body.classList.add('mobile-order-page', 'mobile-menu-first', 'mobile-premium-v2', 'mobile-final-layout');
-  renderMobilePage('Carregando cardápio...');
+  renderMobilePage();
   await loadMobileData();
-  renderMobilePage('');
+  renderMobilePage();
 }
 
+window.addEventListener('hotdog-customer-session', () => renderMobilePage());
+window.addEventListener('hotdog-account-updated', () => renderMobilePage());
+window.addEventListener('storage', (event) => {
+  if (event.key === 'hotdog_customer_token' || event.key === 'hotdog_customer_profile') renderMobilePage();
+});
+
 bootMobileOrder();
+
