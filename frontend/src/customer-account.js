@@ -13,6 +13,10 @@ function isTrackingPage() {
   return window.location.pathname.includes('acompanhar') || window.location.pathname.includes('pedido-status');
 }
 
+function isMobileOrderPage() {
+  return ['/pedir', '/pedido-mobile', '/mobile'].some((path) => window.location.pathname === path || window.location.pathname.startsWith(`${path}/`));
+}
+
 function money(value) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
 }
@@ -104,6 +108,14 @@ function closeAccountModal() {
   document.body.classList.remove('account-modal-open');
 }
 
+function closeMobileAccountAfterAuth() {
+  if (!isMobileOrderPage()) return false;
+  closeAccountModal();
+  window.dispatchEvent(new Event('hotdog-customer-session'));
+  setTimeout(() => document.querySelector('.mobile-product-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+  return true;
+}
+
 function ensureModal() {
   if (document.querySelector('.customer-account-overlay')) return;
   const overlay = document.createElement('div');
@@ -160,6 +172,7 @@ function renderLoginTab() {
       saveSession(data.token, data.customer);
       fillCheckout();
       updateFloatButton();
+      if (closeMobileAccountAfterAuth()) return;
       renderAccountModal('profile', 'Login realizado com sucesso.');
     } catch (error) {
       renderAccountModal('login', error.message);
@@ -188,6 +201,7 @@ function renderRegisterTab() {
       saveSession(data.token, data.customer);
       fillCheckout();
       updateFloatButton();
+      if (closeMobileAccountAfterAuth()) return;
       renderAccountModal('profile', 'Cadastro criado com sucesso.');
     } catch (error) {
       renderAccountModal('register', error.message);
