@@ -4,7 +4,7 @@ function isMobileOrderRoute() {
 
 function installPreflight() {
   if (!isMobileOrderRoute()) return;
-  document.body.classList.add('mobile-order-page', 'mobile-menu-first', 'mobile-premium-v2', 'mobile-final-layout');
+  document.body.classList.add('mobile-order-page');
   if (document.getElementById('mobile-preflight-style')) return;
   const style = document.createElement('style');
   style.id = 'mobile-preflight-style';
@@ -18,3 +18,4 @@ function installPreflight() {
 }
 
 installPreflight();
+
