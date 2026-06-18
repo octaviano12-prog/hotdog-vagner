@@ -1,0 +1,625 @@
+body.mobile-order-page {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 85% 0, rgba(255, 160, 20, .14), transparent 30rem),
+    linear-gradient(180deg, #090705 0, #050403 100%);
+  color: #fff;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+}
+
+body.mobile-order-page #root { display: none !important; }
+
+body.mobile-order-page .mobile-order-app {
+  width: min(100%, 560px);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: 12px 12px 36px;
+  box-sizing: border-box;
+}
+
+body.mobile-order-page button,
+body.mobile-order-page input,
+body.mobile-order-page select,
+body.mobile-order-page textarea { font: inherit; }
+
+body.mobile-order-page button { -webkit-tap-highlight-color: transparent; }
+
+body.mobile-order-page .mobile-order-header {
+  position: relative;
+  inset: auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 68px;
+  margin: 0 0 12px;
+  padding: 11px 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 170, 27, .26);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 151, 20, .1), transparent 58%), rgba(13, 10, 7, .94);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, .34), inset 0 1px rgba(255, 255, 255, .04);
+  backdrop-filter: blur(14px);
+}
+
+body.mobile-order-page .mobile-brand {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+body.mobile-order-page .mobile-brand span {
+  color: #ffbf39;
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 950;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+body.mobile-order-page .mobile-brand strong {
+  overflow: hidden;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.mobile-order-page .mobile-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+}
+
+body.mobile-order-page .mobile-header-actions button {
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 170, 27, .28);
+  border-radius: 13px;
+  background: rgba(255, 170, 27, .09);
+  color: #ffd77a;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+body.mobile-order-page .mobile-header-actions .mobile-logout-top {
+  width: 58px;
+  padding: 0 8px;
+  border-color: rgba(255, 255, 255, .1);
+  background: rgba(255, 255, 255, .055);
+  color: rgba(255, 255, 255, .78);
+}
+
+body.mobile-order-page .mobile-order-hero {
+  display: grid;
+  min-height: 144px;
+  margin: 0 0 12px;
+  padding: 20px;
+  align-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 166, 20, .23);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 90% 15%, rgba(255, 187, 45, .22), transparent 35%),
+    linear-gradient(135deg, rgba(255, 136, 14, .13), rgba(255, 184, 20, .035)), #100b07;
+  box-shadow: 0 22px 58px rgba(0, 0, 0, .34);
+}
+
+body.mobile-order-page .mobile-order-hero > span,
+body.mobile-order-page .mobile-guided-panel > span {
+  color: #ffca55;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+}
+
+body.mobile-order-page .mobile-order-hero h1 {
+  margin: 8px 0 6px;
+  color: #fff;
+  font-size: clamp(30px, 9vw, 40px);
+  line-height: .98;
+  letter-spacing: -.045em;
+}
+
+body.mobile-order-page .mobile-order-hero p,
+body.mobile-order-page .mobile-guided-panel p,
+body.mobile-order-page .mobile-login-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, .64);
+  font-size: 13px;
+  line-height: 1.38;
+}
+
+body.mobile-order-page[data-guided-step='2'] .mobile-order-hero,
+body.mobile-order-page[data-guided-step='3'] .mobile-order-hero,
+body.mobile-order-page[data-guided-step='4'] .mobile-order-hero { display: none; }
+
+body.mobile-order-page .mobile-login-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 66px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 171, 28, .16);
+  border-radius: 19px;
+  background: rgba(255, 255, 255, .035);
+}
+
+body.mobile-order-page .mobile-login-card.logged {
+  border-color: rgba(72, 226, 132, .22);
+  background: linear-gradient(135deg, rgba(49, 255, 123, .09), rgba(255, 184, 0, .025));
+}
+
+body.mobile-order-page .mobile-login-card strong { display: block; margin-bottom: 3px; font-size: 14px; }
+
+body.mobile-order-page .mobile-login-card button {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 120px;
+  height: 38px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffb51c, #ff7217);
+  color: #1a0900;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+body.mobile-order-page .mobile-guided-panel {
+  position: relative;
+  display: block;
+  margin: 0 0 12px;
+  padding: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 181, 34, .2);
+  border-radius: 23px;
+  background: linear-gradient(135deg, rgba(255, 181, 20, .09), rgba(255, 106, 20, .035)), rgba(10, 7, 5, .9);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, .28);
+}
+
+body.mobile-order-page .guided-progress {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 13px;
+}
+
+body.mobile-order-page .guided-progress i {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .11);
+}
+
+body.mobile-order-page .guided-progress i.done {
+  background: linear-gradient(90deg, #ffbd28, #ff7618);
+  box-shadow: 0 0 14px rgba(255, 119, 20, .28);
+}
+
+body.mobile-order-page .mobile-guided-panel h2 {
+  margin: 7px 0 5px;
+  color: #fff;
+  font-size: clamp(23px, 7vw, 29px);
+  line-height: 1;
+  letter-spacing: -.035em;
+}
+
+body.mobile-order-page .guided-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+body.mobile-order-page .guided-actions button {
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid rgba(255, 183, 32, .2);
+  border-radius: 999px;
+  background: rgba(255, 183, 32, .07);
+  color: #ffd577;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+body.mobile-order-page .guided-actions .guided-primary {
+  flex: 1 1 190px;
+  border: 0;
+  background: linear-gradient(135deg, #ffb51c, #ff7217);
+  color: #1a0900;
+}
+
+body.mobile-order-page .mobile-product-list { display: grid; gap: 11px; }
+
+body.mobile-order-page .mobile-product-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 158px;
+  padding: 10px;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid rgba(255, 164, 22, .2);
+  border-radius: 23px;
+  background: linear-gradient(135deg, rgba(255, 154, 22, .055), transparent 50%), #100c09;
+  box-shadow: 0 15px 42px rgba(0, 0, 0, .29), inset 0 1px rgba(255, 255, 255, .035);
+}
+
+body.mobile-order-page .mobile-product-image {
+  display: grid;
+  width: 112px;
+  min-width: 112px;
+  min-height: 138px;
+  padding: 7px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 165, 24, .16);
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 185, 36, .16), transparent 64%), #0b0806;
+}
+
+body.mobile-order-page .mobile-product-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  object-fit: contain;
+}
+
+body.mobile-order-page .mobile-product-copy {
+  display: grid;
+  min-width: 0;
+  padding: 5px 0 2px;
+  align-content: center;
+}
+
+body.mobile-order-page .mobile-product-copy > span {
+  width: max-content;
+  max-width: calc(100% - 42px);
+  padding: 4px 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 181, 32, .1);
+  color: #ffc64a;
+  font-size: 9px;
+  font-weight: 950;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+body.mobile-order-page .mobile-product-card h3 {
+  margin: 7px 42px 4px 0;
+  overflow: visible;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.08;
+  letter-spacing: -.025em;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+body.mobile-order-page .mobile-product-card p {
+  display: -webkit-box;
+  margin: 0 0 9px;
+  overflow: hidden;
+  color: rgba(255, 255, 255, .59);
+  font-size: 11.5px;
+  line-height: 1.28;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+body.mobile-order-page .mobile-product-card footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+  margin-top: auto;
+  align-items: end;
+}
+
+body.mobile-order-page .mobile-product-card footer > strong {
+  align-self: center;
+  color: #ffae27;
+  font-size: 18px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body.mobile-order-page .mobile-product-card [data-add-product] {
+  display: inline-flex;
+  min-width: 98px;
+  height: 39px;
+  min-height: 39px;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffb51c, #ff7217);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+  box-shadow: 0 10px 26px rgba(255, 103, 15, .2);
+}
+
+body.mobile-order-page .mobile-product-card [data-add-product] b { font-size: 18px; line-height: 1; }
+
+body.mobile-order-page .premium-heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  display: grid;
+  width: 35px;
+  height: 35px;
+  min-width: 35px;
+  min-height: 35px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 50%;
+  background: rgba(14, 10, 7, .84);
+  color: #fff;
+  font-size: 19px;
+  line-height: 1;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .28);
+  backdrop-filter: blur(9px);
+}
+
+body.mobile-order-page .premium-heart.active {
+  border-color: rgba(255, 122, 31, .55);
+  background: #ff7618;
+  color: #fff;
+}
+
+body.mobile-order-page .mobile-loading,
+body.mobile-order-page .mobile-empty-products,
+body.mobile-order-page .mobile-empty-cart {
+  padding: 22px;
+  border: 1px dashed rgba(255, 179, 28, .18);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .025);
+  color: rgba(255, 255, 255, .62);
+  text-align: center;
+}
+
+body.mobile-order-page .mobile-order-cart {
+  display: block;
+  padding: 15px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 174, 25, .2);
+  border-radius: 25px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .038), transparent), #0d0a07;
+  box-shadow: 0 20px 58px rgba(0, 0, 0, .38);
+}
+
+body.mobile-order-page .mobile-cart-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, .075);
+}
+
+body.mobile-order-page .mobile-cart-head span { color: #ffc85a; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+body.mobile-order-page .mobile-cart-head h2 { margin: 4px 0 0; color: #fff; font-size: 26px; line-height: 1; letter-spacing: -.035em; }
+body.mobile-order-page .mobile-cart-head > strong { color: #ffbd3f; font-size: 22px; white-space: nowrap; }
+
+body.mobile-order-page .mobile-cart-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 18px;
+  background: rgba(0, 0, 0, .24);
+  box-shadow: inset 3px 0 #ff941a;
+}
+
+body.mobile-order-page .mobile-cart-item-copy { min-width: 0; }
+body.mobile-order-page .mobile-cart-item-copy strong { display: block; overflow-wrap: anywhere; font-size: 15px; }
+body.mobile-order-page .mobile-cart-item-copy small { display: block; margin-top: 4px; color: rgba(255, 255, 255, .54); font-size: 11px; line-height: 1.3; }
+
+body.mobile-order-page .mobile-qty {
+  display: inline-flex;
+  align-self: start;
+  align-items: center;
+  gap: 7px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .04);
+}
+
+body.mobile-order-page .mobile-qty button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .075);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+body.mobile-order-page .mobile-qty > b { min-width: 15px; text-align: center; }
+
+body.mobile-order-page .mobile-extra-list {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 7px;
+  padding: 2px 0 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+body.mobile-order-page .mobile-extra-list::-webkit-scrollbar { display: none; }
+
+body.mobile-order-page .mobile-extra-list button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 175, 26, .17);
+  border-radius: 999px;
+  background: rgba(255, 175, 26, .055);
+  color: rgba(255, 255, 255, .76);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+body.mobile-order-page .mobile-extra-list button.active {
+  border-color: #ff941a;
+  background: rgba(255, 148, 26, .17);
+  color: #ffd27a;
+}
+
+body.mobile-order-page .mobile-checkout-form {
+  display: grid;
+  gap: 11px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, .075);
+}
+
+body.mobile-order-page .mobile-checkout-form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+body.mobile-order-page .mobile-checkout-form legend,
+body.mobile-order-page .mobile-field { color: rgba(255, 255, 255, .72); font-size: 12px; font-weight: 800; }
+
+body.mobile-order-page .mobile-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 7px;
+}
+
+body.mobile-order-page .mobile-choice button {
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, .045);
+  color: rgba(255, 255, 255, .68);
+  font-weight: 900;
+}
+
+body.mobile-order-page .mobile-choice button.active {
+  border-color: rgba(255, 161, 24, .5);
+  background: rgba(255, 145, 18, .14);
+  color: #ffd16c;
+}
+
+body.mobile-order-page .mobile-field { display: grid; gap: 7px; }
+
+body.mobile-order-page .mobile-field select,
+body.mobile-order-page .mobile-field input,
+body.mobile-order-page .mobile-field textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 15px;
+  outline: none;
+  background: rgba(0, 0, 0, .27);
+  color: #fff;
+  font-size: 15px;
+}
+
+body.mobile-order-page .mobile-field select,
+body.mobile-order-page .mobile-field input { height: 48px; padding: 0 13px; }
+body.mobile-order-page .mobile-field textarea { min-height: 76px; padding: 12px 13px; resize: vertical; }
+
+body.mobile-order-page .mobile-field select:focus,
+body.mobile-order-page .mobile-field input:focus,
+body.mobile-order-page .mobile-field textarea:focus { border-color: #ff9e1d; box-shadow: 0 0 0 3px rgba(255, 145, 18, .1); }
+
+body.mobile-order-page .mobile-total-box {
+  display: grid;
+  gap: 7px;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 178, 28, .14);
+  border-radius: 18px;
+  background: rgba(255, 174, 26, .045);
+}
+
+body.mobile-order-page .mobile-total-box span,
+body.mobile-order-page .mobile-total-box strong { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+body.mobile-order-page .mobile-total-box strong { padding-top: 7px; border-top: 1px solid rgba(255, 255, 255, .075); color: #fff; font-size: 17px; }
+body.mobile-order-page .mobile-total-box b { color: #ffc452; }
+
+body.mobile-order-page .mobile-send-order {
+  height: 54px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffb51c, #ff6d15);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 950;
+  box-shadow: 0 16px 38px rgba(255, 103, 15, .25);
+}
+
+body.mobile-order-page .mobile-send-order:disabled { opacity: .65; }
+
+body.mobile-order-page .mobile-order-message {
+  margin: 12px 0 0;
+  padding: 11px 13px;
+  border: 1px solid rgba(255, 180, 30, .17);
+  border-radius: 15px;
+  background: rgba(255, 180, 30, .07);
+  color: #ffd57c;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+body.mobile-order-page .mobile-bottom-bar,
+body.mobile-order-page .mobile-category-tabs,
+body.mobile-order-page .mobile-quick-search,
+body.mobile-order-page .mobile-step-bar,
+body.mobile-order-page .customer-account-float,
+body.mobile-order-page .track-order-float,
+body.mobile-order-page .loyalty-mini-badge,
+body.mobile-order-page .home-v2-sticky-cta,
+body.mobile-order-page .float-contact { display: none !important; }
+
+body.mobile-order-page .customer-account-overlay { z-index: 1000; }
+
+@media (max-width: 380px) {
+  body.mobile-order-page .mobile-order-app { padding: 9px 9px 28px; }
+  body.mobile-order-page .mobile-order-header { min-height: 64px; padding: 9px 10px; }
+  body.mobile-order-page .mobile-brand span { font-size: 10px; }
+  body.mobile-order-page .mobile-brand strong { font-size: 14px; }
+  body.mobile-order-page .mobile-header-actions button { height: 37px; padding: 0 9px; font-size: 11px; }
+  body.mobile-order-page .mobile-header-actions .mobile-logout-top { width: 50px; }
+  body.mobile-order-page .mobile-product-card { grid-template-columns: 96px minmax(0, 1fr); gap: 9px; min-height: 148px; padding: 8px; }
+  body.mobile-order-page .mobile-product-image { width: 96px; min-width: 96px; min-height: 132px; }
+  body.mobile-order-page .mobile-product-card h3 { font-size: 16px; }
+  body.mobile-order-page .mobile-product-card p { font-size: 11px; }
+  body.mobile-order-page .mobile-product-card footer > strong { font-size: 16px; }
+  body.mobile-order-page .mobile-product-card [data-add-product] { min-width: 88px; height: 37px; min-height: 37px; padding: 0 9px; font-size: 11px; }
+  body.mobile-order-page .premium-heart { top: 8px; right: 8px; width: 33px; height: 33px; min-width: 33px; min-height: 33px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.mobile-order-page * { scroll-behavior: auto !important; }
+}
+
