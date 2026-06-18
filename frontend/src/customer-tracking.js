@@ -111,13 +111,22 @@ async function loadAndRender(code, phone, shouldScroll = false) {
   const root = document.getElementById('tracking-root');
   const message = root.querySelector('.tracking-message');
   const result = root.querySelector('.tracking-result');
-  message.textContent = 'Consultando pedido...';
-  result.hidden = true;
+  const hasRenderedOrder = Boolean(trackState.order) || !result.hidden;
+  const isBackgroundRefresh = !shouldScroll && hasRenderedOrder;
+
+  if (!isBackgroundRefresh) {
+    message.textContent = 'Consultando pedido...';
+    result.hidden = true;
+  } else {
+    message.textContent = '';
+    result.classList.add('tracking-refreshing');
+  }
 
   try {
     const order = await fetchTrackedOrder(code, phone);
     trackState.order = order;
     message.textContent = '';
+    result.classList.remove('tracking-refreshing');
     renderOrder(order);
     const url = new URL(window.location.href);
     url.pathname = '/acompanhar';
@@ -134,6 +143,11 @@ async function loadAndRender(code, phone, shouldScroll = false) {
       trackState.pollTimer = setInterval(() => loadAndRender(order.public_code, phone, false), 12000);
     }
   } catch (error) {
+    result.classList.remove('tracking-refreshing');
+    if (isBackgroundRefresh) {
+      message.textContent = 'Nao foi possivel atualizar agora. Tentaremos novamente em instantes.';
+      return;
+    }
     message.textContent = error.message;
     result.hidden = true;
   }
