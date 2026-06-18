@@ -7,27 +7,15 @@ function isMobileOrderRoute() {
 function setHeroCopy() {
   const hero = document.querySelector('.mobile-order-hero');
   if (!hero) return;
-  document.body.classList.add('mobile-premium-v2');
+  document.body.classList.add('mobile-premium-v2', 'mobile-final-layout');
   const pill = hero.querySelector('span');
   const title = hero.querySelector('h1');
   const text = hero.querySelector('p');
-  if (pill) pill.innerHTML = '⚡ Pedido rápido';
-  if (title) title.innerHTML = 'Seu hot dog,<br/>do seu jeito.';
-  if (text) text.textContent = 'Escolha, personalize e receba seu pedido em minutos.';
-  if (!hero.querySelector('.premium-hero-food')) {
-    const img = document.createElement('img');
-    img.className = 'premium-hero-food';
-    img.src = '/images/hotdog-premium.svg';
-    img.alt = 'Hot dog premium';
-    img.loading = 'eager';
-    hero.appendChild(img);
-  }
-  if (!hero.querySelector('.premium-hero-dots')) {
-    const dots = document.createElement('div');
-    dots.className = 'premium-hero-dots';
-    dots.innerHTML = '<i></i><i></i><i></i>';
-    hero.appendChild(dots);
-  }
+  if (pill) pill.innerHTML = '🌭 Cardápio online';
+  if (title) title.textContent = 'Escolha seu pedido';
+  if (text) text.textContent = 'Cardápio simples, rápido e direto para pedir pelo celular.';
+  hero.querySelector('.premium-hero-food')?.remove();
+  hero.querySelector('.premium-hero-dots')?.remove();
 }
 
 function enhanceHeader() {
@@ -69,13 +57,7 @@ function ensurePremiumBottom() {
   if (!bottom) return;
   const count = cartCount();
   document.body.classList.toggle('premium-has-cart', count > 0);
-  if (!document.querySelector('.mobile-premium-shortcuts')) {
-    const shortcuts = document.createElement('div');
-    shortcuts.className = 'mobile-premium-shortcuts';
-    shortcuts.innerHTML = '<a href="/acompanhar"><span>🛵</span><div><strong>Acompanhar pedido</strong><small>Veja o status do seu pedido</small></div></a><button type="button" data-premium-account><span>👤</span><div><strong>Minha conta</strong><small>Endereços, dados e pedidos</small></div></button>';
-    bottom.insertAdjacentElement('afterend', shortcuts);
-    shortcuts.querySelector('[data-premium-account]').addEventListener('click', () => document.querySelector('[data-account]')?.click());
-  }
+  document.querySelector('.mobile-premium-shortcuts')?.remove();
 }
 
 function bootPremiumMobile() {
