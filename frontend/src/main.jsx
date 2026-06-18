@@ -52,6 +52,7 @@ import './mobile-account-orders.js';
 import './mobile-logout-top.js';
 import './site-final-review.js';
 import './mobile-account-router.js';
+import './mobile-session-normalize.js';
 import './public-checkout-upgrade.js';
 import './public-order-rules.js';
 import './public-require-login.js';
