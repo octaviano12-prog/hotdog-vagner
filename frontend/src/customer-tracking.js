@@ -31,6 +31,10 @@ function normalizeCode(value = '') {
   return String(value || '').trim().toUpperCase();
 }
 
+function normalizePhone(value = '') {
+  return String(value || '').replace(/\D/g, '');
+}
+
 function mainItems(order) {
   return (order.items || []).filter((item) => item.item_type === 'produto');
 }
@@ -45,10 +49,18 @@ function statusIndex(status) {
 }
 
 async function fetchTrackedOrder(code, phone) {
-  const response = await fetch(`/api/public/orders/${encodeURIComponent(normalizeCode(code))}?phone=${encodeURIComponent(phone)}`);
+  const response = await fetch(`/api/public/orders/${encodeURIComponent(normalizeCode(code))}?phone=${encodeURIComponent(normalizePhone(phone))}`);
   const data = await response.json();
   if (!response.ok) throw new Error(data?.message || 'Nao foi possivel consultar o pedido.');
   return data.order;
+}
+
+async function submitTrackingForm(form, shouldScroll = true) {
+  const formData = new FormData(form);
+  const nextCode = normalizeCode(formData.get('code'));
+  const nextPhone = normalizePhone(formData.get('phone'));
+  if (!nextCode || !nextPhone) return;
+  await loadAndRender(nextCode, nextPhone, shouldScroll);
 }
 
 function renderTrackingRoot() {
@@ -61,19 +73,19 @@ function renderTrackingRoot() {
   }
 
   const code = normalizeCode(params().get('codigo') || params().get('code') || '');
-  const phone = params().get('phone') || params().get('telefone') || '';
+  const phone = normalizePhone(params().get('phone') || params().get('telefone') || '');
 
   root.innerHTML = `
     <main class="tracking-page">
       <section class="tracking-card tracking-hero">
-        <a class="tracking-back" href="/">← Voltar ao cardapio</a>
+        <a class="tracking-back" href="/pedir">← Voltar ao cardapio</a>
         <span class="tracking-pill">Acompanhe seu pedido</span>
         <h1>Status em tempo real do seu hot dog</h1>
         <p>Informe o codigo do pedido e os ultimos digitos do WhatsApp usado na compra.</p>
         <form class="tracking-form">
           <label>Codigo do pedido<input name="code" value="${code}" placeholder="Ex.: HD0007" required /></label>
-          <label>WhatsApp<input name="phone" value="${phone}" placeholder="Ultimos 4 digitos ou numero completo" required /></label>
-          <button>Consultar pedido</button>
+          <label>WhatsApp<input name="phone" value="${phone}" placeholder="Ultimos 4 digitos ou numero completo" inputmode="numeric" required /></label>
+          <button type="submit" data-track-submit>Consultar pedido</button>
         </form>
         <p class="tracking-message"></p>
       </section>
@@ -82,18 +94,20 @@ function renderTrackingRoot() {
   `;
 
   const form = root.querySelector('.tracking-form');
+  const submit = root.querySelector('[data-track-submit]');
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const formData = new FormData(form);
-    const nextCode = formData.get('code');
-    const nextPhone = formData.get('phone');
-    await loadAndRender(nextCode, nextPhone);
+    await submitTrackingForm(form, true);
+  });
+  submit.addEventListener('click', async (event) => {
+    event.preventDefault();
+    await submitTrackingForm(form, true);
   });
 
-  if (code && phone) loadAndRender(code, phone);
+  if (code && phone) loadAndRender(code, phone, false);
 }
 
-async function loadAndRender(code, phone) {
+async function loadAndRender(code, phone, shouldScroll = false) {
   const root = document.getElementById('tracking-root');
   const message = root.querySelector('.tracking-message');
   const result = root.querySelector('.tracking-result');
@@ -108,12 +122,16 @@ async function loadAndRender(code, phone) {
     const url = new URL(window.location.href);
     url.pathname = '/acompanhar';
     url.searchParams.set('codigo', order.public_code);
-    url.searchParams.set('phone', phone);
+    url.searchParams.set('phone', normalizePhone(phone));
     window.history.replaceState({}, '', url);
+
+    if (shouldScroll) {
+      setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    }
 
     clearInterval(trackState.pollTimer);
     if (!['concluido', 'cancelado'].includes(order.status)) {
-      trackState.pollTimer = setInterval(() => loadAndRender(order.public_code, phone), 12000);
+      trackState.pollTimer = setInterval(() => loadAndRender(order.public_code, phone, false), 12000);
     }
   } catch (error) {
     message.textContent = error.message;
@@ -169,7 +187,7 @@ function renderOrder(order) {
 
     <div class="tracking-actions">
       <button type="button" onclick="window.location.reload()">Atualizar status</button>
-      <a href="/">Fazer novo pedido</a>
+      <a href="/pedir">Fazer novo pedido</a>
     </div>
   `;
 }
