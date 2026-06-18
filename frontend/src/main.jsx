@@ -33,6 +33,7 @@ import './admin-operations.css';
 import './admin-flow.css';
 import './admin-report-tools.css';
 import './customer-tracking.css';
+import './tracking-professional.css';
 import './customer-account.css';
 import './account-login-redesign.css';
 import './account-orders-redesign.css';
