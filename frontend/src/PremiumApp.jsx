@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
+  BarChart3,
   Bike,
+  Building2,
+  CalendarDays,
   ChefHat,
   CheckCircle,
   Clock,
   DollarSign,
   Flame,
   Home,
+  History,
+  KeyRound,
   LogOut,
   MapPin,
   Menu,
@@ -17,6 +22,8 @@ import {
   Plus,
   Printer,
   RefreshCw,
+  RotateCcw,
+  Save,
   Search,
   Settings,
   ShieldCheck,
@@ -591,6 +598,27 @@ function DashboardTab({ orders, summary, dashboard, onMove, onCancel, setActiveT
   );
 }
 
+function SettingsReference({ settings, setSettings, report, saveSettings, setTab }) {
+  return (
+    <section className="admin-settings-reference">
+      <form onSubmit={saveSettings} className="settings-reference-form">
+        <div className="settings-title"><Settings size={23} /><h2>Configurações do negócio</h2></div>
+        <fieldset><legend><Building2 size={19} /> 1. Informações da loja</legend><div className="settings-grid two"><label>Nome do negócio<input value={settings.business_name || ''} onChange={(e) => setSettings({ ...settings, business_name: e.target.value })} /></label><label>Telefone<input value={settings.phone || ''} onChange={(e) => setSettings({ ...settings, phone: e.target.value })} /></label><label>WhatsApp<input value={settings.whatsapp || ''} onChange={(e) => setSettings({ ...settings, whatsapp: e.target.value })} /></label><label>Endereço<input value={settings.address || ''} onChange={(e) => setSettings({ ...settings, address: e.target.value })} /></label></div></fieldset>
+        <fieldset><legend><DollarSign size={19} /> 2. Financeiro e PIX</legend><div className="settings-grid three"><label>Chave PIX<input value={settings.pix_key || ''} onChange={(e) => setSettings({ ...settings, pix_key: e.target.value })} /></label><label>Taxa de entrega base (R$)<input type="number" step="0.01" value={settings.delivery_fee || 0} onChange={(e) => setSettings({ ...settings, delivery_fee: e.target.value })} /></label><label>Pedido mínimo (R$)<input type="number" step="0.01" value={settings.minimum_order || 0} onChange={(e) => setSettings({ ...settings, minimum_order: e.target.value })} /></label></div></fieldset>
+        <fieldset><legend><Bike size={19} /> 3. Entrega</legend><label>Áreas/bairros de entrega<textarea value={settings.delivery_area_text || ''} onChange={(e) => setSettings({ ...settings, delivery_area_text: e.target.value })} /><small>Separe cada área ou bairro por vírgula.</small></label></fieldset>
+        <fieldset><legend><KeyRound size={19} /> 4. Operação</legend><div className="settings-grid two"><label>Status da loja<select value={Number(settings.is_open ?? 1)} onChange={(e) => setSettings({ ...settings, is_open: e.target.value })}><option value="1">Aberto</option><option value="0">Fechado</option></select></label><label>Automação<select value={Number(settings.allow_whatsapp_redirect ?? 1)} onChange={(e) => setSettings({ ...settings, allow_whatsapp_redirect: e.target.value })}><option value="1">Abrir WhatsApp após pedido</option><option value="0">Não abrir WhatsApp</option></select></label></div></fieldset>
+        <div className="settings-actions"><button className="btn-primary"><Save size={19} /> Salvar configurações</button><button type="button" className="btn-secondary"><XCircle size={18} /> Cancelar alterações</button><button type="button" className="btn-secondary restore"><RotateCcw size={18} /> Restaurar padrão</button></div>
+      </form>
+      <aside className="settings-reference-side">
+        <section><h3><BarChart3 size={20} /> Resumo rápido</h3><div className="settings-summary"><span>Vendas<strong>{formatMoney(report?.summary?.gross)}</strong></span><span>Recebido<strong>{formatMoney(report?.summary?.paid)}</strong></span><span>Despesas<strong>{formatMoney(report?.summary?.expenses)}</strong></span><span>Líquido<strong>{formatMoney(report?.summary?.net)}</strong></span></div></section>
+        <section><h3>Status da loja</h3><div className="store-status-card"><i /><div><strong>{Number(settings.is_open ?? 1) === 1 ? 'Loja aberta' : 'Loja fechada'}</strong><small>{Number(settings.is_open ?? 1) === 1 ? 'Recebendo pedidos normalmente' : 'Pedidos temporariamente pausados'}</small></div><Store size={35} /></div></section>
+        <section><h3>Atalhos rápidos</h3><div className="settings-shortcuts"><button type="button" onClick={() => { window.history.pushState({}, '', '/'); window.location.reload(); }}><ShoppingBag size={23} />Cardápio</button><button type="button"><Printer size={23} />Imprimir pedidos</button><button type="button" onClick={() => setTab('new-order')}><Store size={23} />Pedidos no balcão</button><button type="button" onClick={() => setTab('orders')}><ShoppingBag size={23} />Ver pedidos</button></div></section>
+        <section className="settings-tip"><strong>💡 Dica</strong><p>Mantenha suas informações sempre atualizadas para uma melhor experiência dos clientes.</p></section>
+      </aside>
+    </section>
+  );
+}
+
 function AdminPremium() {
   const [tab, setTab] = useState('dashboard');
   const [orders, setOrders] = useState([]);
@@ -649,11 +677,13 @@ function AdminPremium() {
   }, []);
 
   useEffect(() => {
-    const referenceMode = ['new-order', 'products', 'finance'].includes(tab);
+    const referenceMode = ['new-order', 'products', 'finance', 'customers', 'settings'].includes(tab);
     document.body.classList.toggle('admin-counter-mode', referenceMode);
     document.body.classList.toggle('admin-products-mode', tab === 'products');
     document.body.classList.toggle('admin-finance-mode', tab === 'finance');
-    return () => document.body.classList.remove('admin-counter-mode', 'admin-products-mode', 'admin-finance-mode');
+    document.body.classList.toggle('admin-customers-mode', tab === 'customers');
+    document.body.classList.toggle('admin-settings-mode', tab === 'settings');
+    return () => document.body.classList.remove('admin-counter-mode', 'admin-products-mode', 'admin-finance-mode', 'admin-customers-mode', 'admin-settings-mode');
   }, [tab]);
 
   async function updateStatus(orderId, status, payment_status) {
@@ -831,10 +861,43 @@ function AdminPremium() {
     }
 
     if (tab === 'customers') {
-      return <section className="panel big-form-panel"><div className="panel-title"><h3>Clientes</h3><span>{customers.length} cadastrados</span></div><div className="product-table">{customers.map((customer) => <div className="product-row" key={customer.id}><div><strong>{customer.name}</strong><small>{customer.phone} • {customer.address}</small></div><span>{customer.orders_count} pedidos</span><strong>{formatMoney(customer.total_spent)}</strong></div>)}</div></section>;
+      const totalOrders = customers.reduce((total, customer) => total + Number(customer.orders_count || 0), 0);
+      const totalSpent = customers.reduce((total, customer) => total + Number(customer.total_spent || 0), 0);
+      return (
+        <section className="admin-customers-reference">
+          <div className="customers-reference-head">
+            <div className="customers-title"><span><Users size={28} /></span><h2>Clientes</h2></div>
+            <div className="customers-metrics">
+              <article><Users size={25} /><div><strong>{customers.length} cadastrados</strong><small>Clientes ativos</small></div></article>
+              <article><ShoppingBag size={25} /><div><strong>{totalOrders} pedidos no total</strong><small>Pedidos realizados</small></div></article>
+              <article><DollarSign size={25} /><div><small>Faturamento acumulado</small><strong>{formatMoney(totalSpent)}</strong></div></article>
+            </div>
+          </div>
+          <div className="customers-reference-list">
+            {customers.map((customer, index) => {
+              const initials = String(customer.name || 'Cliente').split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
+              return <article className="customer-reference-card" key={customer.id}>
+                <div className={`customer-avatar avatar-${index % 3}`}>{initials}<i /></div>
+                <div className="customer-identity"><strong>{customer.name}</strong><span><Phone size={16} />{customer.phone || 'Telefone não informado'}</span><span><MapPin size={16} />{customer.address || 'Endereço não informado'}</span></div>
+                <span className="customer-active"><i /> Ativo</span>
+                <div className="customer-stat"><small><ShoppingBag size={16} /> Pedidos</small><strong>{Number(customer.orders_count || 0)}</strong><span>{Number(customer.orders_count || 0) === 1 ? 'pedido' : 'pedidos'}</span></div>
+                <div className="customer-stat"><small><DollarSign size={16} /> Total gasto</small><strong>{formatMoney(customer.total_spent || 0)}</strong><span>valor total</span></div>
+                <div className="customer-stat"><small><CalendarDays size={16} /> Último pedido</small><strong>{customer.last_order_at ? new Date(customer.last_order_at).toLocaleDateString('pt-BR') : '—'}</strong><span>{customer.last_order_at ? 'registrado' : 'sem registro'}</span></div>
+                <div className="customer-actions"><button type="button"><History size={16} /> Ver histórico</button><div><button type="button"><Settings size={16} /> Editar</button><button type="button" className="primary" onClick={() => setTab('new-order')}><Plus size={16} /> Novo pedido</button></div></div>
+              </article>;
+            })}
+            {!customers.length && <p className="reference-empty">Nenhum cliente cadastrado.</p>}
+          </div>
+          <footer className="customers-reference-footer">Mostrando {customers.length ? `1 a ${customers.length}` : '0'} de {customers.length} clientes <span><button type="button">‹</button><b>1</b><button type="button">›</button></span></footer>
+        </section>
+      );
     }
 
     if (tab === 'settings' && settings) {
+      return <SettingsReference settings={settings} setSettings={setSettings} report={report} saveSettings={saveSettings} setTab={setTab} />;
+    }
+
+    if (tab === 'settings-legacy' && settings) {
       return (
         <section className="admin-dashboard-grid products-view">
           <div className="panel"><div className="panel-title"><h3>Configuracoes do negocio</h3></div><form onSubmit={saveSettings} className="stack-form"><input value={settings.business_name || ''} onChange={(e) => setSettings({ ...settings, business_name: e.target.value })} placeholder="Nome do negocio" /><input value={settings.phone || ''} onChange={(e) => setSettings({ ...settings, phone: e.target.value })} placeholder="Telefone" /><input value={settings.whatsapp || ''} onChange={(e) => setSettings({ ...settings, whatsapp: e.target.value })} placeholder="WhatsApp com DDI" /><input value={settings.address || ''} onChange={(e) => setSettings({ ...settings, address: e.target.value })} placeholder="Endereco" /><input type="number" step="0.01" value={settings.delivery_fee || 0} onChange={(e) => setSettings({ ...settings, delivery_fee: e.target.value })} placeholder="Taxa entrega" /><input type="number" step="0.01" value={settings.minimum_order || 0} onChange={(e) => setSettings({ ...settings, minimum_order: e.target.value })} placeholder="Pedido minimo" /><input value={settings.pix_key || ''} onChange={(e) => setSettings({ ...settings, pix_key: e.target.value })} placeholder="Chave PIX" /><input type="number" value={settings.estimated_delivery_minutes || 35} onChange={(e) => setSettings({ ...settings, estimated_delivery_minutes: e.target.value })} placeholder="Previsao em minutos" /><textarea value={settings.delivery_area_text || ''} onChange={(e) => setSettings({ ...settings, delivery_area_text: e.target.value })} placeholder="Areas/bairros de entrega" /><select value={Number(settings.is_open ?? 1)} onChange={(e) => setSettings({ ...settings, is_open: e.target.value })}><option value="1">Aberto</option><option value="0">Fechado</option></select><select value={Number(settings.allow_whatsapp_redirect ?? 1)} onChange={(e) => setSettings({ ...settings, allow_whatsapp_redirect: e.target.value })}><option value="1">Abrir WhatsApp apos pedido</option><option value="0">Nao abrir WhatsApp</option></select><button className="btn-primary">Salvar configuracoes</button></form></div>
@@ -849,7 +912,7 @@ function AdminPremium() {
   return (
     <div className="admin-desktop-shell">
       <AdminSidebar activeTab={tab} setActiveTab={setTab} />
-      <main className={`admin-workspace ${['new-order', 'products', 'finance'].includes(tab) ? 'counter-workspace' : ''}`}>
+      <main className={`admin-workspace ${['new-order', 'products', 'finance', 'customers', 'settings'].includes(tab) ? 'counter-workspace' : ''}`}>
         <header className="admin-topbar">
           <div className="admin-title-block">
             <button className="hamburger"><Menu size={28} /></button>
@@ -863,7 +926,7 @@ function AdminPremium() {
           </div>
         </header>
 
-        {['new-order', 'products', 'finance'].includes(tab) && <AdminCounterToolbar onRefresh={loadAdmin} />}
+        {['new-order', 'products', 'finance', 'customers', 'settings'].includes(tab) && <AdminCounterToolbar onRefresh={loadAdmin} />}
         {message && <p className="notice admin-message">{message}</p>}
         {renderContent()}
         <footer className="admin-footer">© 2026 Hot Dog do Vagner • Painel Premium de Pedidos e Gestao</footer>

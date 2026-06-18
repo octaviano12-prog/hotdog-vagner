@@ -1,0 +1,30 @@
+/* Approved premium storefront reference. Kept separate from /pedir. */
+@media (min-width: 901px) {
+  body.home-v2-ready { background:radial-gradient(circle at 72% 7%,rgba(255,116,0,.15),transparent 27rem),linear-gradient(180deg,#0a0805,#050403 58%,#090704)!important; }
+  .home-v2-ready .ultra-header { width:100%!important; max-width:none!important; top:0!important; left:0!important; transform:none!important; height:74px!important; padding:0 max(40px,calc((100vw - 1460px)/2))!important; border:0!important; border-bottom:1px solid rgba(255,174,0,.13)!important; border-radius:0!important; background:rgba(8,7,5,.91)!important; }
+  .home-v2-ready .ultra-header .brand { min-width:190px; }
+  .home-v2-ready .ultra-hero { display:grid!important; grid-template-columns:minmax(0,1.15fr) minmax(440px,.85fr)!important; width:min(1460px,calc(100% - 72px))!important; min-height:650px!important; margin:100px auto 30px!important; padding:62px 34px 50px!important; border:0!important; border-radius:0!important; background:radial-gradient(circle at 72% 35%,rgba(255,119,0,.22),transparent 31rem)!important; box-shadow:none!important; overflow:visible!important; }
+  .home-v2-ready .hero-copy { max-width:760px; align-self:center; }
+  .home-v2-ready .hero-copy h1 { max-width:720px!important; margin:20px 0!important; font-size:clamp(56px,5.3vw,86px)!important; line-height:.98!important; letter-spacing:-.055em!important; }
+  .home-v2-ready .hero-copy h1 em { display:inline; color:#ffad00; font-style:normal; }
+  .home-v2-ready .hero-copy>p { max-width:650px!important; font-size:17px!important; line-height:1.65!important; }
+  .home-v2-ready .hero-actions { margin-top:26px!important; }
+  .home-v2-ready .hero-actions button { min-height:54px!important; border-radius:9px!important; padding:0 22px!important; }
+  .home-v2-ready .hero-metrics { display:flex!important; width:max-content!important; margin-top:28px!important; gap:24px!important; }
+  .home-v2-ready .hero-metrics span { min-width:0!important; padding:0!important; border:0!important; background:transparent!important; }
+  .home-v2-ready .hero-art { position:relative!important; display:grid!important; min-height:520px!important; place-items:center!important; transform:none!important; border:1px solid rgba(255,174,0,.28)!important; border-radius:28px!important; background:radial-gradient(circle at 50% 42%,rgba(255,138,0,.18),transparent 60%),#130d06!important; box-shadow:0 30px 90px rgba(0,0,0,.45)!important; overflow:hidden!important; }
+  .home-v2-ready .hero-art .food-visual { width:92%!important; height:390px!important; filter:drop-shadow(0 38px 45px rgba(0,0,0,.65))!important; }
+  .home-v2-ready .smart-queue { right:22px!important; bottom:20px!important; left:22px!important; width:auto!important; border-radius:14px!important; background:rgba(10,7,3,.88)!important; }
+  .home-v2-ready .feature-row { width:min(1460px,calc(100% - 72px))!important; grid-template-columns:repeat(3,1fr)!important; margin:0 auto 34px!important; }
+  .home-v2-ready .feature-row article { min-height:96px!important; border-radius:13px!important; background:linear-gradient(135deg,rgba(255,174,0,.055),rgba(255,255,255,.025))!important; border-color:rgba(255,174,0,.18)!important; }
+  .home-v2-ready .workflow-zone,.home-v2-ready .ultra-section,.home-v2-ready .combo-showcase,.home-v2-ready .menu-zone,.home-v2-ready .trust-strip,.home-v2-ready .home-v2-signup { width:min(1460px,calc(100% - 72px))!important; }
+  .home-v2-ready .ultra-section,.home-v2-ready .menu-zone { border:1px solid rgba(255,174,0,.13)!important; border-radius:22px!important; background:rgba(14,10,6,.82)!important; box-shadow:0 26px 90px rgba(0,0,0,.28)!important; }
+  .home-v2-ready .highlight-card,.home-v2-ready .ultra-product-card { border-color:rgba(255,174,0,.22)!important; border-radius:16px!important; background:linear-gradient(155deg,rgba(255,174,0,.045),rgba(255,255,255,.025))!important; }
+  .home-v2-ready .menu-zone { padding:24px!important; }
+  .home-v2-ready .cart-panel { position:sticky!important; top:92px!important; border-color:rgba(255,174,0,.3)!important; background:#0d0a06!important; }
+}
+
+@media(max-width:900px){
+  .home-v2-ready .hero-copy h1 em{color:#ffad00;font-style:normal}
+  .home-v2-ready .ultra-hero{padding-bottom:220px!important}
+}
