@@ -462,11 +462,11 @@ function PremiumLanding({ settings }) {
               <span className="hero-pill"><Sparkles size={15} /> Hot dog prensado premium</span>
               <span className="mini-rating"><Star size={15} fill="currentColor" /> Feito na hora</span>
             </div>
-            <h1>Seu hot dog prensado favorito, pedido em poucos cliques.</h1>
-            <p>Monte o lanche, escolha adicionais, envie o pedido e acompanhe pelo WhatsApp. Tudo cai automaticamente no painel do negocio.</p>
+            <h1>O hot dog que você ama, <em>no capricho</em> que você merece.</h1>
+            <p>Pães macios, salsichas selecionadas e combinações irresistíveis. Peça agora e receba com rapidez e qualidade.</p>
             <div className="hero-actions">
               <button className="hero-primary" onClick={() => document.getElementById('cardapio')?.scrollIntoView({ behavior: 'smooth' })}>Fazer pedido agora <ChevronRight size={18} /></button>
-              <button className="hero-secondary" onClick={() => { window.history.pushState({}, '', '/admin'); window.location.reload(); }}><ShieldCheck size={17} /> Entrar no painel</button>
+              <button className="hero-secondary" onClick={() => document.getElementById('cardapio')?.scrollIntoView({ behavior: 'smooth' })}><ShoppingCart size={17} /> Ver cardápio</button>
             </div>
             <div className="hero-metrics">
               <span><Clock size={19} /><b>Previsao</b><strong>{settings?.estimated_delivery_minutes || 35} min</strong></span>
