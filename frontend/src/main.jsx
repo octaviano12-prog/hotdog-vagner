@@ -32,6 +32,7 @@ import './mobile-checkout-overlap-fix.css';
 import './mobile-order-premium-reference.css';
 import './mobile-order-reference.css';
 import './mobile-order-reference-fix.css';
+import './mobile-heart-stable.css';
 import './admin-operations.css';
 import './admin-flow.css';
 import './admin-report-tools.css';
