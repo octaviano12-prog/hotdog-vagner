@@ -1,5 +1,5 @@
-const CACHE_NAME = 'hotdog-vagner-v1';
-const APP_SHELL = ['/', '/manifest.webmanifest', '/icon.svg'];
+const CACHE_NAME = 'hotdog-vagner-v12';
+const APP_SHELL = ['/', '/pedir', '/acompanhar', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -9,10 +9,19 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
+
+function networkFirst(request) {
+  return fetch(request).then((response) => {
+    const copy = response.clone();
+    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+    return response;
+  }).catch(() => caches.match(request));
+}
 
 self.addEventListener('fetch', (event) => {
   const request = event.request;
@@ -22,7 +31,12 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/')) return;
 
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).catch(() => caches.match('/')));
+    event.respondWith(fetch(request).catch(() => caches.match('/pedir').then((cached) => cached || caches.match('/'))));
+    return;
+  }
+
+  if (/\.(js|css|html|webmanifest)$/i.test(url.pathname)) {
+    event.respondWith(networkFirst(request));
     return;
   }
 
