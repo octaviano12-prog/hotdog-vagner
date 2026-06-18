@@ -8,6 +8,10 @@ function scrollToOrder() {
   document.getElementById('cardapio')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function goMobileOrder() {
+  window.location.href = '/pedir';
+}
+
 function openAccount() {
   document.querySelector('.customer-account-float')?.click();
 }
@@ -27,6 +31,13 @@ function ensureHeroUpgrade() {
 
   const actions = copy.querySelector('.hero-actions');
   if (actions && !actions.querySelector('[data-v2-account]')) {
+    const mobile = document.createElement('button');
+    mobile.type = 'button';
+    mobile.className = 'hero-mobile-v2';
+    mobile.textContent = 'Pedido mobile';
+    mobile.addEventListener('click', goMobileOrder);
+    actions.appendChild(mobile);
+
     const account = document.createElement('button');
     account.type = 'button';
     account.className = 'hero-account-v2';
@@ -44,7 +55,7 @@ function ensureHeroUpgrade() {
   const badge = document.createElement('div');
   badge.className = 'home-v2-price-card';
   badge.innerHTML = '<span>Mais pedido</span><strong>Hot Dog Prensado</strong><small>Monte com adicionais e envie direto para a cozinha.</small><button type="button">Ver cardápio</button>';
-  badge.querySelector('button').addEventListener('click', scrollToOrder);
+  badge.querySelector('button').addEventListener('click', goMobileOrder);
   art?.appendChild(badge);
 }
 
@@ -64,7 +75,7 @@ function ensureStickyCta() {
   const bar = document.createElement('div');
   bar.className = 'home-v2-sticky-cta';
   bar.innerHTML = '<button type="button" data-menu>Fazer pedido</button><button type="button" data-account>Minha conta</button>';
-  bar.querySelector('[data-menu]').addEventListener('click', scrollToOrder);
+  bar.querySelector('[data-menu]').addEventListener('click', goMobileOrder);
   bar.querySelector('[data-account]').addEventListener('click', openAccount);
   document.body.appendChild(bar);
 }
