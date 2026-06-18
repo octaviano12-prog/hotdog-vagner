@@ -36,6 +36,7 @@ import './home-v2.js';
 import './public-image-upgrade.js';
 import './public-offer-showcase.js';
 import './public-mobile-order.js';
+import './mobile-back-fix.js';
 import './mobile-app-checkout.js';
 import './mobile-menu-first.js';
 import './public-checkout-upgrade.js';
