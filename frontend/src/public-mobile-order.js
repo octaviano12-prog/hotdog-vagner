@@ -165,7 +165,7 @@ function cartLine(item) {
 }
 
 function renderMobilePage(message = mobileOrder.message) {
-  document.body.classList.add('mobile-order-page', 'mobile-menu-first');
+  document.body.classList.add('mobile-order-page', 'mobile-menu-first', 'mobile-premium-v2', 'mobile-final-layout');
   let root = document.querySelector('.mobile-order-app');
   if (!root) {
     root = document.createElement('main');
@@ -176,7 +176,7 @@ function renderMobilePage(message = mobileOrder.message) {
   const count = mobileOrder.cart.reduce((sum, item) => sum + item.quantity, 0);
   const bottomLabel = count ? `Pedido • ${brl(total())}` : 'Pedido';
   root.innerHTML = `<header class="mobile-order-header"><button type="button" data-back>←</button><div><span>Hot Dog do Vagner</span><strong>Pedido mobile</strong></div><button type="button" data-account>${isLogged() ? 'Conta' : 'Entrar'}</button></header><section class="mobile-order-hero"><div><span>🌭 Cardápio online</span><h1>Escolha seu pedido</h1><p>Cardápio simples, rápido e direto para pedir pelo celular.</p></div></section><section class="mobile-login-card ${isLogged() ? 'logged' : ''}">${isLogged() ? `<strong>✅ Pedido liberado</strong><p>Comprando como <b>${profile?.name || 'cliente'}</b>.</p>` : '<strong>🔒 Entre para finalizar</strong><p>Você pode escolher os produtos agora. Para enviar, faça login/cadastro.</p><button type="button" data-account>Entrar</button>'}</section><nav class="mobile-category-tabs"><button class="${mobileOrder.category === 'todos' ? 'active' : ''}" data-cat="todos">Todos</button>${mobileOrder.menu.categories.map((cat) => `<button class="${String(mobileOrder.category) === String(cat.id) ? 'active' : ''}" data-cat="${cat.id}">${cat.name}</button>`).join('')}</nav><section class="mobile-product-list">${mobileOrder.loaded ? visibleProducts().map(productCard).join('') : '<div class="mobile-loading">Carregando cardápio...</div>'}</section><section class="mobile-order-cart"><div class="mobile-cart-head"><div><span>${count} item(ns)</span><h2>Seu pedido</h2></div><strong>${brl(total())}</strong></div>${mobileOrder.cart.length ? mobileOrder.cart.map(cartLine).join('') : '<div class="mobile-empty-cart">Adicione produtos para começar.</div>'}<form class="mobile-checkout-form"><div class="mobile-choice"><button type="button" class="${mobileOrder.delivery === 'entrega' ? 'active' : ''}" data-delivery="entrega">Entrega</button><button type="button" class="${mobileOrder.delivery === 'retirada' ? 'active' : ''}" data-delivery="retirada">Retirada</button></div><select data-payment><option value="dinheiro" ${mobileOrder.payment === 'dinheiro' ? 'selected' : ''}>Dinheiro</option><option value="pix" ${mobileOrder.payment === 'pix' ? 'selected' : ''}>PIX</option><option value="cartao" ${mobileOrder.payment === 'cartao' ? 'selected' : ''}>Cartão</option><option value="fiado" ${mobileOrder.payment === 'fiado' ? 'selected' : ''}>Fiado</option></select>${mobileOrder.payment === 'dinheiro' ? '<input data-mobile-change type="number" step="0.01" placeholder="Troco para quanto?" />' : ''}<textarea data-mobile-notes placeholder="Observações do pedido"></textarea><div class="mobile-total-box"><span>Subtotal <b>${brl(subtotal())}</b></span><span>Entrega <b>${brl(deliveryFee())}</b></span><strong>Total <b>${brl(total())}</b></strong></div><button class="mobile-send-order" type="submit">${isLogged() ? 'Finalizar pedido' : 'Entrar para finalizar'}</button>${message ? `<p class="mobile-order-message">${message}</p>` : ''}</form></section><div class="mobile-bottom-bar"><button type="button" data-menu>Cardápio</button><button type="button" data-cart>${bottomLabel}</button></div>`;
-  root.querySelector('[data-back]').addEventListener('click', () => { window.location.href = '/?normal=1'; });
+  root.querySelector('[data-back]').addEventListener('click', () => { root.querySelector('.mobile-product-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   root.querySelectorAll('[data-account]').forEach((btn) => btn.addEventListener('click', openAccount));
   root.querySelectorAll('[data-cat]').forEach((btn) => btn.addEventListener('click', () => { mobileOrder.category = btn.dataset.cat; renderMobilePage(); }));
   root.querySelectorAll('[data-add-product]').forEach((btn) => btn.addEventListener('click', () => addProduct(btn.dataset.addProduct)));
@@ -192,6 +192,7 @@ function renderMobilePage(message = mobileOrder.message) {
 async function bootMobileOrder() {
   if (mobileOrder.booted || !isMobileOrderRoute()) return;
   mobileOrder.booted = true;
+  document.body.classList.add('mobile-order-page', 'mobile-menu-first', 'mobile-premium-v2', 'mobile-final-layout');
   renderMobilePage('Carregando cardápio...');
   await loadMobileData();
   renderMobilePage('');
