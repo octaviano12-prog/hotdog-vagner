@@ -38,6 +38,7 @@ import './admin-flow.css';
 import './admin-report-tools.css';
 import './admin-reference-layout.css';
 import './admin-board-reference-final.css';
+import './admin-dashboard-clean.css';
 import './customer-tracking.css';
 import './tracking-professional.css';
 import './customer-account.css';
