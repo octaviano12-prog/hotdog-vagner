@@ -1,3 +1,5 @@
 /* counter order form polish */
 [class~="big-form-panel"]{padding:28px}
 [class~="big-form-panel"]{border-radius:22px}
+[class~="big-form-panel"]{border:1px solid #c48a18}
+[class~="big-form-panel"]{background:#0b0c0d}
