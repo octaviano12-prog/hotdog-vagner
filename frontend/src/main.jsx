@@ -35,6 +35,7 @@ import './home-v2.js';
 import './public-image-upgrade.js';
 import './public-offer-showcase.js';
 import './public-mobile-order.js';
+import './mobile-app-checkout.js';
 import './public-checkout-upgrade.js';
 import './public-order-rules.js';
 import './public-require-login.js';
