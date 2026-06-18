@@ -170,7 +170,7 @@ function renderAccountModal(tab = 'login', message = '') {
       <p>${logged ? 'Seus dados ficam salvos para pedir mais rapido.' : 'Salve nome, WhatsApp e endereco para nao preencher tudo de novo.'}</p>
     </div>
     <div class="account-tabs">
-      ${logged ? '<button data-tab="profile">Meus dados</button><button data-tab="orders">Meus pedidos</button>' : '<button data-tab="login">Entrar</button><button data-tab="register">Cadastrar</button>'}
+      ${logged ? '<button data-tab="profile">Meus dados</button><button data-tab="orders">Meus pedidos</button><button data-tab="loyalty" data-loyalty-tab="true">Fidelidade</button>' : '<button data-tab="login">Entrar</button><button data-tab="register">Cadastrar</button>'}
     </div>
     <div class="account-body"></div>
     <p class="account-message">${message}</p>
@@ -180,9 +180,17 @@ function renderAccountModal(tab = 'login', message = '') {
   modal.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => renderAccountModal(button.dataset.tab)));
 
   if (logged && tab === 'orders') renderOrdersTab();
+  else if (logged && tab === 'loyalty') renderLoyaltyTab();
   else if (logged) renderProfileTab();
   else if (tab === 'register') renderRegisterTab();
   else renderLoginTab();
+}
+
+function renderLoyaltyTab() {
+  const body = document.querySelector('.account-body');
+  if (body) body.innerHTML = '<p class="account-loading">Carregando fidelidade...</p>';
+  if (window.hotdogRenderLoyaltyPanel) window.hotdogRenderLoyaltyPanel();
+  else window.dispatchEvent(new Event('hotdog-render-loyalty'));
 }
 
 function renderLoginTab() {
