@@ -37,6 +37,54 @@ body.admin-executive-mode .executive-dashboard{gap:12px!important;margin:0!impor
   .admin-desktop-shell{grid-template-columns:240px minmax(0,1fr)!important}
   .admin-sidebar{width:240px!important;min-width:240px!important;max-width:240px!important}
 }
+
+/* Mobile admin drawer: the workspace always keeps the full screen. */
+.admin-mobile-backdrop{display:none}
+@media(max-width:900px){
+  body:has(.admin-desktop-shell){overflow-x:hidden!important}
+  .admin-desktop-shell{display:block!important;min-height:100dvh!important;overflow:visible!important}
+  .admin-sidebar,
+  body.admin-executive-mode .admin-sidebar,
+  body.admin-counter-mode .admin-sidebar,
+  body.admin-products-mode .admin-sidebar,
+  body.admin-finance-mode .admin-sidebar,
+  body.admin-customers-mode .admin-sidebar,
+  body.admin-settings-mode .admin-sidebar{position:fixed!important;z-index:340!important;inset:0 auto 0 0!important;width:min(84vw,300px)!important;min-width:0!important;max-width:300px!important;height:100dvh!important;min-height:100dvh!important;padding:18px 14px!important;display:flex!important;flex-direction:column!important;overflow-y:auto!important;transform:translateX(-105%)!important;transition:transform .22s ease!important;box-shadow:24px 0 70px rgba(0,0,0,.62)!important}
+  .admin-desktop-shell.mobile-menu-open .admin-sidebar{transform:translateX(0)!important}
+  .admin-mobile-backdrop{position:fixed!important;z-index:330!important;inset:0!important;display:block!important;border:0!important;background:rgba(0,0,0,.7)!important;opacity:0!important;pointer-events:none!important;transition:opacity .2s ease!important}
+  .admin-desktop-shell.mobile-menu-open .admin-mobile-backdrop{opacity:1!important;pointer-events:auto!important}
+  .sidebar-brand,
+  body.admin-counter-mode .sidebar-brand,
+  body.admin-products-mode .sidebar-brand,
+  body.admin-finance-mode .sidebar-brand,
+  body.admin-customers-mode .sidebar-brand,
+  body.admin-settings-mode .sidebar-brand{display:grid!important;grid-template-columns:58px minmax(0,1fr)!important;gap:11px!important;margin:0 0 18px!important;padding:0 4px!important}
+  .sidebar-logo,
+  body.admin-counter-mode .sidebar-logo,
+  body.admin-products-mode .sidebar-logo,
+  body.admin-finance-mode .sidebar-logo,
+  body.admin-customers-mode .sidebar-logo,
+  body.admin-settings-mode .sidebar-logo{display:grid!important;width:58px!important;height:58px!important;min-width:58px!important;margin:0!important}
+  .sidebar-brand-copy{display:flex!important;flex-direction:column!important}
+  .sidebar-brand-copy strong{font-size:16px!important}.sidebar-brand-copy span{font-size:12px!important}
+  .sidebar-nav{display:grid!important;width:100%!important;gap:7px!important;overflow:visible!important;margin:0!important}
+  .sidebar-nav button,
+  body.admin-counter-mode .sidebar-nav button,
+  body.admin-products-mode .sidebar-nav button,
+  body.admin-finance-mode .sidebar-nav button,
+  body.admin-customers-mode .sidebar-nav button,
+  body.admin-settings-mode .sidebar-nav button{display:flex!important;width:100%!important;min-width:0!important;height:46px!important;padding:0 13px!important;justify-content:flex-start!important;font-size:14px!important}
+  .sidebar-shortcuts{display:grid!important;margin-top:auto!important}.sidebar-shortcuts button{font-size:14px!important}
+  .sidebar-user{display:flex!important}.sidebar-user>div:not(.avatar){display:block!important}
+  .admin-workspace{width:100%!important;min-height:100dvh!important;padding:0 10px 22px!important;overflow:visible!important}
+  .admin-topbar{position:sticky!important;top:0!important;z-index:300!important;min-height:72px!important;margin:8px 0 10px!important;padding:10px 12px!important;display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;border-radius:14px!important}
+  .admin-title-block{min-width:0!important;display:flex!important;align-items:center!important;gap:7px!important}.hamburger{display:grid!important;flex:none!important;width:40px!important;height:40px!important;place-items:center!important}.admin-title-block h1{font-size:18px!important;white-space:nowrap!important}.admin-title-block span{font-size:11px!important}
+  .admin-top-actions{margin-left:auto!important;display:flex!important;gap:6px!important;flex-wrap:nowrap!important}.admin-top-actions button{height:38px!important;padding:0 9px!important;font-size:0!important}.admin-top-actions button svg{margin:0!important}.admin-top-actions .store-open,.admin-top-actions .store-closed{font-size:10px!important;padding:0 9px!important}.admin-top-actions .outline-gold,.admin-top-actions .btn-secondary{display:none!important}
+  .executive-dashboard,.counter-workspace>.admin-products-reference,.counter-workspace>.admin-finance-reference,.counter-workspace>.admin-customers-reference,.counter-workspace>.admin-settings-reference,.counter-workspace>.counter-order-panel{width:100%!important;margin:0!important}
+}
+@media(max-width:430px){
+  .admin-title-block h1{font-size:16px!important}.admin-title-block span{font-size:10px!important}.admin-top-actions .store-open,.admin-top-actions .store-closed{max-width:88px!important;overflow:hidden!important}.admin-workspace{padding-inline:7px!important}
+}
 .sidebar-logo{display:grid!important;place-items:center!important;overflow:hidden!important}
 .sidebar-logo:before,.sidebar-logo:after{content:none!important;display:none!important}
 .sidebar-logo img{display:block!important;width:48px!important;height:48px!important;object-fit:contain!important;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))!important}
