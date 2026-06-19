@@ -43,6 +43,7 @@ body.admin-executive-mode .executive-dashboard{gap:12px!important;margin:0!impor
 .sidebar-brand-copy strong,.sidebar-brand-copy span,.sidebar-nav button,.sidebar-shortcuts button{white-space:nowrap!important}
 .sidebar-nav button svg,.sidebar-shortcuts button svg{flex:none!important}
 .delivery-dock,.kitchen-dock,.delivery-shortcut,.kitchen-shortcut,.report-dock,.command-dock,.daily-goals-dock,.clientes-vip-dock,.campaign-dock,.post-sale-dock,.menu-rank-dock{display:none!important}
+body:has(.admin-desktop-shell) .admin-flow-toolbar{display:none!important}
 @media(min-width:901px) and (max-width:1450px){
   .admin-desktop-shell{grid-template-columns:240px minmax(0,1fr)!important}
   .admin-sidebar{width:240px!important;min-width:240px!important;max-width:240px!important}
