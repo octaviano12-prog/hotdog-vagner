@@ -128,8 +128,16 @@ async function bootPublicOrderRules() {
   await getSettings();
   installFetchRules();
   if (isMobileOrderPage()) return;
-  setInterval(() => {
+  const applyInitialRules = () => {
     injectStatusBanner();
+    injectChangeInput();
+    blockClosedStore();
+    installFormListeners();
+    window.__markHotdogHomeReady?.('rules');
+  };
+  window.addEventListener('hotdog:home-v2-ready', applyInitialRules, { once: true });
+  if (document.querySelector('.ultra-hero[data-home-v2-ready="1"]')) applyInitialRules();
+  setInterval(() => {
     injectChangeInput();
     blockClosedStore();
     installFormListeners();
@@ -137,4 +145,3 @@ async function bootPublicOrderRules() {
 }
 
 bootPublicOrderRules();
-
