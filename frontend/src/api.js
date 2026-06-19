@@ -37,6 +37,10 @@ async function request(path, options = {}) {
   const data = contentType.includes('application/json') ? await response.json() : await response.text();
 
   if (!response.ok) {
+    if (response.status === 401 && path.startsWith('/api/admin/')) {
+      clearToken();
+      window.dispatchEvent(new CustomEvent('hotdog:admin-auth-expired'));
+    }
     throw new Error(extractErrorMessage(data, response.status));
   }
 
@@ -44,7 +48,19 @@ async function request(path, options = {}) {
 }
 
 export function getToken() {
-  return localStorage.getItem('hotdog_token');
+  const token = localStorage.getItem('hotdog_token');
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (!payload?.exp || payload.exp * 1000 <= Date.now()) {
+      localStorage.removeItem('hotdog_token');
+      return null;
+    }
+    return token;
+  } catch {
+    localStorage.removeItem('hotdog_token');
+    return null;
+  }
 }
 
 export function setToken(token) {
