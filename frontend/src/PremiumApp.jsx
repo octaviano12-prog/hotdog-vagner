@@ -447,7 +447,7 @@ function AdminSidebar({ activeTab, setActiveTab }) {
   return (
     <aside className="admin-sidebar">
       <div className="sidebar-brand">
-        <div className="sidebar-logo">🌭</div>
+        <div className="sidebar-logo" aria-hidden="true" />
         <div className="sidebar-brand-copy"><strong>Hotdog Prensado</strong><span>Pedidos Online</span></div>
       </div>
       <nav className="sidebar-nav">
