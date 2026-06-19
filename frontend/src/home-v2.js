@@ -5,6 +5,28 @@ function isPublicHome() {
     && !window.location.pathname.includes('admin') && !window.location.pathname.includes('cozinha') && !window.location.pathname.includes('entregas') && !window.location.pathname.includes('acompanhar');
 }
 
+function installHomePreflight() {
+  document.body.classList.add('home-v2-ready', 'home-v2-preparing');
+  if (document.getElementById('home-v2-preflight')) return;
+  const style = document.createElement('style');
+  style.id = 'home-v2-preflight';
+  style.textContent = 'body.home-v2-preparing #root{visibility:hidden!important}';
+  document.head.appendChild(style);
+}
+
+function revealHome() {
+  document.body.classList.remove('home-v2-preparing');
+  document.getElementById('home-v2-preflight')?.remove();
+}
+
+window.__revealHotdogHome = revealHome;
+window.__hotdogHomeReady = window.__hotdogHomeReady || new Set();
+window.__markHotdogHomeReady = (part) => {
+  window.__hotdogHomeReady.add(part);
+  const required = ['core', 'images', 'offer', 'rules'];
+  if (required.every((item) => window.__hotdogHomeReady.has(item))) revealHome();
+};
+
 function scrollToOrder() {
   document.getElementById('cardapio')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -93,13 +115,24 @@ function ensureSectionLabels() {
 function bootHomeV2() {
   if (homeV2.booted || !isPublicHome()) return;
   homeV2.booted = true;
-  setInterval(() => {
+  installHomePreflight();
+  const finish = () => {
+    const hero = document.querySelector('.ultra-hero');
+    const workflow = document.querySelector('.workflow-section');
+    if (!hero || !workflow) return false;
+    observer.disconnect();
     ensureHeroUpgrade();
     ensureSignupBanner();
     ensureStickyCta();
     ensureSectionLabels();
-  }, 1200);
+    window.__markHotdogHomeReady('core');
+    window.dispatchEvent(new CustomEvent('hotdog:home-v2-ready'));
+    return true;
+  };
+  const observer = new MutationObserver(finish);
+  observer.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+  finish();
+  setTimeout(revealHome, 3500);
 }
 
 bootHomeV2();
-
