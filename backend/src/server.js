@@ -388,7 +388,7 @@ app.get('/api/admin/finance/summary', authRequired, adminRequired, async (_req, 
 });
 
 app.get('/api/admin/finance/expenses', authRequired, adminRequired, async (_req, res) => {
-  const expenses = await query('SELECT * FROM expenses ORDER BY expense_date DESC, id DESC LIMIT 100');
+  const expenses = await query('SELECT * FROM expenses WHERE is_active = 1 ORDER BY expense_date DESC, id DESC LIMIT 200');
   return res.json(expenses);
 });
 
@@ -397,16 +397,29 @@ app.post('/api/admin/finance/expenses', authRequired, adminRequired, async (req,
     description: z.string().min(2),
     amount: z.number().positive(),
     category: z.string().optional().default('Geral'),
-    expense_date: z.string().optional()
+    expense_date: z.string().optional(),
+    payment_method: z.enum(['dinheiro', 'pix', 'cartao', 'fiado']).optional().default('dinheiro'),
+    notes: z.string().optional().default('')
   });
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ message: 'Despesa invalida.' });
 
-  const result = await query(
-    'INSERT INTO expenses (description, amount, category, expense_date) VALUES (?, ?, ?, COALESCE(?, CURDATE()))',
-    [parsed.data.description, money(parsed.data.amount), parsed.data.category, parsed.data.expense_date || null]
-  );
-  return res.status(201).json({ message: 'Despesa cadastrada.', id: result.insertId });
+  const result = await transaction(async (connection) => {
+    const [openRows] = await connection.execute("SELECT id FROM cash_registers WHERE status = 'aberto' ORDER BY opened_at DESC, id DESC LIMIT 1 FOR UPDATE");
+    const registerId = openRows[0]?.id || null;
+    const [movementResult] = await connection.execute(
+      `INSERT INTO cash_movements (cash_register_id, movement_type, description, amount, payment_method, notes, category, source_type, created_by)
+       VALUES (?, 'saida', ?, ?, ?, ?, ?, 'expense', ?)`,
+      [registerId, parsed.data.description, money(parsed.data.amount), parsed.data.payment_method, parsed.data.notes, parsed.data.category, req.user?.id || null]
+    );
+    const [expenseResult] = await connection.execute(
+      `INSERT INTO expenses (description, amount, category, expense_date, payment_method, notes, cash_movement_id, created_by)
+       VALUES (?, ?, ?, COALESCE(?, CURDATE()), ?, ?, ?, ?)`,
+      [parsed.data.description, money(parsed.data.amount), parsed.data.category, parsed.data.expense_date || null, parsed.data.payment_method, parsed.data.notes, movementResult.insertId, req.user?.id || null]
+    );
+    return expenseResult;
+  });
+  return res.status(201).json({ message: 'Despesa cadastrada e lançada no caixa.', id: result.insertId });
 });
 
 app.get('/api/admin/settings', authRequired, adminRequired, async (_req, res) => {
