@@ -64,7 +64,7 @@ bootCustomerAccount();
 bootCustomerReorder();
 bootCustomerLoyalty();
 
-if (window.location.pathname.includes('admin') || window.location.pathname.includes('cozinha')) {
+if (window.location.pathname.includes('cozinha')) {
   import('./admin-kitchen-board.css');
   import('./admin-kitchen-board.js');
 }
@@ -78,3 +78,4 @@ createRoot(document.getElementById('root')).render(
     </React.Suspense>
   </React.StrictMode>
 );
+

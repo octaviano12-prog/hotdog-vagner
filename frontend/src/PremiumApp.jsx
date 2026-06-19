@@ -447,7 +447,7 @@ function AdminSidebar({ activeTab, setActiveTab }) {
   return (
     <aside className="admin-sidebar">
       <div className="sidebar-brand">
-        <div className="sidebar-logo" aria-hidden="true" />
+        <div className="sidebar-logo" aria-hidden="true"><img src="/images/hotdog-premium.svg" alt="" /></div>
         <div className="sidebar-brand-copy"><strong>Hotdog Prensado</strong><span>Pedidos Online</span></div>
       </div>
       <nav className="sidebar-nav">
@@ -458,11 +458,7 @@ function AdminSidebar({ activeTab, setActiveTab }) {
         ))}
       </nav>
       <div className="sidebar-shortcuts">
-        <button type="button" onClick={() => {
-          const shortcut = document.querySelector('.delivery-dock,[data-delivery-open]');
-          if (shortcut) shortcut.click();
-          else setActiveTab('orders');
-        }}><Bike size={19} /> Entregas</button>
+        <button type="button" onClick={() => { window.location.href = '/entregas'; }}><Bike size={19} /> Entregas</button>
         <button type="button" onClick={() => { window.location.href = '/cozinha'; }}><ChefHat size={19} /> Modo cozinha</button>
       </div>
       <div className="sidebar-user">
@@ -965,7 +961,6 @@ function AdminPremium() {
           </div>
         </header>
 
-        {tab === 'orders' && <AdminCounterToolbar onRefresh={loadAdmin} />}
         {message && <p className="notice admin-message">{message}</p>}
         {renderContent()}
         <footer className="admin-footer">© 2026 Hotdog Prensado • Painel Premium de Pedidos e Gestao</footer>
