@@ -272,3 +272,14 @@ body.admin-finance-mode .finance-table-wrap tbody tr:hover{background:rgba(255,1
 body.admin-finance-mode .reverse-button{height:30px;padding:0 9px;border:1px solid rgba(255,89,89,.32);border-radius:7px;background:rgba(255,89,89,.08);color:#ff8588;font-size:10px;font-weight:900;cursor:pointer}
 @media(max-width:1250px){body.admin-finance-mode .finance-control-head{align-items:flex-start;flex-direction:column}body.admin-finance-mode .finance-overview-grid{grid-template-columns:1fr}body.admin-finance-mode .finance-daily-panel{grid-column:auto}}
 @media(max-width:760px){body.admin-finance-mode .finance-view-tabs{grid-template-columns:1fr 1fr}body.admin-finance-mode .finance-period-form{display:grid;grid-template-columns:1fr 1fr;width:100%}body.admin-finance-mode .finance-payment-list article{grid-template-columns:80px 1fr 90px}body.admin-finance-mode .finance-payment-list article small{display:none}body.admin-finance-mode .ledger-head{align-items:stretch;flex-direction:column}body.admin-finance-mode .ledger-filters{display:grid;grid-template-columns:1fr 1fr}body.admin-finance-mode .ledger-filters button{grid-column:1/-1;justify-content:center}}
+@media(max-width:900px){
+  body.admin-finance-mode .finance-complete{min-width:0!important;width:100%!important}
+  body.admin-finance-mode .finance-complete>*{min-width:0!important;width:100%!important;max-width:100%!important}
+  body.admin-finance-mode .finance-reference-metrics{grid-template-columns:1fr!important}
+  body.admin-finance-mode .finance-reference-metrics article{grid-template-columns:58px minmax(0,1fr)!important;min-width:0!important;width:100%!important}
+  body.admin-finance-mode .finance-reference-metrics article>span{width:54px!important;height:54px!important}
+  body.admin-finance-mode .finance-view-tabs button{min-width:0!important;padding:5px!important;white-space:normal!important;line-height:1.15!important}
+  body.admin-finance-mode .finance-control-head,body.admin-finance-mode .finance-overview-grid,body.admin-finance-mode .finance-reference-grid,body.admin-finance-mode .finance-history-panel,body.admin-finance-mode .finance-ledger-panel{min-width:0!important;width:100%!important;max-width:100%!important}
+  body.admin-finance-mode .finance-period-form{min-width:0!important;width:100%!important}
+}
+
