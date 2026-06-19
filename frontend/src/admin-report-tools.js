@@ -138,7 +138,7 @@ function printDailyReport(data) {
           <div class="card">Caixa<b>${data.cash?.register ? 'Aberto' : 'Fechado'}</b></div>
           ${Object.entries(totals).map(([method, total]) => `<div class="card">${method}<b>${money(total)}</b></div>`).join('')}
         </section>
-        ${pending.length ? `<p class="warn">Atenção: ${pending.length} pedido(s) com pagamento pendente.</p>` : '<p>Sem pagamentos pendentes no momento.</p>'}
+        ${pending.length ? `<p class="warn">AtenÃ§Ã£o: ${pending.length} pedido(s) com pagamento pendente.</p>` : '<p>Sem pagamentos pendentes no momento.</p>'}
         <h2>Pedidos do dia</h2>
         <table><thead><tr><th>Codigo</th><th>Cliente</th><th>Status</th><th>Pagamento</th><th>Itens</th><th>Total</th></tr></thead><tbody>
           ${data.orders.map((order) => `<tr><td>${order.public_code || `#${order.id}`}</td><td>${order.customer_name || ''}</td><td>${order.status}</td><td>${order.payment_status} / ${order.payment_method}</td><td>${itemNames(order)}</td><td>${money(order.total)}</td></tr>`).join('')}
@@ -198,7 +198,8 @@ function bootReports() {
 
 bootReports();
 
-if (window.location.pathname.includes('admin') || window.location.pathname.includes('entregas')) {
+if (window.location.pathname.includes('entregas')) {
   import('./admin-delivery-dispatch.css');
   import('./admin-delivery-dispatch.js');
 }
+
