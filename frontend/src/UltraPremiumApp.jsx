@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import PremiumApp from './PremiumApp.jsx';
 import { api, formatMoney } from './api.js';
+import { BRAND_NAME, productMedia, productMediaPosition } from './product-media.js';
 
 const paymentLabels = {
   dinheiro: 'Dinheiro',
@@ -74,7 +75,7 @@ function productBadge(product = {}) {
 
 function makeWhatsAppMessage(settings, payload, total, order) {
   const lines = [
-    `Novo pedido - ${settings?.business_name || 'Hot Dog do Vagner'}`,
+    `Novo pedido - ${settings?.business_name || BRAND_NAME}`,
     order?.public_code ? `Codigo: ${order.public_code}` : order?.id ? `Pedido: #${order.id}` : '',
     '',
     ...payload.items.map((item, index) => {
@@ -132,11 +133,11 @@ function Header({ settings }) {
         <span><Flame size={24} /></span>
         <div>
           <small>Pedidos online</small>
-          <strong>{settings?.business_name || 'Hot Dog do Vagner'}</strong>
+          <strong>{settings?.business_name || BRAND_NAME}</strong>
         </div>
       </button>
       <nav>
-        <button onClick={() => document.getElementById('cardapio')?.scrollIntoView({ behavior: 'smooth' })}><ShoppingCart size={16} /> Cardapio</button>
+        <button onClick={() => { window.location.href = '/pedir'; }}><ShoppingCart size={16} /> Cardápio</button>
         <button className="admin" onClick={() => { window.history.pushState({}, '', '/admin'); window.location.reload(); }}><ShieldCheck size={16} /> Painel Admin</button>
       </nav>
     </header>
@@ -157,10 +158,10 @@ function ProductCard({ product, extras, onAdd, featured = false }) {
   }
 
   return (
-    <article className={`ultra-product-card ${featured ? 'featured' : ''}`}>
+    <article className={`ultra-product-card ${featured ? 'featured' : ''} ${productMediaPosition(product)}`}>
       <div className="product-photo-wrap">
         {featured && <span className="most-ordered">Mais pedido</span>}
-        <FoodVisual product={product} />
+        <img className="catalog-product-photo" src={productMedia(product)} alt={product.name} loading="lazy" />
       </div>
       <div className="product-info">
         <small>{productBadge(product)}</small>
@@ -435,6 +436,11 @@ function PremiumLanding({ settings }) {
   }, [menu.categories, searchTerm]);
 
   function addToCart(product, extraIds = []) {
+    if (window.location.pathname === '/') {
+      localStorage.setItem('hotdog_pending_cart', JSON.stringify([{ productId: product.id, extraIds }]));
+      window.location.href = '/pedir';
+      return;
+    }
     const selectedExtras = extras.filter((extra) => extraIds.includes(extra.id));
     const key = `${product.id}-${selectedExtras.map((extra) => extra.id).sort().join('-')}`;
     setCart((current) => {
@@ -465,8 +471,8 @@ function PremiumLanding({ settings }) {
             <h1>O hot dog que você ama, <em>no capricho</em> que você merece.</h1>
             <p>Pães macios, salsichas selecionadas e combinações irresistíveis. Peça agora e receba com rapidez e qualidade.</p>
             <div className="hero-actions">
-              <button className="hero-primary" onClick={() => document.getElementById('cardapio')?.scrollIntoView({ behavior: 'smooth' })}>Fazer pedido agora <ChevronRight size={18} /></button>
-              <button className="hero-secondary" onClick={() => document.getElementById('cardapio')?.scrollIntoView({ behavior: 'smooth' })}><ShoppingCart size={17} /> Ver cardápio</button>
+              <button className="hero-primary" onClick={() => { window.location.href = '/pedir'; }}>Fazer pedido agora <ChevronRight size={18} /></button>
+              <button className="hero-secondary" onClick={() => { window.location.href = '/pedir'; }}><ShoppingCart size={17} /> Ver cardápio</button>
             </div>
             <div className="hero-metrics">
               <span><Clock size={19} /><b>Previsao</b><strong>{settings?.estimated_delivery_minutes || 35} min</strong></span>
@@ -475,7 +481,7 @@ function PremiumLanding({ settings }) {
             </div>
           </div>
           <div className="hero-art">
-            <FoodVisual product={{ product_type: 'hotdog', name: 'Hot Dog Especial' }} hero />
+            <img className="catalog-hero-photo" src="/images/catalog-products-premium.png" alt="Hot dog prensado artesanal" />
             <div className="smart-queue">
               <strong><Zap size={17} /> Fila inteligente</strong>
               <div><i /> <i /> <i /> <i /></div>
@@ -498,7 +504,7 @@ function PremiumLanding({ settings }) {
             <div className="highlight-grid">
               {featuredProducts.map((product, index) => (
                 <button key={product.id} className="highlight-card" onClick={() => addToCart(product, [])}>
-                  <FoodVisual product={product} />
+                  <img className={`catalog-highlight-photo ${productMediaPosition(product)}`} src={productMedia(product)} alt={product.name} loading="lazy" />
                   <div>
                     <strong>{product.name}</strong>
                     <b>{formatMoney(product.price)}</b>

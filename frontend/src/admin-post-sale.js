@@ -62,12 +62,12 @@ async function loadPostSale(force = false) {
 function messageFor(order, type = 'avaliar') {
   const name = firstName(order);
   if (type === 'obrigado') {
-    return `Oi ${name}, aqui e do Hot Dog do Vagner. Passando para agradecer pelo seu pedido ${orderCode(order)}. Ficamos felizes em atender voce. Volte sempre!`;
+    return `Oi ${name}, aqui e do Hotdog Prensado. Passando para agradecer pelo seu pedido ${orderCode(order)}. Ficamos felizes em atender voce. Volte sempre!`;
   }
   if (type === 'voltar') {
-    return `Oi ${name}, tudo bem? Aqui e do Hot Dog do Vagner. Ja deu vontade de repetir aquele hot dog? Posso te mandar o cardapio ou separar um combo pra voce.`;
+    return `Oi ${name}, tudo bem? Aqui e do Hotdog Prensado. Ja deu vontade de repetir aquele hot dog? Posso te mandar o cardapio ou separar um combo pra voce.`;
   }
-  return `Oi ${name}, tudo bem? Aqui e do Hot Dog do Vagner. Como foi seu pedido ${orderCode(order)}? Sua opiniao ajuda muito a gente melhorar. Se puder, manda uma nota de 0 a 10 ou um comentario rapidinho. Obrigado!`;
+  return `Oi ${name}, tudo bem? Aqui e do Hotdog Prensado. Como foi seu pedido ${orderCode(order)}? Sua opiniao ajuda muito a gente melhorar. Se puder, manda uma nota de 0 a 10 ou um comentario rapidinho. Obrigado!`;
 }
 
 function whatsappLink(order, type) {
@@ -125,7 +125,7 @@ function exportPostSaleCsv(list) {
 
 async function copyPostSaleList(list) {
   const text = [
-    'Pos-venda - Hot Dog do Vagner',
+    'Pos-venda - Hotdog Prensado',
     '',
     ...list.slice(0, 20).map((order, index) => `${index + 1}. ${order.customer_name} - ${order.customer_phone || 'sem telefone'} - ${messageFor(order, postSaleState.filter === 'voltar' ? 'voltar' : 'avaliar')}`)
   ].join('\n');

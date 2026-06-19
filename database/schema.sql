@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS settings (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  business_name VARCHAR(160) NOT NULL DEFAULT 'Hot Dog do Vagner',
+  business_name VARCHAR(160) NOT NULL DEFAULT 'Hotdog Prensado',
   phone VARCHAR(30) DEFAULT '',
   whatsapp VARCHAR(30) DEFAULT '',
   address VARCHAR(255) DEFAULT '',
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS cash_movements (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO settings (id, business_name, phone, whatsapp, delivery_fee, is_open)
-VALUES (1, 'Hot Dog do Vagner', '(18) 99195-9898', '5518991959898', 2.00, 1);
+VALUES (1, 'Hotdog Prensado', '(18) 99195-9898', '5518991959898', 2.00, 1);
 
 INSERT IGNORE INTO categories (id, name, slug, description, sort_order) VALUES
 (1, 'Hot Dog Prensado', 'hot-dog-prensado', 'Lanches prensados da casa', 1),

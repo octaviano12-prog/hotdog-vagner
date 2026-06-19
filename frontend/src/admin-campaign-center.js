@@ -108,18 +108,18 @@ function segmentCustomers() {
 function templateFor(segment, customer = {}) {
   const firstName = String(customer.name || 'cliente').split(' ')[0];
   if (segment === 'vip') {
-    return `Oi ${firstName}, tudo bem? Aqui e do Hot Dog do Vagner. Hoje tem promocao especial para cliente VIP. Seu favorito ${customer.favorite || 'hot dog prensado'} esta te esperando. Quer que eu ja separe seu pedido?`;
+    return `Oi ${firstName}, tudo bem? Aqui e do Hotdog Prensado. Hoje tem promocao especial para cliente VIP. Seu favorito ${customer.favorite || 'hot dog prensado'} esta te esperando. Quer que eu ja separe seu pedido?`;
   }
   if (segment === 'sumidos') {
-    return `Oi ${firstName}, sentimos sua falta no Hot Dog do Vagner. Hoje e um bom dia para matar a saudade daquele hot dog prensado caprichado. Quer ver o cardapio?`;
+    return `Oi ${firstName}, sentimos sua falta no Hotdog Prensado. Hoje e um bom dia para matar a saudade daquele hot dog prensado caprichado. Quer ver o cardapio?`;
   }
   if (segment === 'pendentes') {
-    return `Oi ${firstName}, aqui e do Hot Dog do Vagner. Consta um valor pendente de ${money(customer.pending)} no seu cadastro. Posso te ajudar a regularizar?`;
+    return `Oi ${firstName}, aqui e do Hotdog Prensado. Consta um valor pendente de ${money(customer.pending)} no seu cadastro. Posso te ajudar a regularizar?`;
   }
   if (segment === 'novos') {
-    return `Oi ${firstName}, seja bem-vindo ao Hot Dog do Vagner. Na proxima compra voce pode acompanhar tudo pelo site e pedir novamente mais rapido. Quer receber uma sugestao de combo?`;
+    return `Oi ${firstName}, seja bem-vindo ao Hotdog Prensado. Na proxima compra voce pode acompanhar tudo pelo site e pedir novamente mais rapido. Quer receber uma sugestao de combo?`;
   }
-  return `Oi ${firstName}, aqui e do Hot Dog do Vagner. Temos novidades no cardapio hoje. Quer receber uma sugestao?`;
+  return `Oi ${firstName}, aqui e do Hotdog Prensado. Temos novidades no cardapio hoje. Quer receber uma sugestao?`;
 }
 
 function whatsappLink(customer, customMessage) {
@@ -150,7 +150,7 @@ function exportCampaignCsv(list) {
 
 async function copyCampaignList(list) {
   const text = [
-    `Campanha ${campaignState.segment.toUpperCase()} - Hot Dog do Vagner`,
+    `Campanha ${campaignState.segment.toUpperCase()} - Hotdog Prensado`,
     '',
     ...list.slice(0, 20).map((customer, index) => `${index + 1}. ${customer.name} - ${customer.phone || 'sem telefone'} - ${templateFor(campaignState.segment, customer)}`)
   ].join('\n');

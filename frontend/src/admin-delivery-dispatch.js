@@ -67,7 +67,7 @@ function whatsappUrl(order) {
   if (!phone) return '';
   const number = phone.startsWith('55') ? phone : `55${phone}`;
   const message = [
-    `Oi ${order.customer_name || ''}, aqui e do Hot Dog do Vagner.`,
+    `Oi ${order.customer_name || ''}, aqui e do Hotdog Prensado.`,
     `Seu pedido ${orderCode(order)} ${order.status === 'saiu_entrega' ? 'saiu para entrega' : 'esta sendo preparado'}.`,
     `Total: ${money(order.total)}`
   ].join('\n');

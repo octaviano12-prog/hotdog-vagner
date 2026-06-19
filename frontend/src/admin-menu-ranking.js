@@ -57,7 +57,7 @@ function exportMenuRank() {
 }
 
 async function copyMenuRank() {
-  const lines = ['Ranking do cardapio - Hot Dog do Vagner', '', `Pedidos validos: ${menuRank.orders}`, `Faturamento: ${brl(menuRank.gross)}`, '', 'Top produtos:', ...menuRank.rows.slice(0, 8).map((r, i) => `${i + 1}. ${r.name} - ${r.quantity} un. - ${brl(r.total)}`)];
+  const lines = ['Ranking do cardapio - Hotdog Prensado', '', `Pedidos validos: ${menuRank.orders}`, `Faturamento: ${brl(menuRank.gross)}`, '', 'Top produtos:', ...menuRank.rows.slice(0, 8).map((r, i) => `${i + 1}. ${r.name} - ${r.quantity} un. - ${brl(r.total)}`)];
   await navigator.clipboard.writeText(lines.join('\n'));
   renderMenuRank('Resumo copiado.');
 }

@@ -48,7 +48,7 @@ body:has(.admin-desktop-shell){
   box-shadow:0 0 28px rgba(255,145,0,.16);
 }
 .sidebar-logo:after{
-  content:'Hot Dog do Vagner\APedidos Online';
+  content:'Hotdog Prensado\APedidos Online';
   white-space:pre;
   line-height:1.16;
   font-weight:950;

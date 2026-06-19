@@ -30,7 +30,7 @@ function addHeroImage() {
   const img = document.createElement('img');
   img.className = 'real-hero-food';
   img.src = images.hotdog;
-  img.alt = 'Hot dog prensado premium do Hot Dog do Vagner';
+  img.alt = 'Hot dog prensado premium do Hotdog Prensado';
   img.loading = 'eager';
   art.insertAdjacentElement('afterbegin', img);
 }

@@ -21,10 +21,10 @@ function addLink(rel, href) {
 
 export function registerPwa() {
   addLink(manifest.rel, manifest.href);
-  addMeta('application-name', 'Hot Dog do Vagner');
+  addMeta('application-name', 'Hotdog Prensado');
   addMeta('apple-mobile-web-app-capable', 'yes');
   addMeta('apple-mobile-web-app-status-bar-style', 'black-translucent');
-  addMeta('apple-mobile-web-app-title', 'Hot Dog do Vagner');
+  addMeta('apple-mobile-web-app-title', 'Hotdog Prensado');
   addMeta('mobile-web-app-capable', 'yes');
   addMeta('theme-color', '#080604');
 

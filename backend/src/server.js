@@ -94,7 +94,7 @@ async function ensureDefaults() {
     await query(
       'INSERT INTO settings (business_name, phone, whatsapp, address, delivery_fee, is_open) VALUES (?, ?, ?, ?, ?, ?)',
       [
-        'Hot Dog do Vagner',
+        'Hotdog Prensado',
         '(18) 99195-9898',
         process.env.WHATSAPP_NUMBER || '5518991959898',
         '',
@@ -315,6 +315,7 @@ app.post('/api/admin/products', authRequired, adminRequired, async (req, res) =>
     category_id: z.number().int().positive(),
     name: z.string().min(2),
     description: z.string().optional().default(''),
+    image_url: z.string().max(500).optional().default(''),
     price: z.number().nonnegative(),
     product_type: z.enum(['hotdog', 'bebida', 'suco', 'adicional']).default('hotdog'),
     is_active: z.boolean().default(true),
@@ -325,9 +326,9 @@ app.post('/api/admin/products', authRequired, adminRequired, async (req, res) =>
 
   const slug = parsed.data.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const result = await query(
-    `INSERT INTO products (category_id, name, slug, description, price, product_type, is_active, sort_order)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [parsed.data.category_id, parsed.data.name, `${slug}-${Date.now()}`, parsed.data.description, money(parsed.data.price), parsed.data.product_type, parsed.data.is_active ? 1 : 0, parsed.data.sort_order]
+    `INSERT INTO products (category_id, name, slug, description, image_url, price, product_type, is_active, sort_order)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [parsed.data.category_id, parsed.data.name, `${slug}-${Date.now()}`, parsed.data.description, parsed.data.image_url, money(parsed.data.price), parsed.data.product_type, parsed.data.is_active ? 1 : 0, parsed.data.sort_order]
   );
   return res.status(201).json({ message: 'Produto criado.', id: result.insertId });
 });
@@ -337,6 +338,7 @@ app.put('/api/admin/products/:id', authRequired, adminRequired, async (req, res)
     category_id: z.number().int().positive(),
     name: z.string().min(2),
     description: z.string().optional().default(''),
+    image_url: z.string().max(500).optional().default(''),
     price: z.number().nonnegative(),
     product_type: z.enum(['hotdog', 'bebida', 'suco', 'adicional']),
     is_active: z.boolean(),
@@ -346,8 +348,8 @@ app.put('/api/admin/products/:id', authRequired, adminRequired, async (req, res)
   if (!parsed.success) return res.status(400).json({ message: 'Produto invalido.', errors: parsed.error.flatten() });
 
   await query(
-    `UPDATE products SET category_id = ?, name = ?, description = ?, price = ?, product_type = ?, is_active = ?, sort_order = ? WHERE id = ?`,
-    [parsed.data.category_id, parsed.data.name, parsed.data.description, money(parsed.data.price), parsed.data.product_type, parsed.data.is_active ? 1 : 0, parsed.data.sort_order, req.params.id]
+    `UPDATE products SET category_id = ?, name = ?, description = ?, image_url = ?, price = ?, product_type = ?, is_active = ?, sort_order = ? WHERE id = ?`,
+    [parsed.data.category_id, parsed.data.name, parsed.data.description, parsed.data.image_url, money(parsed.data.price), parsed.data.product_type, parsed.data.is_active ? 1 : 0, parsed.data.sort_order, req.params.id]
   );
   return res.json({ message: 'Produto atualizado.' });
 });
@@ -461,7 +463,7 @@ app.use((error, _req, res, _next) => {
 });
 
 app.listen(PORT, async () => {
-  console.log(`Hot Dog do Vagner API rodando na porta ${PORT}`);
+  console.log(`Hotdog Prensado API rodando na porta ${PORT}`);
   try {
     await initDatabase();
     await ensureDefaults();

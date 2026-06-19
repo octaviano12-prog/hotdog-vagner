@@ -92,7 +92,7 @@ function buildSummaryText(data) {
   const totals = paymentTotals(data.orders);
   const pending = data.orders.filter((order) => order.payment_status === 'pendente' && order.status !== 'cancelado');
   const lines = [
-    `Resumo do dia - Hot Dog do Vagner (${new Date().toLocaleDateString('pt-BR')})`,
+    `Resumo do dia - Hotdog Prensado (${new Date().toLocaleDateString('pt-BR')})`,
     '',
     `Pedidos: ${data.summary?.orders_today || data.orders.length}`,
     `Faturamento: ${money(data.summary?.gross_today || data.sales?.summary?.gross)}`,
@@ -121,14 +121,14 @@ function printDailyReport(data) {
   const html = `
     <html>
       <head>
-        <title>Relatorio diario - Hot Dog do Vagner</title>
+        <title>Relatorio diario - Hotdog Prensado</title>
         <style>
           body{font-family:Arial,sans-serif;margin:28px;color:#161616}.head{display:flex;justify-content:space-between;gap:18px;border-bottom:3px solid #111;padding-bottom:14px;margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.card{border:1px solid #222;border-radius:12px;padding:12px}.card b{display:block;font-size:20px;margin-top:6px}table{width:100%;border-collapse:collapse;margin-top:14px}th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left;font-size:12px}.total{font-size:24px;font-weight:900}.warn{color:#a34b00;font-weight:800}@media print{button{display:none}.card{break-inside:avoid}}
         </style>
       </head>
       <body>
         <button onclick="window.print()">Imprimir relatorio</button>
-        <section class="head"><div><h1>Hot Dog do Vagner</h1><p>Relatorio diario gerado em ${new Date().toLocaleString('pt-BR')}</p></div><div class="total">${money(data.summary?.net_today || data.sales?.summary?.net)}<br><small>liquido</small></div></section>
+        <section class="head"><div><h1>Hotdog Prensado</h1><p>Relatorio diario gerado em ${new Date().toLocaleString('pt-BR')}</p></div><div class="total">${money(data.summary?.net_today || data.sales?.summary?.net)}<br><small>liquido</small></div></section>
         <section class="grid">
           <div class="card">Pedidos<b>${data.summary?.orders_today || data.orders.length}</b></div>
           <div class="card">Faturamento<b>${money(data.summary?.gross_today || data.sales?.summary?.gross)}</b></div>

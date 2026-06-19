@@ -96,7 +96,7 @@ function exportVipCsv(list) {
 }
 
 async function copyVip(list) {
-  const content = ['Clientes VIP - Hot Dog do Vagner', '', ...list.slice(0, 12).map((client, index) => `${index + 1}. ${client.name} - ${money(client.total)} - ${client.orders} pedido(s)`)].join('\n');
+  const content = ['Clientes VIP - Hotdog Prensado', '', ...list.slice(0, 12).map((client, index) => `${index + 1}. ${client.name} - ${money(client.total)} - ${client.orders} pedido(s)`)].join('\n');
   await navigator.clipboard.writeText(content);
   const message = document.querySelector('.clientes-vip-message');
   if (message) message.textContent = 'Lista copiada para WhatsApp.';
@@ -151,7 +151,7 @@ function renderVipPanel(message = '') {
               <div class="vip-head"><div><strong>${client.name}</strong><span>${client.phone || 'Sem telefone'}</span></div><b>${money(client.total)}</b></div>
               <div class="vip-tags"><span>${client.orders} pedido(s)</span><span>Ticket ${money(client.ticket)}</span><span>Favorito: ${client.favorite}</span></div>
               <p>${client.neighborhood || 'Bairro nao informado'} ${client.address ? `• ${client.address}` : ''}</p>
-              <footer>${phone ? `<a target="_blank" rel="noreferrer" href="https://wa.me/${phone}?text=${encodeURIComponent(`Oi ${client.name}, tudo bem? Aqui e do Hot Dog do Vagner.`)}">WhatsApp</a>` : ''}${client.pending > 0 ? `<em>Pendente ${money(client.pending)}</em>` : '<em>Sem pendencia</em>'}${client.orders >= 3 ? '<mark>VIP</mark>' : ''}</footer>
+              <footer>${phone ? `<a target="_blank" rel="noreferrer" href="https://wa.me/${phone}?text=${encodeURIComponent(`Oi ${client.name}, tudo bem? Aqui e do Hotdog Prensado.`)}">WhatsApp</a>` : ''}${client.pending > 0 ? `<em>Pendente ${money(client.pending)}</em>` : '<em>Sem pendencia</em>'}${client.orders >= 3 ? '<mark>VIP</mark>' : ''}</footer>
             </article>`;
         }).join('') : '<div class="vip-empty">Nenhum cliente encontrado.</div>'}
       </div>

@@ -32,7 +32,7 @@ async function initDatabase() {
 
   await run(`CREATE TABLE IF NOT EXISTS settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    business_name VARCHAR(160) NOT NULL DEFAULT 'Hot Dog do Vagner',
+    business_name VARCHAR(160) NOT NULL DEFAULT 'Hotdog Prensado',
     phone VARCHAR(30) DEFAULT '',
     whatsapp VARCHAR(30) DEFAULT '',
     address VARCHAR(255) DEFAULT '',
@@ -170,8 +170,9 @@ async function initDatabase() {
 
   await run(
     `INSERT IGNORE INTO settings (id, business_name, phone, whatsapp, delivery_fee, is_open, estimated_delivery_minutes, allow_whatsapp_redirect)
-     VALUES (1, 'Hot Dog do Vagner', '(18) 99195-9898', '5518991959898', 2.00, 1, 35, 1)`
+     VALUES (1, 'Hotdog Prensado', '(18) 99195-9898', '5518991959898', 2.00, 1, 35, 1)`
   );
+  await run("UPDATE settings SET business_name = 'Hotdog Prensado' WHERE LOWER(REPLACE(business_name, ' ', '')) IN ('hotdogdovagner', 'hotdogvagner')");
 
   await run(
     `INSERT IGNORE INTO categories (id, name, slug, description, sort_order) VALUES

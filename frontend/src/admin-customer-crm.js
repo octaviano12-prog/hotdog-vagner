@@ -158,7 +158,7 @@ function exportCsv(customers) {
 
 function campaignText(customers) {
   const top = customers.slice(0, 10).map((customer, index) => `${index + 1}. ${customer.name} - ${money(customer.total)} - ${customer.orders} pedido(s)`).join('\n');
-  return `Clientes VIP - Hot Dog do Vagner\n\n${top}\n\nSugestao: enviar promocao para clientes mais frequentes.`;
+  return `Clientes VIP - Hotdog Prensado\n\n${top}\n\nSugestao: enviar promocao para clientes mais frequentes.`;
 }
 
 async function copyCampaign(customers) {
@@ -225,7 +225,7 @@ function renderCrmPanel(message = '') {
             </div>
             <p>${customer.neighborhood || 'Bairro nao informado'} ${customer.address ? `• ${customer.address}` : ''}</p>
             <footer>
-              ${customer.whatsapp ? `<a href="${customer.whatsapp}?text=${encodeURIComponent(`Oi ${customer.name}, tudo bem? Aqui e do Hot Dog do Vagner.`)}" target="_blank" rel="noreferrer">WhatsApp</a>` : ''}
+              ${customer.whatsapp ? `<a href="${customer.whatsapp}?text=${encodeURIComponent(`Oi ${customer.name}, tudo bem? Aqui e do Hotdog Prensado.`)}" target="_blank" rel="noreferrer">WhatsApp</a>` : ''}
               ${customer.pending > 0 ? `<em>Pendente ${money(customer.pending)}</em>` : '<em>Sem pendencia</em>'}
               ${customer.orders >= 3 ? '<mark>VIP</mark>' : ''}
             </footer>

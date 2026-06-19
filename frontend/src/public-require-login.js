@@ -58,7 +58,7 @@ function showLoginPrompt() {
     });
     document.body.appendChild(overlay);
   }
-  overlay.innerHTML = `<section class="require-login-card"><button type="button" class="require-login-close">×</button><span>Cadastro obrigatório</span><h2>Entre ou cadastre para finalizar</h2><p>Para fazer pedido no Hot Dog do Vagner, o cliente precisa ter cadastro. Assim o endereço fica salvo, o histórico aparece na conta e o acompanhamento fica mais seguro.</p><div class="require-login-benefits"><article>✅ Pedido com seus dados salvos</article><article>🚚 Endereço preenchido automaticamente</article><article>⭐ Fidelidade e pedir novamente</article></div><button type="button" data-open-account>Entrar / cadastrar agora</button></section>`;
+  overlay.innerHTML = `<section class="require-login-card"><button type="button" class="require-login-close">×</button><span>Cadastro obrigatório</span><h2>Entre ou cadastre para finalizar</h2><p>Para fazer pedido no Hotdog Prensado, o cliente precisa ter cadastro. Assim o endereço fica salvo, o histórico aparece na conta e o acompanhamento fica mais seguro.</p><div class="require-login-benefits"><article>✅ Pedido com seus dados salvos</article><article>🚚 Endereço preenchido automaticamente</article><article>⭐ Fidelidade e pedir novamente</article></div><button type="button" data-open-account>Entrar / cadastrar agora</button></section>`;
   overlay.querySelector('.require-login-close').addEventListener('click', closeLoginPrompt);
   overlay.querySelector('[data-open-account]').addEventListener('click', openAccount);
 }
@@ -149,4 +149,3 @@ function bootRequireLogin() {
 }
 
 bootRequireLogin();
-

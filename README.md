@@ -1,6 +1,6 @@
-# Hot Dog do Vagner
+# Hotdog Prensado
 
-Sistema de pedidos online e gestao financeira para o Hot Dog do Vagner.
+Sistema de pedidos online e gestao financeira para o Hotdog Prensado.
 
 ## Tecnologias
 
