@@ -1,0 +1,85 @@
+:root{--brand-gold:#ffb000;--brand-orange:#ff6a00;--brand-ink:#070604;--brand-panel:#11100e;--brand-line:rgba(255,176,0,.22)}
+html{scroll-behavior:smooth;background:var(--brand-ink)}
+body{background:radial-gradient(circle at 80% 0,rgba(255,106,0,.12),transparent 34rem),var(--brand-ink)}
+.catalog-hero-photo,.catalog-product-photo,.catalog-highlight-photo{display:block;width:100%;height:100%;object-fit:cover;background:#0c0905}
+.catalog-hero-photo{min-height:520px;object-position:center 15%;filter:saturate(1.08) contrast(1.04)}
+.catalog-product-photo{min-height:210px;object-position:center 25%;transition:transform .35s ease,filter .35s ease}
+.ultra-product-card:hover .catalog-product-photo{transform:scale(1.025);filter:saturate(1.08)}
+.media-simple .catalog-product-photo,.media-simple.catalog-highlight-photo{object-position:center 27%}
+.media-traditional .catalog-product-photo,.media-traditional.catalog-highlight-photo{object-position:center 40%}
+.media-special .catalog-product-photo,.media-special.catalog-highlight-photo{object-position:center 54%}
+.media-complete .catalog-product-photo,.media-complete.catalog-highlight-photo{object-position:center 67%}
+.media-juice .catalog-product-photo,.media-juice.catalog-highlight-photo{object-position:center 30%}
+.media-pitcher .catalog-product-photo,.media-pitcher.catalog-highlight-photo{object-position:center 38%}
+.media-drink .catalog-product-photo,.media-drink.catalog-highlight-photo{object-position:center 42%}
+.media-extra .catalog-product-photo,.media-extra.catalog-highlight-photo{object-position:center 76%}
+.catalog-highlight-photo{position:absolute;inset:0;object-position:center 30%;opacity:.78}
+.highlight-card>div{position:relative;z-index:2}
+.highlight-card:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,3,2,.94),rgba(4,3,2,.25));pointer-events:none}
+.product-photo-wrap{height:220px;overflow:hidden}
+
+@media(min-width:901px){
+  .home-v2-ready .ultra-header{padding-inline:clamp(28px,3.2vw,72px)!important}
+  .home-v2-ready .ultra-hero,.home-v2-ready .feature-row,.home-v2-ready .workflow-zone,.home-v2-ready .ultra-section,.home-v2-ready .combo-showcase,.home-v2-ready .menu-zone,.home-v2-ready .trust-strip,.home-v2-ready .home-v2-signup{width:calc(100% - clamp(32px,4vw,84px))!important;max-width:1920px!important}
+  .home-v2-ready .ultra-hero{grid-template-columns:minmax(520px,1.05fr) minmax(500px,.95fr)!important;min-height:680px!important;padding-inline:clamp(20px,3vw,58px)!important}
+  .home-v2-ready .hero-art{min-height:560px!important}
+  .home-v2-ready .menu-zone{grid-template-columns:minmax(0,1fr) minmax(340px,410px)!important}
+  .home-v2-ready .ultra-product-grid{grid-template-columns:repeat(3,minmax(250px,1fr))!important}
+}
+
+body.mobile-order-page .mobile-product-image img{object-fit:cover!important;object-position:center 27%!important;background:#120b05!important}
+body.mobile-order-page .mobile-product-card.media-traditional .mobile-product-image img{object-position:center 40%!important}
+body.mobile-order-page .mobile-product-card.media-special .mobile-product-image img{object-position:center 54%!important}
+body.mobile-order-page .mobile-product-card.media-complete .mobile-product-image img{object-position:center 67%!important}
+body.mobile-order-page .mobile-product-card.media-juice .mobile-product-image img{object-position:center 30%!important}
+body.mobile-order-page .mobile-product-card.media-pitcher .mobile-product-image img{object-position:center 38%!important}
+body.mobile-order-page .mobile-product-card.media-drink .mobile-product-image img{object-position:center 42%!important}
+
+@media(min-width:760px){
+  body.mobile-order-page .mobile-order-app{width:calc(100% - 40px)!important;max-width:1480px!important;margin:0 auto!important;padding:112px 24px 48px!important;border:0!important}
+  body.mobile-order-page .mobile-order-header{top:18px!important;width:calc(100% - 40px)!important;max-width:1480px!important;padding:13px 18px!important;border-radius:20px!important}
+  body.mobile-order-page .mobile-order-hero{min-height:290px!important;padding:40px!important;background:linear-gradient(90deg,rgba(7,5,3,.98) 0 47%,rgba(7,5,3,.15) 74%),url('/images/catalog-products-premium.png') left top/400% 300%!important}
+  body.mobile-order-page .mobile-order-hero h1{font-size:clamp(48px,5vw,76px)!important;max-width:650px!important}
+  body.mobile-order-page .mobile-order-hero p{font-size:17px!important;max-width:520px!important}
+  body.mobile-order-page .mobile-login-card,body.mobile-order-page .mobile-guided-panel{max-width:none!important}
+  body.mobile-order-page .mobile-product-list{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important}
+  body.mobile-order-page .mobile-product-card{display:grid!important;grid-template-columns:1fr!important;min-width:0!important;align-content:start!important}
+  body.mobile-order-page .mobile-product-image{width:100%!important;height:210px!important;min-height:210px!important}
+  body.mobile-order-page .mobile-product-copy{padding:18px!important}
+  body.mobile-order-page .mobile-product-copy h3{font-size:22px!important;white-space:normal!important}
+  body.mobile-order-page .mobile-order-cart{max-width:980px!important;margin:18px auto 0!important;padding:24px!important}
+  body.mobile-order-page .mobile-checkout-form{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+  body.mobile-order-page .mobile-checkout-form fieldset,body.mobile-order-page .mobile-checkout-form .mobile-total-box,body.mobile-order-page .mobile-checkout-form .mobile-send-order{grid-column:1/-1!important}
+  body.mobile-order-page .mobile-bottom-bar{display:none!important}
+}
+
+body.admin-page .admin-shell,body.admin-counter-mode .admin-shell{max-width:none!important}
+body.admin-page .admin-main,body.admin-counter-mode .admin-main{min-width:0!important}
+.admin-products-reference,.admin-finance-reference,.admin-customers-reference,.admin-settings-reference{max-width:1800px;margin-inline:auto}
+.reference-product-row img{object-fit:cover!important;background:#0b0804}
+@media(max-width:1100px){.admin-products-reference,.admin-finance-reference-grid,.admin-settings-reference{grid-template-columns:1fr!important}.admin-products-reference .product-list-panel{min-height:440px}.customers-metrics{grid-template-columns:1fr!important}}
+@media(max-width:720px){.ultra-header,.admin-topbar{border-radius:0!important}.product-photo-wrap{height:180px}.catalog-hero-photo{min-height:300px}.admin-products-reference,.admin-finance-reference,.admin-customers-reference,.admin-settings-reference{padding-inline:10px}.reference-product-row{grid-template-columns:58px minmax(0,1fr)!important}.reference-product-price{grid-column:2!important}}
+body.home-v2-ready .menu-zone>.ultra-cart{display:none!important}
+body.home-v2-ready .menu-zone{grid-template-columns:minmax(0,1fr)!important}
+
+/* Digital product photography sprite: four columns by three rows. */
+.product-photo-wrap,.mobile-product-image,.highlight-card{position:relative!important;overflow:hidden!important;background:#080604!important}
+.product-photo-wrap .catalog-product-photo,.mobile-product-image img,.highlight-card .catalog-highlight-photo,.hero-art .catalog-hero-photo{position:absolute!important;width:400%!important;max-width:none!important;height:300%!important;object-fit:fill!important;inset:auto!important;transform:none!important;filter:none!important}
+.hero-art .catalog-hero-photo{left:-300%!important;top:0!important;min-height:0!important}
+.media-simple .catalog-product-photo,.mobile-product-card.media-simple .mobile-product-image img,.catalog-highlight-photo.media-simple{left:0!important;top:0!important}
+.media-traditional .catalog-product-photo,.mobile-product-card.media-traditional .mobile-product-image img,.catalog-highlight-photo.media-traditional{left:-100%!important;top:0!important}
+.media-special .catalog-product-photo,.mobile-product-card.media-special .mobile-product-image img,.catalog-highlight-photo.media-special{left:-200%!important;top:0!important}
+.media-complete .catalog-product-photo,.mobile-product-card.media-complete .mobile-product-image img,.catalog-highlight-photo.media-complete{left:-300%!important;top:0!important}
+.media-juice .catalog-product-photo,.mobile-product-card.media-juice .mobile-product-image img,.catalog-highlight-photo.media-juice{left:0!important;top:-100%!important}
+.media-pitcher .catalog-product-photo,.mobile-product-card.media-pitcher .mobile-product-image img,.catalog-highlight-photo.media-pitcher{left:-100%!important;top:-100%!important}
+.media-drink .catalog-product-photo,.mobile-product-card.media-drink .mobile-product-image img,.catalog-highlight-photo.media-drink{left:-200%!important;top:-100%!important}
+.media-bottles .catalog-product-photo,.mobile-product-card.media-bottles .mobile-product-image img,.catalog-highlight-photo.media-bottles{left:-300%!important;top:-100%!important}
+.media-creams .catalog-product-photo,.mobile-product-card.media-creams .mobile-product-image img,.catalog-highlight-photo.media-creams{left:0!important;top:-200%!important}
+.media-cheese .catalog-product-photo,.mobile-product-card.media-cheese .mobile-product-image img,.catalog-highlight-photo.media-cheese{left:-100%!important;top:-200%!important}
+.media-meats .catalog-product-photo,.mobile-product-card.media-meats .mobile-product-image img,.catalog-highlight-photo.media-meats{left:-200%!important;top:-200%!important}
+.media-extra .catalog-product-photo,.mobile-product-card.media-extra .mobile-product-image img,.catalog-highlight-photo.media-extra{left:-300%!important;top:-200%!important}
+.reference-product-thumb{position:relative;width:58px;height:58px;border-radius:10px;overflow:hidden;background:#080604}
+.reference-product-thumb img{position:absolute!important;width:400%!important;max-width:none!important;height:300%!important;object-fit:fill!important}
+.reference-product-thumb.media-simple img{left:0;top:0}.reference-product-thumb.media-traditional img{left:-100%;top:0}.reference-product-thumb.media-special img{left:-200%;top:0}.reference-product-thumb.media-complete img{left:-300%;top:0}
+.reference-product-thumb.media-juice img{left:0;top:-100%}.reference-product-thumb.media-pitcher img{left:-100%;top:-100%}.reference-product-thumb.media-drink img{left:-200%;top:-100%}.reference-product-thumb.media-bottles img{left:-300%;top:-100%}
+.reference-product-thumb.media-creams img{left:0;top:-200%}.reference-product-thumb.media-cheese img{left:-100%;top:-200%}.reference-product-thumb.media-meats img{left:-200%;top:-200%}.reference-product-thumb.media-extra img{left:-300%;top:-200%}

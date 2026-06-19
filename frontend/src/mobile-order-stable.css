@@ -622,4 +622,3 @@ body.mobile-order-page .customer-account-overlay { z-index: 1000; }
 @media (prefers-reduced-motion: reduce) {
   body.mobile-order-page * { scroll-behavior: auto !important; }
 }
-

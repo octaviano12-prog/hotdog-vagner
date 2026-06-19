@@ -45,6 +45,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { api, clearToken, formatMoney, getToken, setToken } from './api.js';
+import { productMedia, productMediaPosition } from './product-media.js';
 
 const statusLabels = {
   novo: 'Novo',
@@ -83,7 +84,7 @@ const adminTabs = [
 
 function makeWhatsAppMessage(settings, payload, total, order) {
   const lines = [
-    `Novo pedido - ${settings?.business_name || 'Hot Dog do Vagner'}`,
+    `Novo pedido - ${settings?.business_name || 'Hotdog Prensado'}`,
     order?.public_code ? `Codigo: ${order.public_code}` : order?.id ? `Pedido: #${order.id}` : '',
     '',
     ...payload.items.map((item, index) => {
@@ -119,7 +120,7 @@ function PremiumHeader({ route, navigate, settings }) {
         <span className="brand-icon"><Flame size={24} /></span>
         <span>
           <small>Pedidos online</small>
-          <strong>{settings?.business_name || 'Hot Dog do Vagner'}</strong>
+          <strong>{settings?.business_name || 'Hotdog Prensado'}</strong>
         </span>
       </button>
 
@@ -410,8 +411,8 @@ function PremiumLogin({ onLogin }) {
   return (
     <main className="admin-login-page">
       <section className="admin-login-showcase">
-        <div className="login-showcase-badge"><span>🌭</span><div><strong>Hot Dog do Vagner</strong><small>Central de operações</small></div></div>
-        <img className="login-hotdog-art" src="/images/admin-login-hotdog.svg" alt="Hot dog do Vagner" />
+        <div className="login-showcase-badge"><span>🌭</span><div><strong>Hotdog Prensado</strong><small>Central de operações</small></div></div>
+        <img className="login-hotdog-art" src="/images/admin-login-hotdog.svg" alt="Hotdog Prensado" />
         <div className="login-showcase-copy">
           <span className="login-eyebrow"><Activity size={15} /> Gestão em tempo real</span>
           <h1>Seu delivery<br /><em>sob controle.</em></h1>
@@ -447,7 +448,7 @@ function AdminSidebar({ activeTab, setActiveTab }) {
     <aside className="admin-sidebar">
       <div className="sidebar-brand">
         <div className="sidebar-logo">🌭</div>
-        <div className="sidebar-brand-copy"><strong>Hot Dog do Vagner</strong><span>Pedidos Online</span></div>
+        <div className="sidebar-brand-copy"><strong>Hotdog Prensado</strong><span>Pedidos Online</span></div>
       </div>
       <nav className="sidebar-nav">
         {adminTabs.map(([key, label, Icon]) => (
@@ -487,7 +488,7 @@ function AdminCounterToolbar({ onRefresh }) {
 }
 
 function adminProductImage(product = {}) {
-  return product.product_type === 'hotdog' ? '/images/hotdog-premium.svg' : '/images/drink-premium.svg';
+  return productMedia(product);
 }
 
 function MetricCard({ icon, label, value, accent = 'gold', footer }) {
@@ -656,7 +657,7 @@ function AdminPremium() {
   const [movement, setMovement] = useState({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
   const [openValue, setOpenValue] = useState('0');
   const [closeValue, setCloseValue] = useState('0');
-  const [productForm, setProductForm] = useState({ category_id: '', name: '', description: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
+  const [productForm, setProductForm] = useState({ category_id: '', name: '', description: '', image_url: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
   const [manualCustomer, setManualCustomer] = useState({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
   const [manualOrder, setManualOrder] = useState({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
   const activeProducts = useMemo(() => products.filter((p) => Number(p.is_active) === 1 && p.product_type !== 'adicional'), [products]);
@@ -719,7 +720,7 @@ function AdminPremium() {
   async function saveProduct(event) {
     event.preventDefault();
     await api.admin.post('/api/admin/products', { ...productForm, category_id: Number(productForm.category_id), price: Number(productForm.price), sort_order: Number(productForm.sort_order || 0), is_active: true });
-    setProductForm({ category_id: '', name: '', description: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
+    setProductForm({ category_id: '', name: '', description: '', image_url: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
     await loadAdmin();
   }
 
@@ -828,6 +829,7 @@ function AdminPremium() {
               <label><span>Categoria</span><div className="product-input"><Package size={18} /><select value={productForm.category_id} onChange={(e) => setProductForm({ ...productForm, category_id: e.target.value })} required><option value="">Selecione a categoria</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></div></label>
               <label><span>Nome do produto</span><div className="product-input"><ShoppingBag size={18} /><input placeholder="Digite o nome do produto" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required /></div></label>
               <label><span>Descrição</span><div className="product-input product-description"><Menu size={18} /><textarea placeholder="Digite a descrição do produto" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} /></div></label>
+              <label><span>Foto do produto</span><div className="product-input"><Package size={18} /><input placeholder="https://... ou /images/produto.jpg" value={productForm.image_url} onChange={(e) => setProductForm({ ...productForm, image_url: e.target.value })} /></div></label>
               <label><span>Preço</span><div className="product-input"><DollarSign size={18} /><input placeholder="R$ 0,00" type="number" step="0.01" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} required /></div></label>
               <label><span>Tipo</span><div className="product-input"><Sparkles size={18} /><select value={productForm.product_type} onChange={(e) => setProductForm({ ...productForm, product_type: e.target.value })}><option value="hotdog">Hot dog</option><option value="suco">Suco</option><option value="bebida">Bebida</option><option value="adicional">Adicional</option></select></div></label>
               <button className="btn-primary"><CheckCircle size={20} /> Salvar produto</button>
@@ -835,7 +837,7 @@ function AdminPremium() {
           </div>
           <div className="panel product-list-panel">
             <div className="panel-title"><h3>Produtos cadastrados</h3><span>{products.length} itens</span></div>
-            <div className="reference-product-list">{products.map((product) => <article className="reference-product-row" key={product.id}><img src={adminProductImage(product)} alt="" /><div><strong>{product.name}</strong><small>{product.category_name} • {product.product_type}</small></div><div className="reference-product-price"><strong>{formatMoney(product.price)}</strong><span className={product.is_active ? 'active' : 'inactive'}>{product.is_active ? 'Ativo' : 'Inativo'}</span></div></article>)}{!products.length && <p className="reference-empty">Nenhum produto cadastrado.</p>}</div>
+            <div className="reference-product-list">{products.map((product) => <article className="reference-product-row" key={product.id}><div className={`reference-product-thumb ${productMediaPosition(product)}`}><img src={adminProductImage(product)} alt="" /></div><div><strong>{product.name}</strong><small>{product.category_name} • {product.product_type}</small></div><div className="reference-product-price"><strong>{formatMoney(product.price)}</strong><span className={product.is_active ? 'active' : 'inactive'}>{product.is_active ? 'Ativo' : 'Inativo'}</span></div></article>)}{!products.length && <p className="reference-empty">Nenhum produto cadastrado.</p>}</div>
           </div>
         </section>
       );
@@ -936,7 +938,7 @@ function AdminPremium() {
         <header className="admin-topbar">
           <div className="admin-title-block">
             <button className="hamburger"><Menu size={28} /></button>
-            <div><h1>Hot Dog do Vagner</h1><span>Pedidos Online</span></div>
+            <div><h1>Hotdog Prensado</h1><span>Pedidos Online</span></div>
           </div>
           <div className="admin-top-actions">
             <button className={Number(settings?.is_open ?? 1) === 1 ? 'store-open' : 'store-closed'}><span />{Number(settings?.is_open ?? 1) === 1 ? 'Loja aberta' : 'Loja fechada'}</button>
@@ -949,7 +951,7 @@ function AdminPremium() {
         {['new-order', 'products', 'finance', 'customers', 'settings'].includes(tab) && <AdminCounterToolbar onRefresh={loadAdmin} />}
         {message && <p className="notice admin-message">{message}</p>}
         {renderContent()}
-        <footer className="admin-footer">© 2026 Hot Dog do Vagner • Painel Premium de Pedidos e Gestao</footer>
+        <footer className="admin-footer">© 2026 Hotdog Prensado • Painel Premium de Pedidos e Gestao</footer>
       </main>
     </div>
   );

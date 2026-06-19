@@ -53,7 +53,7 @@ function saveGoals() {
 async function copyGoals() {
   const s = stats();
   const text = [
-    `Metas do dia - Hot Dog do Vagner (${new Date().toLocaleDateString('pt-BR')})`,
+    `Metas do dia - Hotdog Prensado (${new Date().toLocaleDateString('pt-BR')})`,
     `Faturamento: ${brl(s.gross)} de ${brl(goalsState.goalValue)} (${s.valuePercent}%)`,
     `Pedidos: ${s.orderCount} de ${goalsState.goalOrders} (${s.orderPercent}%)`,
     `Recebido: ${brl(s.paid)}`,

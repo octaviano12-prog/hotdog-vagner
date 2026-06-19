@@ -211,4 +211,3 @@ body.admin-finance-mode .reference-empty { padding: 24px !important; color: #8d9
   body.admin-finance-mode .finance-movement-form .movement-value,
   body.admin-finance-mode .finance-movement-form .btn-secondary { grid-column: auto !important; }
 }
-

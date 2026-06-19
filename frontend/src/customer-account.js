@@ -314,4 +314,3 @@ export function bootCustomerAccount() {
     fillCheckout();
   }, 900);
 }
-

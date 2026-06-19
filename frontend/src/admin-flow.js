@@ -45,7 +45,7 @@ function orderMessage(order) {
   });
 
   return [
-    `Pedido ${orderCode(order)} - Hot Dog do Vagner`,
+    `Pedido ${orderCode(order)} - Hotdog Prensado`,
     '',
     ...items,
     '',
@@ -244,7 +244,7 @@ function printOrders(orders) {
   const html = `
     <html>
       <head>
-        <title>Comanda - Hot Dog do Vagner</title>
+        <title>Comanda - Hotdog Prensado</title>
         <style>
           body{font-family:Arial,sans-serif;margin:24px;color:#111} .order{border:2px solid #111;border-radius:12px;padding:16px;margin:0 0 18px;page-break-inside:avoid}
           h1,h2{margin:0 0 10px}.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 12px}.items{border-top:1px dashed #444;border-bottom:1px dashed #444;padding:10px 0;margin:10px 0}.item{margin:6px 0}.total{font-size:22px;font-weight:900;text-align:right}.obs{font-weight:700}@media print{button{display:none}}
@@ -252,7 +252,7 @@ function printOrders(orders) {
       </head>
       <body>
         <button onclick="window.print()">Imprimir</button>
-        <h1>Hot Dog do Vagner</h1>
+        <h1>Hotdog Prensado</h1>
         <p>Comanda gerada em ${new Date().toLocaleString('pt-BR')}</p>
         ${list.map((order) => `
           <section class="order">

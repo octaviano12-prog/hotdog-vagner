@@ -58,7 +58,7 @@ function successModal(order = {}) {
     });
     document.body.appendChild(modal);
   }
-  modal.innerHTML = `<section class="checkout-success-modal"><button type="button" class="checkout-success-close">×</button><div class="success-icon">✓</div><span>Pedido enviado</span><h2>${code}</h2><p>Seu pedido caiu no painel do Hot Dog do Vagner. Agora da para acompanhar o preparo e a entrega.</p><div class="success-grid"><article><strong>${total || '-'}</strong><small>Total</small></article><article><strong>${checkoutUx.settings?.estimated_delivery_minutes || 35} min</strong><small>Previsao</small></article></div><div class="success-actions"><a href="/acompanhar?codigo=${encodeURIComponent(code)}&phone=${encodeURIComponent(phone)}">Acompanhar pedido</a><button type="button" data-copy-code>Copiar codigo</button></div></section>`;
+  modal.innerHTML = `<section class="checkout-success-modal"><button type="button" class="checkout-success-close">×</button><div class="success-icon">✓</div><span>Pedido enviado</span><h2>${code}</h2><p>Seu pedido caiu no painel do Hotdog Prensado. Agora da para acompanhar o preparo e a entrega.</p><div class="success-grid"><article><strong>${total || '-'}</strong><small>Total</small></article><article><strong>${checkoutUx.settings?.estimated_delivery_minutes || 35} min</strong><small>Previsao</small></article></div><div class="success-actions"><a href="/acompanhar?codigo=${encodeURIComponent(code)}&phone=${encodeURIComponent(phone)}">Acompanhar pedido</a><button type="button" data-copy-code>Copiar codigo</button></div></section>`;
   modal.querySelector('.checkout-success-close').addEventListener('click', () => modal.remove());
   modal.querySelector('[data-copy-code]').addEventListener('click', async () => {
     await navigator.clipboard.writeText(code);
@@ -141,4 +141,3 @@ function bootPublicCheckoutUpgrade() {
 }
 
 bootPublicCheckoutUpgrade();
-

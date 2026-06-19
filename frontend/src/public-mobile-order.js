@@ -1,3 +1,5 @@
+import { BRAND_NAME, productMedia, productMediaPosition } from './product-media.js';
+
 const mobileOrder = {
   booted: false,
   loaded: false,
@@ -51,10 +53,7 @@ function uid() {
 }
 
 function imageFor(product = {}) {
-  const type = product.product_type || '';
-  const name = String(product.name || '').toLowerCase();
-  if (type === 'bebida' || type === 'suco' || name.includes('coca') || name.includes('suco')) return '/images/delivery-premium.svg';
-  return '/images/hotdog-premium.svg';
+  return productMedia(product);
 }
 
 function productKind(product = {}) {
@@ -190,7 +189,7 @@ function stepPanel() {
 
 function productCard(product) {
   const favorite = mobileOrder.favorites.has(String(product.id));
-  return `<article class="mobile-product-card"><div class="mobile-product-image"><img src="${escapeHtml(imageFor(product))}" alt="${escapeHtml(product.name)}" width="128" height="128" loading="lazy" /></div><div class="mobile-product-copy"><span>${escapeHtml(product.category_name || product.product_type || 'Produto')}</span><h3>${escapeHtml(product.name)}</h3><p>${escapeHtml(product.description || 'Feito na hora.')}</p><footer><strong>${brl(product.price)}</strong><button type="button" data-add-product="${Number(product.id)}">Adicionar <b>+</b></button></footer></div><button type="button" class="premium-heart ${favorite ? 'active' : ''}" data-favorite-product="${Number(product.id)}" aria-label="${favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}" aria-pressed="${favorite}">${favorite ? '♥' : '♡'}</button></article>`;
+  return `<article class="mobile-product-card ${productMediaPosition(product)}"><div class="mobile-product-image"><img src="${escapeHtml(imageFor(product))}" alt="${escapeHtml(product.name)}" width="128" height="128" loading="lazy" /></div><div class="mobile-product-copy"><span>${escapeHtml(product.category_name || product.product_type || 'Produto')}</span><h3>${escapeHtml(product.name)}</h3><p>${escapeHtml(product.description || 'Feito na hora.')}</p><footer><strong>${brl(product.price)}</strong><button type="button" data-add-product="${Number(product.id)}">Adicionar <b>+</b></button></footer></div><button type="button" class="premium-heart ${favorite ? 'active' : ''}" data-favorite-product="${Number(product.id)}" aria-label="${favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}" aria-pressed="${favorite}">${favorite ? '♥' : '♡'}</button></article>`;
 }
 
 function cartLine(item) {
@@ -284,7 +283,7 @@ function renderMobilePage() {
     ? '<div class="mobile-loading">Carregando cardápio…</div>'
     : products.length ? products.map(productCard).join('') : '<div class="mobile-empty-products">Nenhum produto disponível nesta etapa.</div>';
   const cart = mobileOrder.cart.length ? mobileOrder.cart.map(cartLine).join('') : '<div class="mobile-empty-cart">Adicione produtos para começar.</div>';
-  root.innerHTML = `<header class="mobile-order-header"><div class="mobile-brand"><span>HOT DOG DO VAGNER</span><strong>Pedido mobile</strong></div><div class="mobile-header-actions"><button type="button" data-account="${logged ? 'orders' : 'login'}">${logged ? 'Meus pedidos' : 'Entrar'}</button>${logged ? '<button type="button" class="mobile-logout-top" data-mobile-logout>Sair</button>' : ''}</div></header><section class="mobile-order-hero"><span>🌭 Cardápio online</span><h1>Escolha seu pedido</h1><p>Hot dog prensado, feito na hora e do seu jeito.</p></section><section class="mobile-login-card ${logged ? 'logged' : ''}">${logged ? `<div><strong>Pedido liberado</strong><p>Comprando como <b>${escapeHtml(profile?.name || 'cliente')}</b>.</p></div>` : '<div><strong>Entre para finalizar</strong><p>Escolha os produtos agora e faça login antes de enviar.</p></div><button type="button" data-account="login">Entrar</button>'}</section>${stepPanel()}${mobileOrder.step === 1 || mobileOrder.step === 3 ? `<section class="mobile-product-list" aria-live="polite">${productList}</section>` : ''}${mobileOrder.step === 2 || mobileOrder.step === 4 ? `<section class="mobile-order-cart"><div class="mobile-cart-head"><div><span>${mobileOrder.cart.reduce((sum, item) => sum + item.quantity, 0)} item(ns)</span><h2>Seu pedido</h2></div><strong>${brl(total())}</strong></div>${cart}${checkoutForm()}</section>` : ''}${mobileOrder.message ? `<p class="mobile-order-message" role="status">${escapeHtml(mobileOrder.message)}</p>` : ''}`;
+  root.innerHTML = `<header class="mobile-order-header"><div class="mobile-brand"><span>${BRAND_NAME.toUpperCase()}</span><strong>Pedido online</strong></div><div class="mobile-header-actions"><button type="button" data-account="${logged ? 'orders' : 'login'}">${logged ? 'Meus pedidos' : 'Entrar'}</button>${logged ? '<button type="button" class="mobile-logout-top" data-mobile-logout>Sair</button>' : ''}</div></header><section class="mobile-order-hero"><span>🌭 Cardápio online</span><h1>Escolha seu pedido</h1><p>Hot dog prensado, feito na hora e do seu jeito.</p></section><section class="mobile-login-card ${logged ? 'logged' : ''}">${logged ? `<div><strong>Pedido liberado</strong><p>Comprando como <b>${escapeHtml(profile?.name || 'cliente')}</b>.</p></div>` : '<div><strong>Entre para finalizar</strong><p>Escolha os produtos agora e faça login antes de enviar.</p></div><button type="button" data-account="login">Entrar</button>'}</section>${stepPanel()}${mobileOrder.step === 1 || mobileOrder.step === 3 ? `<section class="mobile-product-list" aria-live="polite">${productList}</section>` : ''}${mobileOrder.step === 2 || mobileOrder.step === 4 ? `<section class="mobile-order-cart"><div class="mobile-cart-head"><div><span>${mobileOrder.cart.reduce((sum, item) => sum + item.quantity, 0)} item(ns)</span><h2>Seu pedido</h2></div><strong>${brl(total())}</strong></div>${cart}${checkoutForm()}</section>` : ''}${mobileOrder.message ? `<p class="mobile-order-message" role="status">${escapeHtml(mobileOrder.message)}</p>` : ''}`;
 }
 
 function handleClick(event) {
@@ -320,6 +319,19 @@ async function bootMobileOrder() {
   mobileOrder.booted = true;
   renderMobilePage();
   await loadMobileData();
+  try {
+    const pending = JSON.parse(localStorage.getItem('hotdog_pending_cart') || '[]');
+    localStorage.removeItem('hotdog_pending_cart');
+    pending.forEach(({ productId, extraIds = [] }) => {
+      const product = (mobileOrder.menu.products || []).find((entry) => Number(entry.id) === Number(productId));
+      if (!product) return;
+      const selectedExtras = extras().filter((extra) => extraIds.map(Number).includes(Number(extra.id)));
+      mobileOrder.cart.push({ key: uid(), ...product, quantity: 1, extras: selectedExtras });
+    });
+    if (mobileOrder.cart.length) mobileOrder.step = 2;
+  } catch {
+    localStorage.removeItem('hotdog_pending_cart');
+  }
   renderMobilePage();
 }
 
@@ -330,4 +342,3 @@ window.addEventListener('storage', (event) => {
 });
 
 bootMobileOrder();
-

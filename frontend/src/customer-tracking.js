@@ -199,7 +199,7 @@ function renderOrder(order) {
   result.innerHTML = `
     <header class="tracking-app-head">
       <a href="/pedir" aria-label="Voltar">←</a>
-      <div><span>🌭</span><strong>HOT DOG DO VAGNER</strong><small>Pedido mobile</small></div>
+      <div><span>🌭</span><strong>HOTDOG PRENSADO</strong><small>Pedido mobile</small></div>
       <button type="button" onclick="window.hotdogOpenAccountModal?.()" aria-label="Conta">♡</button>
     </header>
 
@@ -273,4 +273,3 @@ export function bootCustomerTracking() {
 
   setTimeout(installFloatingTrackingLink, 1200);
 }
-

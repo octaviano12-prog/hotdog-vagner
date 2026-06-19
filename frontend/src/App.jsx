@@ -49,7 +49,7 @@ const paymentLabels = {
 
 function makeWhatsAppMessage(settings, payload, total) {
   const lines = [
-    `Ola, quero fazer um pedido no ${settings?.business_name || 'Hot Dog do Vagner'}:`,
+    `Ola, quero fazer um pedido no ${settings?.business_name || 'Hotdog Prensado'}:`,
     '',
     ...payload.items.map((item, index) => {
       const extras = item.extraNames?.length ? ` | Adicionais: ${item.extraNames.join(', ')}` : '';
@@ -81,7 +81,7 @@ function Header({ view, setView, settings }) {
         <span className="brand-icon">🌭</span>
         <span>
           <small>Pedidos online</small>
-          <strong>{settings?.business_name || 'Hot Dog do Vagner'}</strong>
+          <strong>{settings?.business_name || 'Hotdog Prensado'}</strong>
         </span>
       </button>
       <nav className="premium-nav">
@@ -749,7 +749,7 @@ function AdminPage() {
         <header className="admin-topbar">
           <div className="admin-title-block">
             <button className="hamburger"><Menu size={22} /></button>
-            <div><h1>Hot Dog do Vagner</h1><span>Pedidos Online</span></div>
+            <div><h1>Hotdog Prensado</h1><span>Pedidos Online</span></div>
           </div>
           <div className="admin-top-actions">
             <button className="store-open"><span /> Loja aberta</button>
@@ -760,7 +760,7 @@ function AdminPage() {
         </header>
         {message && <p className="notice admin-message">{message}</p>}
         {renderTab()}
-        <footer className="admin-footer">© 2026 Hot Dog do Vagner • Painel premium de pedidos e gestao financeira.</footer>
+        <footer className="admin-footer">© 2026 Hotdog Prensado • Painel premium de pedidos e gestao financeira.</footer>
       </main>
     </div>
   );
