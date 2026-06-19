@@ -211,3 +211,64 @@ body.admin-finance-mode .reference-empty { padding: 24px !important; color: #8d9
   body.admin-finance-mode .finance-movement-form .movement-value,
   body.admin-finance-mode .finance-movement-form .btn-secondary { grid-column: auto !important; }
 }
+
+/* Complete financial center */
+body.admin-finance-mode .finance-complete{gap:12px!important;padding-bottom:28px}
+body.admin-finance-mode .finance-control-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:20px 22px;border:1px solid rgba(255,184,0,.28);border-radius:18px;background:radial-gradient(circle at 80% 0,rgba(255,153,0,.11),transparent 32rem),#121416}
+body.admin-finance-mode .finance-control-head>div>span{color:#ffbd16;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.12em}
+body.admin-finance-mode .finance-control-head h2{margin:5px 0 3px;font-size:28px;letter-spacing:-.035em}
+body.admin-finance-mode .finance-control-head p{margin:0;color:#95999d;font-size:13px}
+body.admin-finance-mode .finance-period-form{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
+body.admin-finance-mode .finance-period-form label{display:grid;gap:5px;color:#aeb2b5;font-size:11px;font-weight:800}
+body.admin-finance-mode .finance-period-form input,body.admin-finance-mode .finance-period-form button{height:43px;border:1px solid #3b3e42;border-radius:10px;background:#1a1d20;color:#fff;padding:0 12px}
+body.admin-finance-mode .finance-period-form button{display:flex;align-items:center;gap:7px;border-color:#73520b;color:#ffc22a;font-weight:900;cursor:pointer}
+body.admin-finance-mode .finance-view-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:7px;border:1px solid #2e3235;border-radius:14px;background:#101214}
+body.admin-finance-mode .finance-view-tabs button{height:42px;border:1px solid transparent;border-radius:9px;background:transparent;color:#aeb2b5;font-weight:900;cursor:pointer}
+body.admin-finance-mode .finance-view-tabs button.active{border-color:rgba(255,184,0,.42);background:linear-gradient(90deg,rgba(255,184,0,.18),rgba(255,107,20,.1));color:#ffd35f;box-shadow:inset 0 -2px #ffae00}
+body.admin-finance-mode .finance-overview-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(340px,.9fr);gap:12px}
+body.admin-finance-mode .finance-overview-grid>.panel,body.admin-finance-mode .finance-history-panel,body.admin-finance-mode .finance-ledger-panel{margin:0;padding:19px;border:1px solid #3a3d40;border-radius:17px;background:linear-gradient(145deg,rgba(255,174,0,.025),transparent 54%),#121416}
+body.admin-finance-mode .finance-overview-grid .panel-title,body.admin-finance-mode .finance-history-panel .panel-title,body.admin-finance-mode .finance-ledger-panel .panel-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+body.admin-finance-mode .finance-overview-grid .panel-title h3,body.admin-finance-mode .finance-history-panel .panel-title h3,body.admin-finance-mode .finance-ledger-panel .panel-title h3{display:flex;align-items:center;gap:9px;margin:0;font-size:17px}
+body.admin-finance-mode .finance-overview-grid .panel-title svg,body.admin-finance-mode .finance-history-panel .panel-title svg,body.admin-finance-mode .finance-ledger-panel .panel-title svg{color:#ffae00}
+body.admin-finance-mode .finance-overview-grid .panel-title span,body.admin-finance-mode .finance-history-panel .panel-title span,body.admin-finance-mode .finance-ledger-panel .panel-title span{color:#8e9397;font-size:11px}
+body.admin-finance-mode .finance-daily-panel{grid-column:1/-1}
+body.admin-finance-mode .finance-summary-list{display:grid;gap:0}
+body.admin-finance-mode .finance-summary-list>span,body.admin-finance-mode .finance-summary-list>b{display:flex;align-items:center;justify-content:space-between;min-height:43px;padding:0 4px;border-bottom:1px solid #2b2e31;color:#cdd0d2;font-size:13px}
+body.admin-finance-mode .finance-summary-list>span strong{color:#fff}
+body.admin-finance-mode .finance-summary-list>b{margin-top:7px;padding:10px 13px;border:1px solid rgba(255,184,0,.25);border-radius:11px;background:rgba(255,184,0,.07);color:#fff;font-size:15px}
+body.admin-finance-mode .finance-summary-list>b strong{color:#ffbd19;font-size:20px}
+body.admin-finance-mode .positive{color:#54d975!important}body.admin-finance-mode .negative{color:#ff666a!important}body.admin-finance-mode .warning{color:#ffc42d!important}
+body.admin-finance-mode .finance-payment-list{display:grid;gap:11px}
+body.admin-finance-mode .finance-payment-list article{display:grid;grid-template-columns:100px minmax(90px,1fr) 100px 70px;gap:10px;align-items:center;font-size:12px}
+body.admin-finance-mode .finance-payment-list article>div{height:7px;overflow:hidden;border-radius:99px;background:#25282b}
+body.admin-finance-mode .finance-payment-list article i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ffbf18,#ff6a0b)}
+body.admin-finance-mode .finance-payment-list article strong{text-align:right;color:#ffd063}body.admin-finance-mode .finance-payment-list article small{text-align:right;color:#898e92}
+body.admin-finance-mode .cash-live-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+body.admin-finance-mode .cash-live-summary>span,body.admin-finance-mode .cash-live-summary>b{display:grid;gap:4px;padding:12px;border:1px solid #33373a;border-radius:11px;background:#191c1e;color:#969b9f;font-size:11px}
+body.admin-finance-mode .cash-live-summary strong{color:#fff;font-size:15px}body.admin-finance-mode .cash-live-summary>b{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;border-color:rgba(255,184,0,.3);color:#ffd05b}body.admin-finance-mode .cash-live-summary>b strong{color:#ffc21d;font-size:21px}
+body.admin-finance-mode .cash-open-badge,body.admin-finance-mode .cash-closed-badge,body.admin-finance-mode .finance-status{padding:6px 9px;border-radius:99px;font-size:10px!important;font-weight:950;text-transform:uppercase}
+body.admin-finance-mode .cash-open-badge,body.admin-finance-mode .finance-status.aberto,body.admin-finance-mode .finance-status.ativo{background:rgba(50,211,93,.13);color:#63e982!important;border:1px solid rgba(50,211,93,.24)}
+body.admin-finance-mode .cash-closed-badge,body.admin-finance-mode .finance-status.fechado{background:rgba(255,255,255,.07);color:#b8bdc1!important;border:1px solid #393d40}
+body.admin-finance-mode .finance-status.estornado{background:rgba(255,89,89,.1);color:#ff8888!important;border:1px solid rgba(255,89,89,.22)}
+body.admin-finance-mode .finance-open-form textarea{min-height:70px;padding:11px 13px;border:1px solid #393c40;border-radius:10px;resize:vertical;background:#1b1d20;color:#fff}
+body.admin-finance-mode .cash-difference{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-radius:10px;font-size:12px}.cash-difference.ok{border:1px solid rgba(53,211,92,.25);background:rgba(53,211,92,.07);color:#66e484}.cash-difference.attention{border:1px solid rgba(255,89,89,.25);background:rgba(255,89,89,.07);color:#ff8a8d}
+body.admin-finance-mode .finance-movement-form{grid-template-columns:1fr 1.45fr!important}
+body.admin-finance-mode .finance-movement-form select,body.admin-finance-mode .finance-expense-form select{width:100%;height:52px;padding:0 13px;border:1px solid #393c40;border-radius:10px;background:#1b1d20;color:#fff}
+body.admin-finance-mode .finance-movement-form .movement-notes{grid-column:1/-1}
+body.admin-finance-mode .finance-movement-form button:disabled{cursor:not-allowed;opacity:.5}
+body.admin-finance-mode .finance-expense-panel .panel-title>span{color:#8f9499;font-size:10px}
+body.admin-finance-mode .finance-movement-list article.reversed,body.admin-finance-mode tr.reversed{opacity:.5;text-decoration:line-through}
+body.admin-finance-mode .ledger-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:12px}
+body.admin-finance-mode .ledger-head .panel-title{flex:1;margin:0}
+body.admin-finance-mode .ledger-filters{display:flex;gap:7px}
+body.admin-finance-mode .ledger-filters select,body.admin-finance-mode .ledger-filters button{height:40px;padding:0 11px;border:1px solid #3a3d40;border-radius:9px;background:#191c1e;color:#fff}
+body.admin-finance-mode .ledger-filters button{display:flex;align-items:center;gap:6px;border-color:#77540a;color:#ffc32c;font-weight:900}
+body.admin-finance-mode .finance-table-wrap{width:100%;overflow:auto;border:1px solid #2e3235;border-radius:12px}
+body.admin-finance-mode .finance-table-wrap table{width:100%;min-width:840px;border-collapse:collapse}
+body.admin-finance-mode .finance-table-wrap th{padding:11px 12px;background:#1a1d1f;color:#9ca1a5;font-size:10px;text-align:left;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+body.admin-finance-mode .finance-table-wrap td{padding:11px 12px;border-top:1px solid #2d3033;color:#dfe1e2;font-size:12px;white-space:nowrap}
+body.admin-finance-mode .finance-table-wrap td strong,body.admin-finance-mode .finance-table-wrap td small{display:block}body.admin-finance-mode .finance-table-wrap td small{margin-top:3px;color:#81868a;white-space:normal}
+body.admin-finance-mode .finance-table-wrap tbody tr:hover{background:rgba(255,184,0,.035)}
+body.admin-finance-mode .reverse-button{height:30px;padding:0 9px;border:1px solid rgba(255,89,89,.32);border-radius:7px;background:rgba(255,89,89,.08);color:#ff8588;font-size:10px;font-weight:900;cursor:pointer}
+@media(max-width:1250px){body.admin-finance-mode .finance-control-head{align-items:flex-start;flex-direction:column}body.admin-finance-mode .finance-overview-grid{grid-template-columns:1fr}body.admin-finance-mode .finance-daily-panel{grid-column:auto}}
+@media(max-width:760px){body.admin-finance-mode .finance-view-tabs{grid-template-columns:1fr 1fr}body.admin-finance-mode .finance-period-form{display:grid;grid-template-columns:1fr 1fr;width:100%}body.admin-finance-mode .finance-payment-list article{grid-template-columns:80px 1fr 90px}body.admin-finance-mode .finance-payment-list article small{display:none}body.admin-finance-mode .ledger-head{align-items:stretch;flex-direction:column}body.admin-finance-mode .ledger-filters{display:grid;grid-template-columns:1fr 1fr}body.admin-finance-mode .ledger-filters button{grid-column:1/-1;justify-content:center}}
