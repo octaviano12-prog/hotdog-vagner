@@ -696,6 +696,7 @@ function FinanceComplete({ cash, summary, overviewData, cashHistory, ledger, fin
 
 function AdminPremium() {
   const [tab, setTab] = useState('dashboard');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -1044,12 +1045,13 @@ function AdminPremium() {
   };
 
   return (
-    <div className="admin-desktop-shell">
-      <AdminSidebar activeTab={tab} setActiveTab={setTab} />
+    <div className={`admin-desktop-shell ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+      <AdminSidebar activeTab={tab} setActiveTab={(nextTab) => { setTab(nextTab); setMobileMenuOpen(false); }} />
+      <button type="button" className="admin-mobile-backdrop" aria-label="Fechar menu" onClick={() => setMobileMenuOpen(false)} />
       <main className={`admin-workspace ${['new-order', 'products', 'finance', 'customers', 'settings'].includes(tab) ? 'counter-workspace' : ''}`}>
         <header className="admin-topbar">
           <div className="admin-title-block">
-            <button className="hamburger"><Menu size={28} /></button>
+            <button type="button" className="hamburger" aria-label="Abrir menu" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}><Menu size={28} /></button>
             <div><h1>Hotdog Prensado</h1><span>Pedidos Online</span></div>
           </div>
           <div className="admin-top-actions">
@@ -1078,6 +1080,12 @@ export default function PremiumApp() {
   }, []);
 
   useEffect(() => {
+    const onExpired = () => setAuthTick((value) => value + 1);
+    window.addEventListener('hotdog:admin-auth-expired', onExpired);
+    return () => window.removeEventListener('hotdog:admin-auth-expired', onExpired);
+  }, []);
+
+  useEffect(() => {
     function onPopState() {
       setRoute(window.location.pathname.includes('admin') ? 'admin' : 'menu');
     }
@@ -1092,7 +1100,7 @@ export default function PremiumApp() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  const logged = Boolean(getToken()) || authTick > 0;
+  const logged = Boolean(getToken());
 
   if (route === 'admin' && logged) return <AdminPremium />;
 
