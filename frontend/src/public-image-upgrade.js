@@ -78,14 +78,24 @@ function upgradeSignupImage() {
 function bootImageUpgrade() {
   if (imageUpgrade.booted || !isPublicHome()) return;
   imageUpgrade.booted = true;
-  setInterval(() => {
+  const applyUpgrade = () => {
     document.body.classList.add('site-images-v2');
     addHeroImage();
     addImageShowcase();
     upgradeProductCards();
     upgradeSignupImage();
-  }, 1100);
+    window.__markHotdogHomeReady?.('images');
+    window.dispatchEvent(new CustomEvent('hotdog:home-images-ready'));
+    let frame = 0;
+    const finishCards = () => {
+      upgradeProductCards();
+      frame += 1;
+      if (!document.querySelector('.ultra-product-card') && frame < 180) requestAnimationFrame(finishCards);
+    };
+    requestAnimationFrame(finishCards);
+  };
+  window.addEventListener('hotdog:home-v2-ready', applyUpgrade, { once: true });
+  if (document.querySelector('.ultra-hero[data-home-v2-ready="1"]')) applyUpgrade();
 }
 
 bootImageUpgrade();
-
