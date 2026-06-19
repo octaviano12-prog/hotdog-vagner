@@ -4,7 +4,7 @@ body:has(.admin-desktop-shell){--admin-bg:#07090a;--admin-panel:#111416;--admin-
 .admin-sidebar{width:224px!important;padding:24px 14px 16px!important;background:linear-gradient(180deg,#13171a,#0d1012)!important;border-right:1px solid var(--admin-line)!important;box-shadow:16px 0 50px rgba(0,0,0,.25)!important}
 .sidebar-brand{display:grid!important;grid-template-columns:60px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;margin:0 0 25px!important;padding:0 4px!important}
 .sidebar-logo{width:60px!important;height:60px!important;margin:0!important;border-radius:50%!important;font-size:0!important;background:radial-gradient(circle,rgba(255,184,0,.2),rgba(255,107,20,.035))!important;border:1px solid rgba(255,184,0,.55)!important;box-shadow:0 0 34px rgba(255,145,0,.13)!important}
-.sidebar-logo:before{content:'ðŸŒ­'!important;width:100%!important;height:100%!important;display:grid!important;place-items:center!important;font-size:35px!important;background:none!important;border:0!important}
+.sidebar-logo:before{content:'🌭'!important;width:100%!important;height:100%!important;display:grid!important;place-items:center!important;font-size:35px!important;background:none!important;border:0!important}
 .sidebar-logo:after{content:none!important;display:none!important}
 .sidebar-brand-copy{display:flex!important;min-width:0!important;flex-direction:column!important;line-height:1.13!important}.sidebar-brand-copy strong{font-size:16px!important;white-space:normal!important}.sidebar-brand-copy span{margin-top:4px!important;color:#ffc11a!important;font-size:13px!important;font-weight:900!important}
 .sidebar-nav{display:grid!important;gap:8px!important}.sidebar-nav:before,.sidebar-nav:after{display:none!important}.sidebar-nav button{display:flex!important;height:48px!important;padding:0 14px!important;gap:12px!important;border:1px solid transparent!important;border-radius:12px!important;background:transparent!important;color:#e3e5e6!important;font-size:14px!important;font-weight:850!important}.sidebar-nav button.active{background:linear-gradient(90deg,rgba(255,184,0,.16),rgba(255,184,0,.055))!important;border-color:rgba(255,184,0,.34)!important;color:#ffca2b!important;box-shadow:inset 3px 0 #ffb800!important}
@@ -56,4 +56,53 @@ body.admin-executive-mode .executive-dashboard{gap:12px!important;margin:0!impor
   .sidebar-shortcuts button{font-size:14px!important}
   .sidebar-user>div:not(.avatar){display:block!important}
 }
-
+@media(min-width:901px){
+  body.admin-executive-mode .admin-desktop-shell,
+  body.admin-counter-mode .admin-desktop-shell,
+  body.admin-products-mode .admin-desktop-shell,
+  body.admin-finance-mode .admin-desktop-shell,
+  body.admin-customers-mode .admin-desktop-shell,
+  body.admin-settings-mode .admin-desktop-shell{grid-template-columns:240px minmax(0,1fr)!important}
+  body.admin-executive-mode .admin-sidebar,
+  body.admin-counter-mode .admin-sidebar,
+  body.admin-products-mode .admin-sidebar,
+  body.admin-finance-mode .admin-sidebar,
+  body.admin-customers-mode .admin-sidebar,
+  body.admin-settings-mode .admin-sidebar{width:240px!important;min-width:240px!important;max-width:240px!important;padding:24px 14px 16px!important}
+  body.admin-executive-mode .sidebar-brand,
+  body.admin-counter-mode .sidebar-brand,
+  body.admin-products-mode .sidebar-brand,
+  body.admin-finance-mode .sidebar-brand,
+  body.admin-customers-mode .sidebar-brand,
+  body.admin-settings-mode .sidebar-brand{display:grid!important;grid-template-columns:60px minmax(0,1fr)!important;gap:12px!important;margin:0 0 25px!important;padding:0 4px!important}
+  body.admin-executive-mode .sidebar-logo,
+  body.admin-counter-mode .sidebar-logo,
+  body.admin-products-mode .sidebar-logo,
+  body.admin-finance-mode .sidebar-logo,
+  body.admin-customers-mode .sidebar-logo,
+  body.admin-settings-mode .sidebar-logo{width:60px!important;height:60px!important;min-width:60px!important;margin:0!important}
+  body.admin-executive-mode .sidebar-brand-copy strong,
+  body.admin-counter-mode .sidebar-brand-copy strong,
+  body.admin-products-mode .sidebar-brand-copy strong,
+  body.admin-finance-mode .sidebar-brand-copy strong,
+  body.admin-customers-mode .sidebar-brand-copy strong,
+  body.admin-settings-mode .sidebar-brand-copy strong{font-size:16px!important}
+  body.admin-executive-mode .sidebar-brand-copy span,
+  body.admin-counter-mode .sidebar-brand-copy span,
+  body.admin-products-mode .sidebar-brand-copy span,
+  body.admin-finance-mode .sidebar-brand-copy span,
+  body.admin-customers-mode .sidebar-brand-copy span,
+  body.admin-settings-mode .sidebar-brand-copy span{font-size:13px!important}
+  body.admin-executive-mode .sidebar-nav,
+  body.admin-counter-mode .sidebar-nav,
+  body.admin-products-mode .sidebar-nav,
+  body.admin-finance-mode .sidebar-nav,
+  body.admin-customers-mode .sidebar-nav,
+  body.admin-settings-mode .sidebar-nav{gap:8px!important}
+  body.admin-executive-mode .sidebar-nav button,
+  body.admin-counter-mode .sidebar-nav button,
+  body.admin-products-mode .sidebar-nav button,
+  body.admin-finance-mode .sidebar-nav button,
+  body.admin-customers-mode .sidebar-nav button,
+  body.admin-settings-mode .sidebar-nav button{height:48px!important;padding:0 14px!important;font-size:14px!important}
+}
