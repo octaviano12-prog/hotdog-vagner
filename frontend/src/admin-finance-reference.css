@@ -280,6 +280,7 @@ body.admin-finance-mode .reverse-button{height:30px;padding:0 9px;border:1px sol
   body.admin-finance-mode .finance-reference-metrics article>span{width:54px!important;height:54px!important}
   body.admin-finance-mode .finance-view-tabs button{min-width:0!important;padding:5px!important;white-space:normal!important;line-height:1.15!important}
   body.admin-finance-mode .finance-control-head,body.admin-finance-mode .finance-overview-grid,body.admin-finance-mode .finance-reference-grid,body.admin-finance-mode .finance-history-panel,body.admin-finance-mode .finance-ledger-panel{min-width:0!important;width:100%!important;max-width:100%!important}
+  body.admin-finance-mode .finance-overview-grid>.panel{min-width:0!important;width:100%!important;max-width:100%!important}
   body.admin-finance-mode .finance-period-form{min-width:0!important;width:100%!important}
 }
 
