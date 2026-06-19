@@ -4,7 +4,7 @@ body:has(.admin-desktop-shell){--admin-bg:#07090a;--admin-panel:#111416;--admin-
 .admin-sidebar{width:224px!important;padding:24px 14px 16px!important;background:linear-gradient(180deg,#13171a,#0d1012)!important;border-right:1px solid var(--admin-line)!important;box-shadow:16px 0 50px rgba(0,0,0,.25)!important}
 .sidebar-brand{display:grid!important;grid-template-columns:60px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;margin:0 0 25px!important;padding:0 4px!important}
 .sidebar-logo{width:60px!important;height:60px!important;margin:0!important;border-radius:50%!important;font-size:0!important;background:radial-gradient(circle,rgba(255,184,0,.2),rgba(255,107,20,.035))!important;border:1px solid rgba(255,184,0,.55)!important;box-shadow:0 0 34px rgba(255,145,0,.13)!important}
-.sidebar-logo:before{content:'🌭'!important;width:100%!important;height:100%!important;display:grid!important;place-items:center!important;font-size:35px!important;background:none!important;border:0!important}
+.sidebar-logo:before{content:'ðŸŒ­'!important;width:100%!important;height:100%!important;display:grid!important;place-items:center!important;font-size:35px!important;background:none!important;border:0!important}
 .sidebar-logo:after{content:none!important;display:none!important}
 .sidebar-brand-copy{display:flex!important;min-width:0!important;flex-direction:column!important;line-height:1.13!important}.sidebar-brand-copy strong{font-size:16px!important;white-space:normal!important}.sidebar-brand-copy span{margin-top:4px!important;color:#ffc11a!important;font-size:13px!important;font-weight:900!important}
 .sidebar-nav{display:grid!important;gap:8px!important}.sidebar-nav:before,.sidebar-nav:after{display:none!important}.sidebar-nav button{display:flex!important;height:48px!important;padding:0 14px!important;gap:12px!important;border:1px solid transparent!important;border-radius:12px!important;background:transparent!important;color:#e3e5e6!important;font-size:14px!important;font-weight:850!important}.sidebar-nav button.active{background:linear-gradient(90deg,rgba(255,184,0,.16),rgba(255,184,0,.055))!important;border-color:rgba(255,184,0,.34)!important;color:#ffca2b!important;box-shadow:inset 3px 0 #ffb800!important}
@@ -31,3 +31,29 @@ body.admin-executive-mode .executive-dashboard{gap:12px!important;margin:0!impor
 @media(max-width:1450px){.admin-desktop-shell{grid-template-columns:205px minmax(0,1fr)!important}.admin-sidebar{width:205px!important}.admin-top-actions button{padding:0 13px!important}.exec-grid-main{grid-template-columns:1fr 1fr!important}.exec-latest{grid-column:auto!important}.admin-workspace:not(.counter-workspace)>.admin-dashboard-grid{grid-template-columns:1fr!important}.right-stack{grid-template-columns:1fr 1fr!important;height:auto!important}.customer-reference-card{grid-template-columns:68px minmax(220px,1.3fr) 80px repeat(3,minmax(105px,.7fr)) minmax(180px,.9fr)!important}}
 @media(max-width:1100px){.admin-desktop-shell{grid-template-columns:82px minmax(0,1fr)!important}.admin-sidebar{width:82px!important;padding-inline:10px!important}.sidebar-brand{display:block!important}.sidebar-logo{width:58px!important;height:58px!important;margin:auto!important}.sidebar-brand-copy,.sidebar-nav button{font-size:0!important}.sidebar-nav button{justify-content:center!important;padding:0!important}.sidebar-nav button svg{width:22px;height:22px}.sidebar-shortcuts button{font-size:0!important}.sidebar-shortcuts button svg{margin:auto}.sidebar-user>div:not(.avatar){display:none!important}.admin-workspace{padding-inline:12px!important}.admin-topbar{padding-inline:16px!important}.admin-title-block h1{font-size:23px!important}.admin-top-actions .btn-secondary{display:none!important}.admin-products-reference,.finance-reference-grid,.admin-settings-reference{grid-template-columns:1fr!important}.manual-extra-grid{grid-template-columns:repeat(2,1fr)!important}.customer-reference-card{grid-template-columns:62px 1fr 90px!important}.customer-stat{grid-row:2}.customer-actions{grid-column:1/-1!important;display:flex!important;gap:8px!important}.exec-metrics{grid-template-columns:repeat(2,1fr)!important}.admin-counter-toolbar{grid-template-columns:1fr 180px!important}.admin-counter-toolbar button{display:none!important}}
 @media(max-width:700px){.admin-desktop-shell{display:block!important}.admin-sidebar{position:relative!important;width:100%!important;height:auto!important;min-height:0!important;display:flex!important;padding:10px!important}.sidebar-brand{margin:0!important}.sidebar-nav{display:flex!important;overflow-x:auto!important;margin-left:10px}.sidebar-nav button{min-width:48px!important}.sidebar-shortcuts,.sidebar-user{display:none!important}.admin-workspace{padding:0 8px 16px!important}.admin-topbar{margin-top:8px!important}.admin-title-block>div{display:none!important}.admin-top-actions{margin-left:auto}.admin-top-actions button:not(.store-open):not(.store-closed){display:none!important}.exec-metrics{grid-template-columns:1fr!important}.exec-grid-main{grid-template-columns:1fr!important}.counter-stepper button span{display:none}.counter-stepper button{justify-content:center}.manual-extra-grid{grid-template-columns:1fr!important}.counter-navigation{display:grid!important;grid-template-columns:1fr 1fr}.counter-navigation button{min-width:0!important;width:100%!important}.finance-reference-metrics{grid-template-columns:1fr 1fr!important}.customer-reference-card{grid-template-columns:56px 1fr!important}.customer-active{grid-column:2}.customer-stat{grid-row:auto}.customers-metrics{grid-template-columns:1fr!important}.settings-grid.delivery-settings{grid-template-columns:1fr!important}}
+
+/* Stable admin chrome: one sidebar and no legacy floating launchers. */
+@media(min-width:901px){
+  .admin-desktop-shell{grid-template-columns:240px minmax(0,1fr)!important}
+  .admin-sidebar{width:240px!important;min-width:240px!important;max-width:240px!important}
+}
+.sidebar-logo{display:grid!important;place-items:center!important;overflow:hidden!important}
+.sidebar-logo:before,.sidebar-logo:after{content:none!important;display:none!important}
+.sidebar-logo img{display:block!important;width:48px!important;height:48px!important;object-fit:contain!important;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))!important}
+.sidebar-brand-copy strong,.sidebar-brand-copy span,.sidebar-nav button,.sidebar-shortcuts button{white-space:nowrap!important}
+.sidebar-nav button svg,.sidebar-shortcuts button svg{flex:none!important}
+.delivery-dock,.kitchen-dock,.delivery-shortcut,.kitchen-shortcut,.report-dock,.command-dock,.daily-goals-dock,.clientes-vip-dock,.campaign-dock,.post-sale-dock,.menu-rank-dock{display:none!important}
+@media(min-width:901px) and (max-width:1450px){
+  .admin-desktop-shell{grid-template-columns:240px minmax(0,1fr)!important}
+  .admin-sidebar{width:240px!important;min-width:240px!important;max-width:240px!important}
+}
+@media(min-width:901px) and (max-width:1100px){
+  .admin-sidebar{padding:24px 14px 16px!important}
+  .sidebar-brand{display:grid!important;grid-template-columns:60px minmax(0,1fr)!important}
+  .sidebar-logo{width:60px!important;height:60px!important;margin:0!important}
+  .sidebar-brand-copy{display:flex!important}
+  .sidebar-nav button{justify-content:flex-start!important;padding:0 14px!important;font-size:14px!important}
+  .sidebar-shortcuts button{font-size:14px!important}
+  .sidebar-user>div:not(.avatar){display:block!important}
+}
+
