@@ -107,10 +107,10 @@ function makeWhatsAppMessage(settings, payload, total, order) {
 }
 
 function productEmoji(type) {
-  if (type === 'suco') return '🍊';
-  if (type === 'bebida') return '🥤';
-  if (type === 'adicional') return '🧀';
-  return '🌭';
+  if (type === 'suco') return 'ðŸŠ';
+  if (type === 'bebida') return 'ðŸ¥¤';
+  if (type === 'adicional') return 'ðŸ§€';
+  return 'ðŸŒ­';
 }
 
 function PremiumHeader({ route, navigate, settings }) {
@@ -337,7 +337,7 @@ function PremiumHome({ settings, navigate }) {
             <span className="filling salad"></span>
             <span className="bread bottom"></span>
           </div>
-          <div className="hero-status-card"><strong>Fila inteligente</strong><small>novo → preparo → entrega → concluido</small></div>
+          <div className="hero-status-card"><strong>Fila inteligente</strong><small>novo â†’ preparo â†’ entrega â†’ concluido</small></div>
         </div>
       </section>
 
@@ -411,23 +411,23 @@ function PremiumLogin({ onLogin }) {
   return (
     <main className="admin-login-page">
       <section className="admin-login-showcase">
-        <div className="login-showcase-badge"><span>🌭</span><div><strong>Hotdog Prensado</strong><small>Central de operações</small></div></div>
+        <div className="login-showcase-badge"><span>ðŸŒ­</span><div><strong>Hotdog Prensado</strong><small>Central de operaÃ§Ãµes</small></div></div>
         <img className="login-hotdog-art" src="/images/admin-login-hotdog.svg" alt="Hotdog Prensado" />
         <div className="login-showcase-copy">
-          <span className="login-eyebrow"><Activity size={15} /> Gestão em tempo real</span>
+          <span className="login-eyebrow"><Activity size={15} /> GestÃ£o em tempo real</span>
           <h1>Seu delivery<br /><em>sob controle.</em></h1>
-          <p>Acompanhe pedidos, produção, entregas e resultados em um painel feito para a rotina do negócio.</p>
+          <p>Acompanhe pedidos, produÃ§Ã£o, entregas e resultados em um painel feito para a rotina do negÃ³cio.</p>
         </div>
         <div className="login-showcase-metrics">
-          <article><ShoppingBag size={20} /><div><strong>Pedidos organizados</strong><small>Da entrada até a entrega</small></div></article>
+          <article><ShoppingBag size={20} /><div><strong>Pedidos organizados</strong><small>Da entrada atÃ© a entrega</small></div></article>
           <article><WalletCards size={20} /><div><strong>Financeiro integrado</strong><small>Caixa e resultados do dia</small></div></article>
-          <article><ShieldCheck size={20} /><div><strong>Acesso protegido</strong><small>Área exclusiva do gestor</small></div></article>
+          <article><ShieldCheck size={20} /><div><strong>Acesso protegido</strong><small>Ãrea exclusiva do gestor</small></div></article>
         </div>
-        <div className="login-operation-status"><i /> Sistema operacional <span>•</span> Pronto para receber pedidos</div>
+        <div className="login-operation-status"><i /> Sistema operacional <span>â€¢</span> Pronto para receber pedidos</div>
       </section>
       <section className="login-card premium-login">
         <div className="login-card-icon"><ShieldCheck size={26} /></div>
-        <span className="hero-pill"><ShieldCheck size={16} /> Área segura</span>
+        <span className="hero-pill"><ShieldCheck size={16} /> Ãrea segura</span>
         <h2>Bem-vindo de volta</h2>
         <p className="muted">Entre com os dados do administrador para acessar o painel.</p>
         <form onSubmit={submit}>
@@ -436,8 +436,8 @@ function PremiumLogin({ onLogin }) {
           <button className="btn-primary login-submit" disabled={loading}>{loading ? 'Entrando...' : <><span>Entrar no painel</span><ArrowRight size={19} /></>}</button>
         </form>
         {message && <p className="notice error">{message}</p>}
-        <div className="login-security-note"><LockKeyhole size={15} /><span>Conexão segura e acesso restrito ao administrador.</span></div>
-        <a href="/" className="login-back-link">← Voltar para o cardápio</a>
+        <div className="login-security-note"><LockKeyhole size={15} /><span>ConexÃ£o segura e acesso restrito ao administrador.</span></div>
+        <a href="/" className="login-back-link">â† Voltar para o cardÃ¡pio</a>
       </section>
     </main>
   );
@@ -447,389 +447,15 @@ function AdminSidebar({ activeTab, setActiveTab }) {
   return (
     <aside className="admin-sidebar">
       <div className="sidebar-brand">
-        <div className="sidebar-logo" aria-hidden="true" />
-        <div className="sidebar-brand-copy"><strong>Hotdog Prensado</strong><span>Pedidos Online</span></div>
-      </div>
-      <nav className="sidebar-nav">
-        {adminTabs.map(([key, label, Icon]) => (
-          <button key={key} className={activeTab === key ? 'active' : ''} onClick={() => setActiveTab(key)}>
-            <Icon size={20} /> {label}
-          </button>
-        ))}
-      </nav>
-      <div className="sidebar-shortcuts">
-        <button type="button" onClick={() => {
-          const shortcut = document.querySelector('.delivery-dock,[data-delivery-open]');
-          if (shortcut) shortcut.click();
-          else setActiveTab('orders');
-        }}><Bike size={19} /> Entregas</button>
-        <button type="button" onClick={() => { window.location.href = '/cozinha'; }}><ChefHat size={19} /> Modo cozinha</button>
-      </div>
-      <div className="sidebar-user">
-        <div className="avatar">AD</div>
-        <div><strong>Administrador</strong><small>admin@hotdog.com</small></div>
-      </div>
-    </aside>
-  );
-}
-
-function AdminCounterToolbar({ onRefresh }) {
-  const [sound, setSound] = useState(true);
-  return (
-    <section className="admin-counter-toolbar" aria-label="Ferramentas do balcão">
-      <label className="counter-search"><Search size={19} /><input placeholder="Buscar por cliente, telefone, código ou item" /></label>
-      <select aria-label="Filtrar por status" defaultValue=""><option value="">Todos os status</option><option value="novo">Novos</option><option value="preparo">Em preparo</option><option value="saiu_entrega">Em entrega</option><option value="concluido">Concluídos</option></select>
-      <select aria-label="Filtrar por pagamento" defaultValue=""><option value="">Todos pagamentos</option><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="cartao">Cartão</option><option value="fiado">Fiado</option></select>
-      <button type="button" className={sound ? 'sound-on' : ''} onClick={() => setSound((current) => !current)}><Volume2 size={18} /> Som {sound ? 'ligado' : 'desligado'}</button>
-      <button type="button" onClick={() => window.print()}><Printer size={18} /> Imprimir pedidos</button>
-      <button type="button" className="counter-refresh" onClick={onRefresh}><RefreshCw size={18} /> Atualizar</button>
-    </section>
-  );
-}
-
-function adminProductImage(product = {}) {
-  return productMedia(product);
-}
-
-function MetricCard({ icon, label, value, accent = 'gold', footer }) {
-  return (
-    <article className={`metric-card ${accent}`}>
-      <span className="metric-icon">{icon}</span>
-      <div>
-        <small>{label}</small>
-        <strong>{value}</strong>
-        {footer && <em>{footer}</em>}
-      </div>
-    </article>
-  );
-}
-
-function OrderKanban({ orders, onMove, onCancel, setActiveTab }) {
-  const grouped = statusFlow.reduce((acc, status) => ({ ...acc, [status]: orders.filter((order) => order.status === status) }), {});
-
-  return (
-    <section className="kanban-shell">
-      <div className="section-toolbar">
-        <div><h3>Pedidos do dia</h3><span>{orders.length} pedidos</span></div>
-        <div className="toolbar-actions"><Search size={18} /><select><option>Filtrar pedidos</option></select></div>
-      </div>
-      <div className="kanban-board">
-        {statusFlow.map((status) => {
-          const meta = statusMeta[status];
-          const Icon = meta.icon;
-          return (
-            <div className={`kanban-column ${status}`} key={status}>
-              <div className="kanban-title"><span>{meta.title}</span><b>{grouped[status]?.length || 0}</b></div>
-              <div className="kanban-cards">
-                {(grouped[status] || []).map((order) => (
-                  <article className="kanban-card" key={order.id}>
-                    <div className="order-head">
-                      <strong>{order.public_code || `#${order.id}`}</strong>
-                      <small>{order.created_at ? new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''}</small>
-                    </div>
-                    <h4>{order.customer_name}</h4>
-                    <div className="order-items">
-                      {order.items?.filter((item) => item.item_type === 'produto').slice(0, 4).map((item) => <span key={item.id}>{item.quantity}x {item.name}</span>)}
-                    </div>
-                    <small>Pagamento</small>
-                    <p>{paymentLabels[order.payment_method] || order.payment_method} • {order.payment_status === 'pago' ? 'Pago' : 'Pendente'}</p>
-                    <strong className="order-price">{formatMoney(order.total)}</strong>
-                    <div className="kanban-actions">
-                      {status !== 'concluido' && status !== 'cancelado' && <button onClick={() => onMove(order.id, meta.next)}><Icon size={15} /> {meta.action}</button>}
-                      {status !== 'cancelado' && <button className="danger-link" onClick={() => onCancel(order.id)}>Cancelar</button>}
-                    </div>
-                  </article>
-                ))}
-                {(grouped[status] || []).length === 0 && <div className="empty-column">Nenhum pedido nesta etapa</div>}
-              </div>
-              <button className="add-order-link" onClick={() => setActiveTab('new-order')}>+ Novo pedido</button>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function TopProducts({ orders, dashboard }) {
-  const ranking = useMemo(() => {
-    if (dashboard?.top_products?.length) return dashboard.top_products.map((item) => [item.name, Number(item.quantity || 0)]);
-    const map = new Map();
-    orders.forEach((order) => {
-      order.items?.filter((item) => item.item_type === 'produto').forEach((item) => {
-        map.set(item.name, (map.get(item.name) || 0) + Number(item.quantity || 0));
-      });
-    });
-    return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
-  }, [orders, dashboard]);
-  const max = Math.max(1, ...ranking.map(([, qty]) => qty));
-
-  return (
-    <section className="side-panel">
-      <div className="panel-title"><h3>🔥 Produtos mais vendidos hoje</h3><select><option>Hoje</option></select></div>
-      <div className="ranking-list">
-        {ranking.map(([name, qty], index) => (
-          <div className="ranking-row" key={name}>
-            <span>{index + 1}</span>
-            <div><strong>{name}</strong><i style={{ width: `${(qty / max) * 100}%` }} /></div>
-            <b>{qty}x</b>
-          </div>
-        ))}
-        {ranking.length === 0 && <p className="muted">Ainda nao ha vendas hoje.</p>}
-      </div>
-      <a className="report-link">Ver relatorio completo →</a>
-    </section>
-  );
-}
-
-function DashboardTab({ orders, summary, dashboard, onMove, onCancel, setActiveTab }) {
-  const todayOrders = Number(summary?.orders_today || orders.length || 0);
-  const ticket = todayOrders ? Number(summary?.gross_today || 0) / todayOrders : 0;
-  const inPrep = orders.filter((order) => order.status === 'preparo').length;
-
-  return (
-    <>
-      <section className="alert-strip">
-        <div><Bell size={20} /><strong>{inPrep} pedido em preparo</strong><span>Acompanhe a coluna Em preparo</span></div>
-        <div><ShoppingBag size={20} /><strong>Novo pedido recebido!</strong><span>Painel atualizado automaticamente</span></div>
-        <div><CheckCircle size={20} /><strong>Dica do dia</strong><span>Mantenha o tempo medio abaixo de 25 min</span></div>
-      </section>
-      <section className="metric-grid">
-        <MetricCard icon="💰" label="Faturamento hoje" value={formatMoney(summary?.gross_today)} footer="▲ 12% vs ontem" />
-        <MetricCard icon="💳" label="Recebido hoje" value={formatMoney(summary?.paid_today)} accent="green" footer="— 0% vs ontem" />
-        <MetricCard icon="⏱" label="Pendente" value={formatMoney(summary?.pending_today)} accent="orange" footer="— 0% vs ontem" />
-        <MetricCard icon="📈" label="Liquido hoje" value={formatMoney(summary?.net_today)} footer="▲ 12% vs ontem" />
-        <MetricCard icon="📋" label="Pedidos do dia" value={todayOrders} accent="red" footer="▲ 2 vs ontem" />
-        <MetricCard icon="📊" label="Ticket medio" value={formatMoney(ticket)} accent="purple" footer="▲ 10% vs ontem" />
-      </section>
-      <section className="admin-dashboard-grid">
-        <OrderKanban orders={orders} onMove={onMove} onCancel={onCancel} setActiveTab={setActiveTab} />
-        <div className="right-stack">
-          <TopProducts orders={orders} dashboard={dashboard} />
-          <section className="side-panel quick-summary">
-            <h3>Resumo rapido</h3>
-            <div><span>⏱ Tempo medio preparo</span><strong>18 min</strong></div>
-            <div><span>⭐ Avaliacao media</span><strong>4,8</strong></div>
-            <div><span>👥 Clientes atendidos</span><strong>{todayOrders}</strong></div>
-            <div><span>📈 Taxa de conclusao</span><strong>100%</strong></div>
-          </section>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function SettingsReference({ settings, setSettings, report, saveSettings, setTab, onReload }) {
-  return (
-    <section className="admin-settings-reference">
-      <form onSubmit={saveSettings} className="settings-reference-form">
-        <div className="settings-title"><Settings size={23} /><h2>Configurações do negócio</h2></div>
-        <fieldset><legend><Building2 size={19} /> 1. Informações da loja</legend><div className="settings-grid two"><label>Nome do negócio<input value={settings.business_name || ''} onChange={(e) => setSettings({ ...settings, business_name: e.target.value })} /></label><label>Telefone<input value={settings.phone || ''} onChange={(e) => setSettings({ ...settings, phone: e.target.value })} /></label><label>WhatsApp<input value={settings.whatsapp || ''} onChange={(e) => setSettings({ ...settings, whatsapp: e.target.value })} /></label><label>Endereço<input value={settings.address || ''} onChange={(e) => setSettings({ ...settings, address: e.target.value })} /></label></div></fieldset>
-        <fieldset><legend><DollarSign size={19} /> 2. Financeiro e PIX</legend><div className="settings-grid three"><label>Chave PIX<input value={settings.pix_key || ''} onChange={(e) => setSettings({ ...settings, pix_key: e.target.value })} /></label><label>Taxa de entrega base (R$)<input type="number" step="0.01" value={settings.delivery_fee || 0} onChange={(e) => setSettings({ ...settings, delivery_fee: e.target.value })} /></label><label>Pedido mínimo (R$)<input type="number" step="0.01" value={settings.minimum_order || 0} onChange={(e) => setSettings({ ...settings, minimum_order: e.target.value })} /></label></div></fieldset>
-        <fieldset><legend><Bike size={19} /> 3. Entrega</legend><div className="settings-grid delivery-settings"><label>Previsão de entrega (minutos)<input type="number" min="5" value={settings.estimated_delivery_minutes || 35} onChange={(e) => setSettings({ ...settings, estimated_delivery_minutes: e.target.value })} /></label><label>Áreas/bairros de entrega<textarea value={settings.delivery_area_text || ''} onChange={(e) => setSettings({ ...settings, delivery_area_text: e.target.value })} /><small>Separe cada área ou bairro por vírgula.</small></label></div></fieldset>
-        <fieldset><legend><KeyRound size={19} /> 4. Operação</legend><div className="settings-grid two"><label>Status da loja<select value={Number(settings.is_open ?? 1)} onChange={(e) => setSettings({ ...settings, is_open: e.target.value })}><option value="1">Aberto</option><option value="0">Fechado</option></select></label><label>Automação<select value={Number(settings.allow_whatsapp_redirect ?? 1)} onChange={(e) => setSettings({ ...settings, allow_whatsapp_redirect: e.target.value })}><option value="1">Abrir WhatsApp após pedido</option><option value="0">Não abrir WhatsApp</option></select></label></div></fieldset>
-        <div className="settings-actions"><button className="btn-primary"><Save size={19} /> Salvar configurações</button><button type="button" className="btn-secondary" onClick={onReload}><XCircle size={18} /> Cancelar alterações</button><button type="button" className="btn-secondary restore" onClick={() => setSettings({ ...settings, business_name: 'Hotdog Prensado', phone: '(18) 99195-9898', whatsapp: '5518991959898', delivery_fee: 2, minimum_order: 0, estimated_delivery_minutes: 35, is_open: 1, allow_whatsapp_redirect: 1 })}><RotateCcw size={18} /> Restaurar padrão</button></div>
-      </form>
-      <aside className="settings-reference-side">
-        <section><h3><BarChart3 size={20} /> Resumo rápido</h3><div className="settings-summary"><span>Vendas<strong>{formatMoney(report?.summary?.gross)}</strong></span><span>Recebido<strong>{formatMoney(report?.summary?.paid)}</strong></span><span>Despesas<strong>{formatMoney(report?.summary?.expenses)}</strong></span><span>Líquido<strong>{formatMoney(report?.summary?.net)}</strong></span></div></section>
-        <section><h3>Status da loja</h3><div className="store-status-card"><i /><div><strong>{Number(settings.is_open ?? 1) === 1 ? 'Loja aberta' : 'Loja fechada'}</strong><small>{Number(settings.is_open ?? 1) === 1 ? 'Recebendo pedidos normalmente' : 'Pedidos temporariamente pausados'}</small></div><Store size={35} /></div></section>
-        <section><h3>Atalhos rápidos</h3><div className="settings-shortcuts"><button type="button" onClick={() => { window.history.pushState({}, '', '/'); window.location.reload(); }}><ShoppingBag size={23} />Cardápio</button><button type="button"><Printer size={23} />Imprimir pedidos</button><button type="button" onClick={() => setTab('new-order')}><Store size={23} />Pedidos no balcão</button><button type="button" onClick={() => setTab('orders')}><ShoppingBag size={23} />Ver pedidos</button></div></section>
-        <section className="settings-tip"><strong>💡 Dica</strong><p>Mantenha suas informações sempre atualizadas para uma melhor experiência dos clientes.</p></section>
-      </aside>
-    </section>
-  );
-}
-
-function AdminPremium() {
-  const [tab, setTab] = useState('dashboard');
-  const [orders, setOrders] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [summary, setSummary] = useState(null);
-  const [dashboard, setDashboard] = useState(null);
-  const [expenses, setExpenses] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [cash, setCash] = useState({ register: null, totals: null, movements: [] });
-  const [settings, setSettings] = useState(null);
-  const [report, setReport] = useState(null);
-  const [message, setMessage] = useState('');
-  const [expense, setExpense] = useState({ description: '', amount: '', category: 'Geral', payment_method: 'dinheiro' });
-  const [movement, setMovement] = useState({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
-  const [openValue, setOpenValue] = useState('0');
-  const [closeValue, setCloseValue] = useState('0');
-  const [productForm, setProductForm] = useState({ category_id: '', name: '', description: '', image_url: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
-  const [manualCustomer, setManualCustomer] = useState({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
-  const [manualOrder, setManualOrder] = useState({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
-  const [manualStep, setManualStep] = useState(1);
-  const activeProducts = useMemo(() => products.filter((p) => Number(p.is_active) === 1 && p.product_type !== 'adicional'), [products]);
-
-  async function loadAdmin() {
-    try {
-      const [orderData, productData, categoryData, summaryData, dashboardData, settingsData, expenseData, cashData, customerData, reportData] = await Promise.all([
-        api.admin.get('/api/admin/orders'),
-        api.admin.get('/api/admin/products'),
-        api.admin.get('/api/admin/categories'),
-        api.admin.get('/api/admin/finance/summary'),
-        api.admin.get('/api/admin/dashboard'),
-        api.admin.get('/api/admin/settings'),
-        api.admin.get('/api/admin/finance/expenses'),
-        api.admin.get('/api/admin/finance/cash/current'),
-        api.admin.get('/api/admin/customers'),
-        api.admin.get('/api/admin/reports/sales')
-      ]);
-      setOrders(orderData);
-      setProducts(productData);
-      setCategories(categoryData);
-      setSummary(summaryData);
-      setDashboard(dashboardData);
-      setSettings(settingsData);
-      setExpenses(expenseData);
-      setCash(cashData);
-      setCustomers(customerData);
-      setReport(reportData);
-    } catch (error) {
-      setMessage(error.message);
-    }
-  }
-
-  useEffect(() => {
-    loadAdmin();
-    const timer = setInterval(loadAdmin, 15000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const referenceMode = ['new-order', 'products', 'finance', 'customers', 'settings'].includes(tab);
-    document.body.classList.toggle('admin-counter-mode', referenceMode);
-    document.body.classList.toggle('admin-products-mode', tab === 'products');
-    document.body.classList.toggle('admin-finance-mode', tab === 'finance');
-    document.body.classList.toggle('admin-customers-mode', tab === 'customers');
-    document.body.classList.toggle('admin-settings-mode', tab === 'settings');
-    return () => document.body.classList.remove('admin-counter-mode', 'admin-products-mode', 'admin-finance-mode', 'admin-customers-mode', 'admin-settings-mode');
-  }, [tab]);
-
-  async function updateStatus(orderId, status, payment_status) {
-    await api.admin.patch(`/api/admin/orders/${orderId}/status-flow`, { status, payment_status });
-    await loadAdmin();
-  }
-
-  async function updatePayment(orderId, payment_status) {
-    await api.admin.patch(`/api/admin/orders/${orderId}/payment-flow`, { payment_status });
-    await loadAdmin();
-  }
-
-  async function saveProduct(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/products', { ...productForm, category_id: Number(productForm.category_id), price: Number(productForm.price), sort_order: Number(productForm.sort_order || 0), is_active: true });
-    setProductForm({ category_id: '', name: '', description: '', image_url: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
-    await loadAdmin();
-  }
-
-  async function saveExpense(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/finance/expenses', { ...expense, amount: Number(expense.amount) });
-    setExpense({ description: '', amount: '', category: 'Geral', payment_method: 'dinheiro' });
-    await loadAdmin();
-  }
-
-  async function saveMovement(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/finance/cash/movements', { ...movement, amount: Number(movement.amount) });
-    setMovement({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
-    await loadAdmin();
-  }
-
-  async function openCash(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/finance/cash/open', { opening_amount: Number(openValue || 0) });
-    await loadAdmin();
-  }
-
-  async function closeCash(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/finance/cash/close', { closing_amount: Number(closeValue || 0) });
-    await loadAdmin();
-  }
-
-  async function saveSettings(event) {
-    event.preventDefault();
-    await api.admin.put('/api/admin/settings/premium', {
-      ...settings,
-      delivery_fee: Number(settings.delivery_fee || 0),
-      minimum_order: Number(settings.minimum_order || 0),
-      estimated_delivery_minutes: Number(settings.estimated_delivery_minutes || 35),
-      is_open: Boolean(Number(settings.is_open ?? 1)),
-      allow_whatsapp_redirect: Boolean(Number(settings.allow_whatsapp_redirect ?? 1))
-    });
-    setMessage('Configuracoes salvas.');
-    await loadAdmin();
-  }
-
-  async function createManualOrder(event) {
-    event.preventDefault();
-    await api.admin.post('/api/admin/orders', { ...manualOrder, customer: manualCustomer, items: manualOrder.items.filter((item) => item.product_id).map((item) => ({ product_id: Number(item.product_id), quantity: Number(item.quantity || 1), extras: (item.extras || []).map(Number), notes: '' })) });
-    setManualCustomer({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
-    setManualOrder({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
-    setManualStep(1);
-    setMessage('Pedido criado no painel.');
-    await loadAdmin();
-  }
-
-  function updateManualItem(index, field, value) {
-    setManualOrder((current) => ({ ...current, items: current.items.map((item, itemIndex) => itemIndex === index ? { ...item, [field]: value } : item) }));
-  }
-
-  function toggleManualExtra(index, extraId) {
-    setManualOrder((current) => ({ ...current, items: current.items.map((item, itemIndex) => {
-      if (itemIndex !== index) return item;
-      const extras = item.extras || [];
-      return { ...item, extras: extras.includes(extraId) ? extras.filter((id) => id !== extraId) : [...extras, extraId] };
-    }) }));
-  }
-
-  const renderContent = () => {
-    if (tab === 'dashboard') {
-      return <DashboardTab orders={orders} summary={summary} dashboard={dashboard} onMove={updateStatus} onCancel={(id) => updateStatus(id, 'cancelado', 'cancelado')} setActiveTab={setTab} />;
-    }
-
-    if (tab === 'orders') {
-      return <section className="admin-dashboard-grid"><OrderKanban orders={orders} onMove={updateStatus} onCancel={(id) => updateStatus(id, 'cancelado', 'cancelado')} setActiveTab={setTab} /><TopProducts orders={orders} dashboard={dashboard} /></section>;
-    }
-
-    if (tab === 'new-order') {
-      const snacks = activeProducts.filter((product) => product.product_type === 'hotdog');
-      const drinks = activeProducts.filter((product) => ['bebida', 'suco'].includes(product.product_type));
-      const manualExtras = products.filter((product) => product.product_type === 'adicional' && Number(product.is_active) === 1);
-      const snackItem = manualOrder.items[0] || { product_id: '', quantity: 1, extras: [] };
-      const drinkItem = manualOrder.items[1] || { product_id: '', quantity: 1, extras: [] };
-      const manualSubtotal = manualOrder.items.reduce((total, item) => {
-        const product = products.find((entry) => Number(entry.id) === Number(item.product_id));
-        const extrasTotal = (item.extras || []).reduce((sum, id) => sum + Number(products.find((entry) => Number(entry.id) === Number(id))?.price || 0), 0);
-        return total + (Number(product?.price || 0) + extrasTotal) * Number(item.quantity || 1);
-      }, 0);
-      const manualDelivery = manualOrder.delivery_type === 'entrega' ? Number(settings?.delivery_fee || 0) : 0;
-      return (
-        <section className="panel big-form-panel counter-order-panel unified-counter-order">
-          <div className="panel-title"><div><h3><Store size={21} /> Pedido manual / balcão</h3><p>Venda presencial, WhatsApp ou telefone</p></div><strong>Etapa {manualStep} de 4</strong></div>
-          <div className="counter-stepper">{['Lanche', 'Adicionais', 'Bebida', 'Finalizar'].map((label, index) => <button type="button" key={label} className={manualStep === index + 1 ? 'active' : manualStep > index + 1 ? 'done' : ''} onClick={() => setManualStep(index + 1)}><b>{index + 1}</b><span>{label}</span></button>)}</div>
-          <form onSubmit={createManualOrder} className={`stack-form manual-step-${manualStep}`}>
-            <section className="counter-step counter-step-1"><header><span>1</span><div><h4>Cliente e lanche</h4><p>Informe o cliente e escolha o prensado principal.</p></div></header>
-            <div className="form-grid counter-customer-grid">
-              <label className="counter-field"><span><Users size={17} /> Nome do cliente</span><input placeholder="Digite o nome do cliente" value={manualCustomer.name} onChange={(e) => setManualCustomer({ ...manualCustomer, name: e.target.value })} required /></label>
-              <label className="counter-field"><span><Phone size={17} /> Telefone</span><input placeholder="(00) 00000-0000" value={manualCustomer.phone} onChange={(e) => setManualCustomer({ ...manualCustomer, phone: e.target.value })} required /></label>
-              <label className="counter-field"><span><MapPin size={17} /> Endereço</span><input placeholder="Rua, número, complemento" value={manualCustomer.address} onChange={(e) => setManualCustomer({ ...manualCustomer, address: e.target.value })} /></label>
-              <label className="counter-field"><span><Home size={17} /> Bairro</span><input placeholder="Digite o bairro" value={manualCustomer.neighborhood} onChange={(e) => setManualCustomer({ ...manualCustomer, neighborhood: e.target.value })} /></label>
-            </div>
-            <div className="form-grid counter-product-grid"><label className="counter-field"><span><Package size={17} /> Lanche</span><select value={snackItem.product_id} onChange={(e) => updateManualItem(0, 'product_id', e.target.value)} required><option value="">Selecione o lanche</option>{snacks.map((product) => <option key={product.id} value={product.id}>{product.name} — {formatMoney(product.price)}</option>)}</select></label><div className="counter-field counter-quantity"><span>Quantidade</span><div><button type="button" aria-label="Diminuir quantidade" onClick={() => updateManualItem(0, 'quantity', Math.max(1, Number(snackItem.quantity || 1) - 1))}><Minus size={17} /></button><b>{snackItem.quantity}</b><button type="button" aria-label="Aumentar quantidade" onClick={() => updateManualItem(0, 'quantity', Number(snackItem.quantity || 1) + 1)}><Plus size={17} /></button></div></div></div></section>
-            <section className="counter-step counter-step-2"><header><span>2</span><div><h4>Personalize o lanche</h4><p>Selecione os adicionais; os valores entram no resumo.</p></div></header><div className="manual-extra-grid">{manualExtras.map((extra) => <button type="button" key={extra.id} className={(snackItem.extras || []).includes(extra.id) ? 'active' : ''} onClick={() => toggleManualExtra(0, extra.id)}><Plus size={17} /><span>{extra.name}</span><b>{formatMoney(extra.price)}</b></button>)}</div></section>
-            <section className="counter-step counter-step-3"><header><span>3</span><div><h4>Quer uma bebida?</h4><p>Adicione uma bebida ou avance sem escolher.</p></div></header><div className="form-grid counter-product-grid"><label className="counter-field"><span><ShoppingBag size={17} /> Bebida</span><select value={drinkItem.product_id || ''} onChange={(e) => setManualOrder((current) => ({ ...current, items: e.target.value ? [current.items[0], { product_id: e.target.value, quantity: 1, extras: [] }] : [current.items[0]] }))}><option value="">Sem bebida</option>{drinks.map((product) => <option key={product.id} value={product.id}>{product.name} — {formatMoney(product.price)}</option>)}</select></label>{drinkItem.product_id && <div className="counter-field counter-quantity"><span>Quantidade</span><div><button type="button" aria-label="Diminuir bebida" onClick={() => updateManualItem(1, 'quantity', Math.max(1, Number(drinkItem.quantity || 1) - 1))}><Minus size={17} /></button><b>{drinkItem.quantity}</b><button type="button" aria-label="Aumentar bebida" onClick={() => updateManualItem(1, 'quantity', Number(drinkItem.quantity || 1) + 1)}><Plus size={17} /></button></div></div>}</div></section>
+        <div className="sidebar-logo" aria-hidden="true"><img src="/images/hotdog-premium.svg" alt="" /></div>
+        <div className="sidebar-brand-copy"><strong>Hotdog Prensad…6919 tokens truncated…uantity || 1) + 1)}><Plus size={17} /></button></div></div>}</div></section>
             <section className="counter-step counter-step-4"><header><span>4</span><div><h4>Revise e finalize</h4><p>Confira entrega, pagamento e total antes de criar.</p></div></header><div className="form-grid counter-options-grid">
               <label className="counter-field"><span><Truck size={17} /> Entrega</span><select value={manualOrder.delivery_type} onChange={(e) => setManualOrder({ ...manualOrder, delivery_type: e.target.value })}><option value="entrega">Entrega</option><option value="retirada">Retirada</option></select></label>
-              <label className="counter-field"><span><DollarSign size={17} /> Pagamento</span><select value={manualOrder.payment_method} onChange={(e) => setManualOrder({ ...manualOrder, payment_method: e.target.value })}><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="cartao">Cartão</option><option value="fiado">Fiado</option></select></label>
+              <label className="counter-field"><span><DollarSign size={17} /> Pagamento</span><select value={manualOrder.payment_method} onChange={(e) => setManualOrder({ ...manualOrder, payment_method: e.target.value })}><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="cartao">CartÃ£o</option><option value="fiado">Fiado</option></select></label>
               <label className="counter-field"><span><Clock size={17} /> Status</span><select value={manualOrder.payment_status} onChange={(e) => setManualOrder({ ...manualOrder, payment_status: e.target.value })}><option value="pendente">Pendente</option><option value="pago">Pago</option></select></label>
-              <label className="counter-field"><span><Store size={17} /> Origem</span><select value={manualOrder.order_source} onChange={(e) => setManualOrder({ ...manualOrder, order_source: e.target.value })}><option value="balcao">Balcão</option><option value="admin">Admin</option><option value="whatsapp">WhatsApp</option></select></label>
+              <label className="counter-field"><span><Store size={17} /> Origem</span><select value={manualOrder.order_source} onChange={(e) => setManualOrder({ ...manualOrder, order_source: e.target.value })}><option value="balcao">BalcÃ£o</option><option value="admin">Admin</option><option value="whatsapp">WhatsApp</option></select></label>
             </div>
-            <label className="counter-field counter-notes"><span><Plus size={17} /> Observações</span><textarea placeholder="Informações adicionais sobre o pedido (opcional)" value={manualOrder.notes} onChange={(e) => setManualOrder({ ...manualOrder, notes: e.target.value })} /></label>
+            <label className="counter-field counter-notes"><span><Plus size={17} /> ObservaÃ§Ãµes</span><textarea placeholder="InformaÃ§Ãµes adicionais sobre o pedido (opcional)" value={manualOrder.notes} onChange={(e) => setManualOrder({ ...manualOrder, notes: e.target.value })} /></label>
             <aside className="manual-order-summary"><div><span>Subtotal</span><b>{formatMoney(manualSubtotal)}</b></div><div><span>Entrega</span><b>{formatMoney(manualDelivery)}</b></div><strong><span>Total</span><b>{formatMoney(manualSubtotal + manualDelivery)}</b></strong></aside></section>
             <footer className="counter-navigation">{manualStep > 1 && <button type="button" className="btn-secondary" onClick={() => setManualStep((step) => step - 1)}>Voltar</button>}{manualStep < 4 ? <button type="button" className="btn-primary" onClick={() => setManualStep((step) => step + 1)}>Continuar</button> : <button className="btn-primary"><ShoppingBag size={20} /> Criar pedido</button>}</footer>
           </form>
@@ -845,16 +471,16 @@ function AdminPremium() {
             <form onSubmit={saveProduct} className="product-reference-form">
               <label><span>Categoria</span><div className="product-input"><Package size={18} /><select value={productForm.category_id} onChange={(e) => setProductForm({ ...productForm, category_id: e.target.value })} required><option value="">Selecione a categoria</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></div></label>
               <label><span>Nome do produto</span><div className="product-input"><ShoppingBag size={18} /><input placeholder="Digite o nome do produto" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required /></div></label>
-              <label><span>Descrição</span><div className="product-input product-description"><Menu size={18} /><textarea placeholder="Digite a descrição do produto" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} /></div></label>
+              <label><span>DescriÃ§Ã£o</span><div className="product-input product-description"><Menu size={18} /><textarea placeholder="Digite a descriÃ§Ã£o do produto" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} /></div></label>
               <label><span>Foto do produto</span><div className="product-input"><Package size={18} /><input placeholder="https://... ou /images/produto.jpg" value={productForm.image_url} onChange={(e) => setProductForm({ ...productForm, image_url: e.target.value })} /></div></label>
-              <label><span>Preço</span><div className="product-input"><DollarSign size={18} /><input placeholder="R$ 0,00" type="number" step="0.01" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} required /></div></label>
+              <label><span>PreÃ§o</span><div className="product-input"><DollarSign size={18} /><input placeholder="R$ 0,00" type="number" step="0.01" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} required /></div></label>
               <label><span>Tipo</span><div className="product-input"><Sparkles size={18} /><select value={productForm.product_type} onChange={(e) => setProductForm({ ...productForm, product_type: e.target.value })}><option value="hotdog">Hot dog</option><option value="suco">Suco</option><option value="bebida">Bebida</option><option value="adicional">Adicional</option></select></div></label>
               <button className="btn-primary"><CheckCircle size={20} /> Salvar produto</button>
             </form>
           </div>
           <div className="panel product-list-panel">
             <div className="panel-title"><h3>Produtos cadastrados</h3><span>{products.length} itens</span></div>
-            <div className="reference-product-list">{products.map((product) => <article className="reference-product-row" key={product.id}><div className={`reference-product-thumb ${productMediaPosition(product)}`}><img src={adminProductImage(product)} alt="" /></div><div><strong>{product.name}</strong><small>{product.category_name} • {product.product_type}</small></div><div className="reference-product-price"><strong>{formatMoney(product.price)}</strong><span className={product.is_active ? 'active' : 'inactive'}>{product.is_active ? 'Ativo' : 'Inativo'}</span></div></article>)}{!products.length && <p className="reference-empty">Nenhum produto cadastrado.</p>}</div>
+            <div className="reference-product-list">{products.map((product) => <article className="reference-product-row" key={product.id}><div className={`reference-product-thumb ${productMediaPosition(product)}`}><img src={adminProductImage(product)} alt="" /></div><div><strong>{product.name}</strong><small>{product.category_name} â€¢ {product.product_type}</small></div><div className="reference-product-price"><strong>{formatMoney(product.price)}</strong><span className={product.is_active ? 'active' : 'inactive'}>{product.is_active ? 'Ativo' : 'Inativo'}</span></div></article>)}{!products.length && <p className="reference-empty">Nenhum produto cadastrado.</p>}</div>
           </div>
         </section>
       );
@@ -870,8 +496,8 @@ function AdminPremium() {
           <div className="finance-reference-metrics">
             <article className="balance"><span><WalletCards size={28} /></span><div><small>Saldo em caixa</small><strong>{formatMoney(balance)}</strong><em>Atualizado agora</em></div></article>
             <article className="entries"><span><RefreshCw size={28} /></span><div><small>Entradas hoje</small><strong>{formatMoney(entries)}</strong><em>Recebimentos confirmados</em></div></article>
-            <article className="exits"><span><LogOut size={28} /></span><div><small>Saídas hoje</small><strong>{formatMoney(exits)}</strong><em>Despesas e retiradas</em></div></article>
-            <article className="net"><span><DollarSign size={28} /></span><div><small>Lucro líquido</small><strong>{formatMoney(net)}</strong><em>Resultado estimado</em></div></article>
+            <article className="exits"><span><LogOut size={28} /></span><div><small>SaÃ­das hoje</small><strong>{formatMoney(exits)}</strong><em>Despesas e retiradas</em></div></article>
+            <article className="net"><span><DollarSign size={28} /></span><div><small>Lucro lÃ­quido</small><strong>{formatMoney(net)}</strong><em>Resultado estimado</em></div></article>
           </div>
           <div className="finance-reference-grid">
             <section className="panel finance-cash-panel">
@@ -884,15 +510,15 @@ function AdminPremium() {
               <div className="finance-divider" />
               <div className="panel-title movement-title"><h3><RefreshCw size={20} /> Registrar movimento</h3></div>
               <form onSubmit={saveMovement} className="finance-movement-form">
-                <label>Tipo de movimento<select value={movement.movement_type} onChange={(e) => setMovement({ ...movement, movement_type: e.target.value })}><option value="entrada">Entrada</option><option value="saida">Saída</option></select></label>
-                <label>Descrição<input placeholder="Ex.: Venda balcão, suprimento..." value={movement.description} onChange={(e) => setMovement({ ...movement, description: e.target.value })} required /></label>
+                <label>Tipo de movimento<select value={movement.movement_type} onChange={(e) => setMovement({ ...movement, movement_type: e.target.value })}><option value="entrada">Entrada</option><option value="saida">SaÃ­da</option></select></label>
+                <label>DescriÃ§Ã£o<input placeholder="Ex.: Venda balcÃ£o, suprimento..." value={movement.description} onChange={(e) => setMovement({ ...movement, description: e.target.value })} required /></label>
                 <label className="movement-value">Valor<div><span>R$</span><input placeholder="0,00" type="number" step="0.01" value={movement.amount} onChange={(e) => setMovement({ ...movement, amount: e.target.value })} required /></div></label>
                 <button className="btn-secondary"><Plus size={18} /> Registrar movimento</button>
               </form>
             </section>
             <div className="finance-reference-side">
-              <section className="panel finance-expense-panel"><div className="panel-title"><h3><WalletCards size={20} /> Nova despesa</h3></div><form onSubmit={saveExpense} className="finance-expense-form"><label>Descrição<input placeholder="Ex.: Compra de ingredientes" value={expense.description} onChange={(e) => setExpense({ ...expense, description: e.target.value })} required /></label><label>Valor<div><span>R$</span><input placeholder="0,00" type="number" step="0.01" value={expense.amount} onChange={(e) => setExpense({ ...expense, amount: e.target.value })} required /></div></label><label>Categoria<input placeholder="Geral" value={expense.category} onChange={(e) => setExpense({ ...expense, category: e.target.value })} /></label><button className="btn-primary"><Plus size={18} /> Cadastrar saída</button></form></section>
-              <section className="panel finance-movements-panel"><div className="panel-title"><h3><Clock size={20} /> Últimas movimentações</h3><span>{cash.movements?.length || 0} itens</span></div><div className="finance-movement-list">{(cash.movements || []).slice(0, 6).map((item) => <article key={item.id}><span className={item.movement_type === 'saida' ? 'out' : 'in'}>{item.movement_type === 'saida' ? '↑' : '↓'}</span><div><strong>{item.description}</strong><small>{item.movement_type === 'saida' ? 'Saída' : 'Entrada'}</small></div><b className={item.movement_type === 'saida' ? 'out' : 'in'}>{item.movement_type === 'saida' ? '- ' : ''}{formatMoney(item.amount)}</b></article>)}{!(cash.movements || []).length && <p className="reference-empty">Nenhuma movimentação registrada.</p>}</div></section>
+              <section className="panel finance-expense-panel"><div className="panel-title"><h3><WalletCards size={20} /> Nova despesa</h3></div><form onSubmit={saveExpense} className="finance-expense-form"><label>DescriÃ§Ã£o<input placeholder="Ex.: Compra de ingredientes" value={expense.description} onChange={(e) => setExpense({ ...expense, description: e.target.value })} required /></label><label>Valor<div><span>R$</span><input placeholder="0,00" type="number" step="0.01" value={expense.amount} onChange={(e) => setExpense({ ...expense, amount: e.target.value })} required /></div></label><label>Categoria<input placeholder="Geral" value={expense.category} onChange={(e) => setExpense({ ...expense, category: e.target.value })} /></label><button className="btn-primary"><Plus size={18} /> Cadastrar saÃ­da</button></form></section>
+              <section className="panel finance-movements-panel"><div className="panel-title"><h3><Clock size={20} /> Ãšltimas movimentaÃ§Ãµes</h3><span>{cash.movements?.length || 0} itens</span></div><div className="finance-movement-list">{(cash.movements || []).slice(0, 6).map((item) => <article key={item.id}><span className={item.movement_type === 'saida' ? 'out' : 'in'}>{item.movement_type === 'saida' ? 'â†‘' : 'â†“'}</span><div><strong>{item.description}</strong><small>{item.movement_type === 'saida' ? 'SaÃ­da' : 'Entrada'}</small></div><b className={item.movement_type === 'saida' ? 'out' : 'in'}>{item.movement_type === 'saida' ? '- ' : ''}{formatMoney(item.amount)}</b></article>)}{!(cash.movements || []).length && <p className="reference-empty">Nenhuma movimentaÃ§Ã£o registrada.</p>}</div></section>
             </div>
           </div>
         </section>
@@ -917,17 +543,17 @@ function AdminPremium() {
               const initials = String(customer.name || 'Cliente').split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
               return <article className="customer-reference-card" key={customer.id}>
                 <div className={`customer-avatar avatar-${index % 3}`}>{initials}<i /></div>
-                <div className="customer-identity"><strong>{customer.name}</strong><span><Phone size={16} />{customer.phone || 'Telefone não informado'}</span><span><MapPin size={16} />{customer.address || 'Endereço não informado'}</span></div>
+                <div className="customer-identity"><strong>{customer.name}</strong><span><Phone size={16} />{customer.phone || 'Telefone nÃ£o informado'}</span><span><MapPin size={16} />{customer.address || 'EndereÃ§o nÃ£o informado'}</span></div>
                 <span className="customer-active"><i /> Ativo</span>
                 <div className="customer-stat"><small><ShoppingBag size={16} /> Pedidos</small><strong>{Number(customer.orders_count || 0)}</strong><span>{Number(customer.orders_count || 0) === 1 ? 'pedido' : 'pedidos'}</span></div>
                 <div className="customer-stat"><small><DollarSign size={16} /> Total gasto</small><strong>{formatMoney(customer.total_spent || 0)}</strong><span>valor total</span></div>
-                <div className="customer-stat"><small><CalendarDays size={16} /> Último pedido</small><strong>{customer.last_order_at ? new Date(customer.last_order_at).toLocaleDateString('pt-BR') : '—'}</strong><span>{customer.last_order_at ? 'registrado' : 'sem registro'}</span></div>
-                <div className="customer-actions"><button type="button"><History size={16} /> Ver histórico</button><div><button type="button"><Settings size={16} /> Editar</button><button type="button" className="primary" onClick={() => setTab('new-order')}><Plus size={16} /> Novo pedido</button></div></div>
+                <div className="customer-stat"><small><CalendarDays size={16} /> Ãšltimo pedido</small><strong>{customer.last_order_at ? new Date(customer.last_order_at).toLocaleDateString('pt-BR') : 'â€”'}</strong><span>{customer.last_order_at ? 'registrado' : 'sem registro'}</span></div>
+                <div className="customer-actions"><button type="button"><History size={16} /> Ver histÃ³rico</button><div><button type="button"><Settings size={16} /> Editar</button><button type="button" className="primary" onClick={() => setTab('new-order')}><Plus size={16} /> Novo pedido</button></div></div>
               </article>;
             })}
             {!customers.length && <p className="reference-empty">Nenhum cliente cadastrado.</p>}
           </div>
-          <footer className="customers-reference-footer">Mostrando {customers.length ? `1 a ${customers.length}` : '0'} de {customers.length} clientes <span><button type="button">‹</button><b>1</b><button type="button">›</button></span></footer>
+          <footer className="customers-reference-footer">Mostrando {customers.length ? `1 a ${customers.length}` : '0'} de {customers.length} clientes <span><button type="button">â€¹</button><b>1</b><button type="button">â€º</button></span></footer>
         </section>
       );
     }
@@ -965,10 +591,9 @@ function AdminPremium() {
           </div>
         </header>
 
-        {tab === 'orders' && <AdminCounterToolbar onRefresh={loadAdmin} />}
         {message && <p className="notice admin-message">{message}</p>}
         {renderContent()}
-        <footer className="admin-footer">© 2026 Hotdog Prensado • Painel Premium de Pedidos e Gestao</footer>
+        <footer className="admin-footer">Â© 2026 Hotdog Prensado â€¢ Painel Premium de Pedidos e Gestao</footer>
       </main>
     </div>
   );
@@ -1011,3 +636,4 @@ export default function PremiumApp() {
     </div>
   );
 }
+
