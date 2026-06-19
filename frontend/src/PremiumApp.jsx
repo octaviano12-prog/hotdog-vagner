@@ -619,16 +619,16 @@ function DashboardTab({ orders, summary, dashboard, onMove, onCancel, setActiveT
   );
 }
 
-function SettingsReference({ settings, setSettings, report, saveSettings, setTab }) {
+function SettingsReference({ settings, setSettings, report, saveSettings, setTab, onReload }) {
   return (
     <section className="admin-settings-reference">
       <form onSubmit={saveSettings} className="settings-reference-form">
         <div className="settings-title"><Settings size={23} /><h2>Configurações do negócio</h2></div>
         <fieldset><legend><Building2 size={19} /> 1. Informações da loja</legend><div className="settings-grid two"><label>Nome do negócio<input value={settings.business_name || ''} onChange={(e) => setSettings({ ...settings, business_name: e.target.value })} /></label><label>Telefone<input value={settings.phone || ''} onChange={(e) => setSettings({ ...settings, phone: e.target.value })} /></label><label>WhatsApp<input value={settings.whatsapp || ''} onChange={(e) => setSettings({ ...settings, whatsapp: e.target.value })} /></label><label>Endereço<input value={settings.address || ''} onChange={(e) => setSettings({ ...settings, address: e.target.value })} /></label></div></fieldset>
         <fieldset><legend><DollarSign size={19} /> 2. Financeiro e PIX</legend><div className="settings-grid three"><label>Chave PIX<input value={settings.pix_key || ''} onChange={(e) => setSettings({ ...settings, pix_key: e.target.value })} /></label><label>Taxa de entrega base (R$)<input type="number" step="0.01" value={settings.delivery_fee || 0} onChange={(e) => setSettings({ ...settings, delivery_fee: e.target.value })} /></label><label>Pedido mínimo (R$)<input type="number" step="0.01" value={settings.minimum_order || 0} onChange={(e) => setSettings({ ...settings, minimum_order: e.target.value })} /></label></div></fieldset>
-        <fieldset><legend><Bike size={19} /> 3. Entrega</legend><label>Áreas/bairros de entrega<textarea value={settings.delivery_area_text || ''} onChange={(e) => setSettings({ ...settings, delivery_area_text: e.target.value })} /><small>Separe cada área ou bairro por vírgula.</small></label></fieldset>
+        <fieldset><legend><Bike size={19} /> 3. Entrega</legend><div className="settings-grid delivery-settings"><label>Previsão de entrega (minutos)<input type="number" min="5" value={settings.estimated_delivery_minutes || 35} onChange={(e) => setSettings({ ...settings, estimated_delivery_minutes: e.target.value })} /></label><label>Áreas/bairros de entrega<textarea value={settings.delivery_area_text || ''} onChange={(e) => setSettings({ ...settings, delivery_area_text: e.target.value })} /><small>Separe cada área ou bairro por vírgula.</small></label></div></fieldset>
         <fieldset><legend><KeyRound size={19} /> 4. Operação</legend><div className="settings-grid two"><label>Status da loja<select value={Number(settings.is_open ?? 1)} onChange={(e) => setSettings({ ...settings, is_open: e.target.value })}><option value="1">Aberto</option><option value="0">Fechado</option></select></label><label>Automação<select value={Number(settings.allow_whatsapp_redirect ?? 1)} onChange={(e) => setSettings({ ...settings, allow_whatsapp_redirect: e.target.value })}><option value="1">Abrir WhatsApp após pedido</option><option value="0">Não abrir WhatsApp</option></select></label></div></fieldset>
-        <div className="settings-actions"><button className="btn-primary"><Save size={19} /> Salvar configurações</button><button type="button" className="btn-secondary"><XCircle size={18} /> Cancelar alterações</button><button type="button" className="btn-secondary restore"><RotateCcw size={18} /> Restaurar padrão</button></div>
+        <div className="settings-actions"><button className="btn-primary"><Save size={19} /> Salvar configurações</button><button type="button" className="btn-secondary" onClick={onReload}><XCircle size={18} /> Cancelar alterações</button><button type="button" className="btn-secondary restore" onClick={() => setSettings({ ...settings, business_name: 'Hotdog Prensado', phone: '(18) 99195-9898', whatsapp: '5518991959898', delivery_fee: 2, minimum_order: 0, estimated_delivery_minutes: 35, is_open: 1, allow_whatsapp_redirect: 1 })}><RotateCcw size={18} /> Restaurar padrão</button></div>
       </form>
       <aside className="settings-reference-side">
         <section><h3><BarChart3 size={20} /> Resumo rápido</h3><div className="settings-summary"><span>Vendas<strong>{formatMoney(report?.summary?.gross)}</strong></span><span>Recebido<strong>{formatMoney(report?.summary?.paid)}</strong></span><span>Despesas<strong>{formatMoney(report?.summary?.expenses)}</strong></span><span>Líquido<strong>{formatMoney(report?.summary?.net)}</strong></span></div></section>
@@ -660,6 +660,7 @@ function AdminPremium() {
   const [productForm, setProductForm] = useState({ category_id: '', name: '', description: '', image_url: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
   const [manualCustomer, setManualCustomer] = useState({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
   const [manualOrder, setManualOrder] = useState({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
+  const [manualStep, setManualStep] = useState(1);
   const activeProducts = useMemo(() => products.filter((p) => Number(p.is_active) === 1 && p.product_type !== 'adicional'), [products]);
 
   async function loadAdmin() {
@@ -766,15 +767,24 @@ function AdminPremium() {
 
   async function createManualOrder(event) {
     event.preventDefault();
-    await api.admin.post('/api/admin/orders', { ...manualOrder, customer: manualCustomer, items: manualOrder.items.map((item) => ({ product_id: Number(item.product_id), quantity: Number(item.quantity || 1), extras: [], notes: '' })) });
+    await api.admin.post('/api/admin/orders', { ...manualOrder, customer: manualCustomer, items: manualOrder.items.filter((item) => item.product_id).map((item) => ({ product_id: Number(item.product_id), quantity: Number(item.quantity || 1), extras: (item.extras || []).map(Number), notes: '' })) });
     setManualCustomer({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
     setManualOrder({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
+    setManualStep(1);
     setMessage('Pedido criado no painel.');
     await loadAdmin();
   }
 
   function updateManualItem(index, field, value) {
     setManualOrder((current) => ({ ...current, items: current.items.map((item, itemIndex) => itemIndex === index ? { ...item, [field]: value } : item) }));
+  }
+
+  function toggleManualExtra(index, extraId) {
+    setManualOrder((current) => ({ ...current, items: current.items.map((item, itemIndex) => {
+      if (itemIndex !== index) return item;
+      const extras = item.extras || [];
+      return { ...item, extras: extras.includes(extraId) ? extras.filter((id) => id !== extraId) : [...extras, extraId] };
+    }) }));
   }
 
   const renderContent = () => {
@@ -787,34 +797,41 @@ function AdminPremium() {
     }
 
     if (tab === 'new-order') {
+      const snacks = activeProducts.filter((product) => product.product_type === 'hotdog');
+      const drinks = activeProducts.filter((product) => ['bebida', 'suco'].includes(product.product_type));
+      const manualExtras = products.filter((product) => product.product_type === 'adicional' && Number(product.is_active) === 1);
+      const snackItem = manualOrder.items[0] || { product_id: '', quantity: 1, extras: [] };
+      const drinkItem = manualOrder.items[1] || { product_id: '', quantity: 1, extras: [] };
+      const manualSubtotal = manualOrder.items.reduce((total, item) => {
+        const product = products.find((entry) => Number(entry.id) === Number(item.product_id));
+        const extrasTotal = (item.extras || []).reduce((sum, id) => sum + Number(products.find((entry) => Number(entry.id) === Number(id))?.price || 0), 0);
+        return total + (Number(product?.price || 0) + extrasTotal) * Number(item.quantity || 1);
+      }, 0);
+      const manualDelivery = manualOrder.delivery_type === 'entrega' ? Number(settings?.delivery_fee || 0) : 0;
       return (
-        <section className="panel big-form-panel counter-order-panel">
-          <div className="panel-title"><h3><Store size={21} /> Pedido manual / balcão</h3><span>Venda presencial, WhatsApp ou telefone</span></div>
-          <form onSubmit={createManualOrder} className="stack-form">
+        <section className="panel big-form-panel counter-order-panel unified-counter-order">
+          <div className="panel-title"><div><h3><Store size={21} /> Pedido manual / balcão</h3><p>Venda presencial, WhatsApp ou telefone</p></div><strong>Etapa {manualStep} de 4</strong></div>
+          <div className="counter-stepper">{['Lanche', 'Adicionais', 'Bebida', 'Finalizar'].map((label, index) => <button type="button" key={label} className={manualStep === index + 1 ? 'active' : manualStep > index + 1 ? 'done' : ''} onClick={() => setManualStep(index + 1)}><b>{index + 1}</b><span>{label}</span></button>)}</div>
+          <form onSubmit={createManualOrder} className={`stack-form manual-step-${manualStep}`}>
+            <section className="counter-step counter-step-1"><header><span>1</span><div><h4>Cliente e lanche</h4><p>Informe o cliente e escolha o prensado principal.</p></div></header>
             <div className="form-grid counter-customer-grid">
               <label className="counter-field"><span><Users size={17} /> Nome do cliente</span><input placeholder="Digite o nome do cliente" value={manualCustomer.name} onChange={(e) => setManualCustomer({ ...manualCustomer, name: e.target.value })} required /></label>
               <label className="counter-field"><span><Phone size={17} /> Telefone</span><input placeholder="(00) 00000-0000" value={manualCustomer.phone} onChange={(e) => setManualCustomer({ ...manualCustomer, phone: e.target.value })} required /></label>
               <label className="counter-field"><span><MapPin size={17} /> Endereço</span><input placeholder="Rua, número, complemento" value={manualCustomer.address} onChange={(e) => setManualCustomer({ ...manualCustomer, address: e.target.value })} /></label>
               <label className="counter-field"><span><Home size={17} /> Bairro</span><input placeholder="Digite o bairro" value={manualCustomer.neighborhood} onChange={(e) => setManualCustomer({ ...manualCustomer, neighborhood: e.target.value })} /></label>
             </div>
-            {manualOrder.items.map((item, index) => (
-              <div className="form-grid counter-product-grid" key={index}>
-                <label className="counter-field"><span><Package size={17} /> Produto</span><select value={item.product_id} onChange={(e) => updateManualItem(index, 'product_id', e.target.value)} required>
-                  <option value="">Selecione o produto</option>
-                  {activeProducts.map((product) => <option key={product.id} value={product.id}>{product.name} - {formatMoney(product.price)}</option>)}
-                </select></label>
-                <div className="counter-field counter-quantity"><span>Quantidade</span><div><button type="button" aria-label="Diminuir quantidade" onClick={() => updateManualItem(index, 'quantity', Math.max(1, Number(item.quantity || 1) - 1))}><Minus size={17} /></button><b>{item.quantity}</b><button type="button" aria-label="Aumentar quantidade" onClick={() => updateManualItem(index, 'quantity', Number(item.quantity || 1) + 1)}><Plus size={17} /></button></div></div>
-              </div>
-            ))}
-            <button type="button" className="btn-secondary" onClick={() => setManualOrder((current) => ({ ...current, items: [...current.items, { product_id: '', quantity: 1, extras: [] }] }))}>Adicionar item</button>
-            <div className="form-grid counter-options-grid">
+            <div className="form-grid counter-product-grid"><label className="counter-field"><span><Package size={17} /> Lanche</span><select value={snackItem.product_id} onChange={(e) => updateManualItem(0, 'product_id', e.target.value)} required><option value="">Selecione o lanche</option>{snacks.map((product) => <option key={product.id} value={product.id}>{product.name} — {formatMoney(product.price)}</option>)}</select></label><div className="counter-field counter-quantity"><span>Quantidade</span><div><button type="button" aria-label="Diminuir quantidade" onClick={() => updateManualItem(0, 'quantity', Math.max(1, Number(snackItem.quantity || 1) - 1))}><Minus size={17} /></button><b>{snackItem.quantity}</b><button type="button" aria-label="Aumentar quantidade" onClick={() => updateManualItem(0, 'quantity', Number(snackItem.quantity || 1) + 1)}><Plus size={17} /></button></div></div></div></section>
+            <section className="counter-step counter-step-2"><header><span>2</span><div><h4>Personalize o lanche</h4><p>Selecione os adicionais; os valores entram no resumo.</p></div></header><div className="manual-extra-grid">{manualExtras.map((extra) => <button type="button" key={extra.id} className={(snackItem.extras || []).includes(extra.id) ? 'active' : ''} onClick={() => toggleManualExtra(0, extra.id)}><Plus size={17} /><span>{extra.name}</span><b>{formatMoney(extra.price)}</b></button>)}</div></section>
+            <section className="counter-step counter-step-3"><header><span>3</span><div><h4>Quer uma bebida?</h4><p>Adicione uma bebida ou avance sem escolher.</p></div></header><div className="form-grid counter-product-grid"><label className="counter-field"><span><ShoppingBag size={17} /> Bebida</span><select value={drinkItem.product_id || ''} onChange={(e) => setManualOrder((current) => ({ ...current, items: e.target.value ? [current.items[0], { product_id: e.target.value, quantity: 1, extras: [] }] : [current.items[0]] }))}><option value="">Sem bebida</option>{drinks.map((product) => <option key={product.id} value={product.id}>{product.name} — {formatMoney(product.price)}</option>)}</select></label>{drinkItem.product_id && <div className="counter-field counter-quantity"><span>Quantidade</span><div><button type="button" aria-label="Diminuir bebida" onClick={() => updateManualItem(1, 'quantity', Math.max(1, Number(drinkItem.quantity || 1) - 1))}><Minus size={17} /></button><b>{drinkItem.quantity}</b><button type="button" aria-label="Aumentar bebida" onClick={() => updateManualItem(1, 'quantity', Number(drinkItem.quantity || 1) + 1)}><Plus size={17} /></button></div></div>}</div></section>
+            <section className="counter-step counter-step-4"><header><span>4</span><div><h4>Revise e finalize</h4><p>Confira entrega, pagamento e total antes de criar.</p></div></header><div className="form-grid counter-options-grid">
               <label className="counter-field"><span><Truck size={17} /> Entrega</span><select value={manualOrder.delivery_type} onChange={(e) => setManualOrder({ ...manualOrder, delivery_type: e.target.value })}><option value="entrega">Entrega</option><option value="retirada">Retirada</option></select></label>
               <label className="counter-field"><span><DollarSign size={17} /> Pagamento</span><select value={manualOrder.payment_method} onChange={(e) => setManualOrder({ ...manualOrder, payment_method: e.target.value })}><option value="dinheiro">Dinheiro</option><option value="pix">PIX</option><option value="cartao">Cartão</option><option value="fiado">Fiado</option></select></label>
               <label className="counter-field"><span><Clock size={17} /> Status</span><select value={manualOrder.payment_status} onChange={(e) => setManualOrder({ ...manualOrder, payment_status: e.target.value })}><option value="pendente">Pendente</option><option value="pago">Pago</option></select></label>
               <label className="counter-field"><span><Store size={17} /> Origem</span><select value={manualOrder.order_source} onChange={(e) => setManualOrder({ ...manualOrder, order_source: e.target.value })}><option value="balcao">Balcão</option><option value="admin">Admin</option><option value="whatsapp">WhatsApp</option></select></label>
             </div>
             <label className="counter-field counter-notes"><span><Plus size={17} /> Observações</span><textarea placeholder="Informações adicionais sobre o pedido (opcional)" value={manualOrder.notes} onChange={(e) => setManualOrder({ ...manualOrder, notes: e.target.value })} /></label>
-            <button className="btn-primary"><ShoppingBag size={20} /> Criar pedido</button>
+            <aside className="manual-order-summary"><div><span>Subtotal</span><b>{formatMoney(manualSubtotal)}</b></div><div><span>Entrega</span><b>{formatMoney(manualDelivery)}</b></div><strong><span>Total</span><b>{formatMoney(manualSubtotal + manualDelivery)}</b></strong></aside></section>
+            <footer className="counter-navigation">{manualStep > 1 && <button type="button" className="btn-secondary" onClick={() => setManualStep((step) => step - 1)}>Voltar</button>}{manualStep < 4 ? <button type="button" className="btn-primary" onClick={() => setManualStep((step) => step + 1)}>Continuar</button> : <button className="btn-primary"><ShoppingBag size={20} /> Criar pedido</button>}</footer>
           </form>
         </section>
       );
@@ -916,7 +933,7 @@ function AdminPremium() {
     }
 
     if (tab === 'settings' && settings) {
-      return <SettingsReference settings={settings} setSettings={setSettings} report={report} saveSettings={saveSettings} setTab={setTab} />;
+      return <SettingsReference settings={settings} setSettings={setSettings} report={report} saveSettings={saveSettings} setTab={setTab} onReload={loadAdmin} />;
     }
 
     if (tab === 'settings-legacy' && settings) {
@@ -948,7 +965,7 @@ function AdminPremium() {
           </div>
         </header>
 
-        {['new-order', 'products', 'finance', 'customers', 'settings'].includes(tab) && <AdminCounterToolbar onRefresh={loadAdmin} />}
+        {tab === 'orders' && <AdminCounterToolbar onRefresh={loadAdmin} />}
         {message && <p className="notice admin-message">{message}</p>}
         {renderContent()}
         <footer className="admin-footer">© 2026 Hotdog Prensado • Painel Premium de Pedidos e Gestao</footer>
