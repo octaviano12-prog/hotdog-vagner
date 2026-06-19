@@ -83,7 +83,12 @@ function ensureOfferShowcase() {
 function bootOfferShowcase() {
   if (offerShowcase.booted || !isPublicHome()) return;
   offerShowcase.booted = true;
-  setInterval(ensureOfferShowcase, 1200);
+  const applyShowcase = () => {
+    ensureOfferShowcase();
+    window.__markHotdogHomeReady?.('offer');
+  };
+  window.addEventListener('hotdog:home-images-ready', applyShowcase, { once: true });
+  if (document.body.classList.contains('site-images-v2')) applyShowcase();
   setInterval(() => {
     const section = document.querySelector('.offer-showcase-v2');
     if (!section) return;
@@ -93,4 +98,3 @@ function bootOfferShowcase() {
 }
 
 bootOfferShowcase();
-
