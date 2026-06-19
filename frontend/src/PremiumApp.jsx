@@ -411,6 +411,7 @@ function PremiumLogin({ onLogin }) {
     <main className="admin-login-page">
       <section className="admin-login-showcase">
         <div className="login-showcase-badge"><span>🌭</span><div><strong>Hot Dog do Vagner</strong><small>Central de operações</small></div></div>
+        <img className="login-hotdog-art" src="/images/admin-login-hotdog.png" alt="Hot dog do Vagner" />
         <div className="login-showcase-copy">
           <span className="login-eyebrow"><Activity size={15} /> Gestão em tempo real</span>
           <h1>Seu delivery<br /><em>sob controle.</em></h1>
