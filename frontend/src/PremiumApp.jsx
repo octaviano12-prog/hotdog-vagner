@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
   BarChart3,
+  Activity,
+  ArrowRight,
   Bike,
   Building2,
   CalendarDays,
@@ -9,12 +11,16 @@ import {
   CheckCircle,
   Clock,
   DollarSign,
+  Eye,
+  EyeOff,
   Flame,
   Home,
   History,
   KeyRound,
+  LockKeyhole,
   LogOut,
   MapPin,
+  Mail,
   Menu,
   Minus,
   Package,
@@ -380,8 +386,9 @@ function PremiumHome({ settings, navigate }) {
 }
 
 function PremiumLogin({ onLogin }) {
-  const [email, setEmail] = useState('admin@hotdog.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -402,21 +409,33 @@ function PremiumLogin({ onLogin }) {
 
   return (
     <main className="admin-login-page">
+      <section className="admin-login-showcase">
+        <div className="login-showcase-badge"><span>🌭</span><div><strong>Hot Dog do Vagner</strong><small>Central de operações</small></div></div>
+        <div className="login-showcase-copy">
+          <span className="login-eyebrow"><Activity size={15} /> Gestão em tempo real</span>
+          <h1>Seu delivery<br /><em>sob controle.</em></h1>
+          <p>Acompanhe pedidos, produção, entregas e resultados em um painel feito para a rotina do negócio.</p>
+        </div>
+        <div className="login-showcase-metrics">
+          <article><ShoppingBag size={20} /><div><strong>Pedidos organizados</strong><small>Da entrada até a entrega</small></div></article>
+          <article><WalletCards size={20} /><div><strong>Financeiro integrado</strong><small>Caixa e resultados do dia</small></div></article>
+          <article><ShieldCheck size={20} /><div><strong>Acesso protegido</strong><small>Área exclusiva do gestor</small></div></article>
+        </div>
+        <div className="login-operation-status"><i /> Sistema operacional <span>•</span> Pronto para receber pedidos</div>
+      </section>
       <section className="login-card premium-login">
-        <span className="hero-pill"><ShieldCheck size={16} /> Acesso do gestor</span>
-        <h2>Painel administrativo premium</h2>
-        <p className="muted">Controle pedidos, produtos, caixa, despesas, clientes e configuracoes do delivery.</p>
+        <div className="login-card-icon"><ShieldCheck size={26} /></div>
+        <span className="hero-pill"><ShieldCheck size={16} /> Área segura</span>
+        <h2>Bem-vindo de volta</h2>
+        <p className="muted">Entre com os dados do administrador para acessar o painel.</p>
         <form onSubmit={submit}>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="E-mail" />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Senha" />
-          <button className="btn-primary" disabled={loading}>{loading ? 'Entrando...' : 'Entrar no painel'}</button>
+          <label><span>E-mail</span><div className="login-input-wrap"><Mail size={18} /><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@hotdog.com" autoComplete="username" required /></div></label>
+          <label><span>Senha</span><div className="login-input-wrap"><LockKeyhole size={18} /><input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Digite sua senha" autoComplete="current-password" required /><button type="button" className="login-password-toggle" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></label>
+          <button className="btn-primary login-submit" disabled={loading}>{loading ? 'Entrando...' : <><span>Entrar no painel</span><ArrowRight size={19} /></>}</button>
         </form>
         {message && <p className="notice error">{message}</p>}
-      </section>
-      <section className="login-benefits">
-        <div><strong>Pedidos em tempo real</strong><span>Acompanhe a fila por status.</span></div>
-        <div><strong>Caixa completo</strong><span>Abra, feche e registre movimentos.</span></div>
-        <div><strong>Relatorios</strong><span>Veja vendas, pendencias e liquido do dia.</span></div>
+        <div className="login-security-note"><LockKeyhole size={15} /><span>Conexão segura e acesso restrito ao administrador.</span></div>
+        <a href="/" className="login-back-link">← Voltar para o cardápio</a>
       </section>
     </main>
   );
