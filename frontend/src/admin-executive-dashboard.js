@@ -114,10 +114,16 @@ function hourlySales(orders) {
 }
 
 function completionRate(orders) {
-  const finished = orders.filter((order) => order.status === 'concluido').length;
+  if (!orders.length) return 100;
   const canceled = orders.filter((order) => order.status === 'cancelado').length;
-  const base = orders.length || 1;
-  return Math.max(0, Math.round(((finished + orders.filter((order) => order.status === 'saiu_entrega').length) / base) * 100 - canceled * 2));
+  return Math.max(0, Math.round(100 - (canceled / orders.length) * 100));
+}
+
+function isToday(order) {
+  if (!order?.created_at) return false;
+  const date = new Date(order.created_at);
+  const now = new Date();
+  return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
 }
 
 function customerStats(customers, orders) {
@@ -175,18 +181,19 @@ function renderExecutiveDashboard(data) {
   const node = ensureContainer();
   if (!node) return;
   const { orders = [], summary = {}, dashboard = {}, customers = [] } = data || {};
+  const today = orders.filter(isToday);
   const todayOrders = Number(summary?.orders_today || orders.length || 0);
   const ticket = todayOrders ? Number(summary?.gross_today || 0) / todayOrders : 0;
   const paid = Number(summary?.paid_today || 0);
   const pending = Number(summary?.pending_today || 0);
   const gross = Number(summary?.gross_today || 0);
   const net = Number(summary?.net_today || gross - pending);
-  const clients = customerStats(customers, orders);
-  const products = topProducts(orders, dashboard);
-  const statuses = statusCounts(orders);
-  const payments = paymentTotals(orders);
-  const salesHours = hourlySales(orders);
-  const rate = completionRate(orders);
+  const clients = customerStats(customers, today);
+  const products = topProducts(today, null);
+  const statuses = statusCounts(today);
+  const payments = paymentTotals(today);
+  const salesHours = hourlySales(today);
+  const rate = completionRate(today);
 
   node.innerHTML = `
     <div class="exec-hero">
@@ -213,7 +220,7 @@ function renderExecutiveDashboard(data) {
       ${renderBarChart('Formas de pagamento', 'Participacao por valor', payments.length ? payments : [{ name: 'Sem vendas', total: 0 }], 'total', money)}
       ${renderBarChart('Produtos mais vendidos', 'Ranking de itens', products.length ? products : [{ name: 'Sem vendas', qty: 0 }], 'qty', (v) => `${v || 0}x`)}
       ${renderLatestOrders(orders)}
-      ${renderAlerts(orders, summary)}
+      ${renderAlerts(today, summary)}
     </section>
   `;
 
