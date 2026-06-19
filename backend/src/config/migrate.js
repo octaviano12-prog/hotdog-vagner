@@ -141,6 +141,10 @@ async function initDatabase() {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
   await ensureColumn('expenses', 'payment_method', "ENUM('dinheiro', 'pix', 'cartao', 'fiado') NULL DEFAULT 'dinheiro'");
+  await ensureColumn('expenses', 'notes', 'TEXT NULL');
+  await ensureColumn('expenses', 'cash_movement_id', 'INT NULL');
+  await ensureColumn('expenses', 'is_active', 'TINYINT(1) NOT NULL DEFAULT 1');
+  await ensureColumn('expenses', 'created_by', 'INT NULL');
 
   await run(`CREATE TABLE IF NOT EXISTS cash_registers (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -154,6 +158,10 @@ async function initDatabase() {
     CONSTRAINT fk_cash_opened_by FOREIGN KEY (opened_by) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT fk_cash_closed_by FOREIGN KEY (closed_by) REFERENCES users(id) ON DELETE SET NULL
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+  await ensureColumn('cash_registers', 'expected_closing_amount', 'DECIMAL(10,2) NULL');
+  await ensureColumn('cash_registers', 'difference_amount', 'DECIMAL(10,2) NULL');
+  await ensureColumn('cash_registers', 'opening_notes', 'TEXT NULL');
+  await ensureColumn('cash_registers', 'closing_notes', 'TEXT NULL');
 
   await run(`CREATE TABLE IF NOT EXISTS cash_movements (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -167,6 +175,12 @@ async function initDatabase() {
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
   await ensureColumn('cash_movements', 'order_id', 'INT NULL');
   await ensureColumn('cash_movements', 'notes', 'TEXT NULL');
+  await ensureColumn('cash_movements', 'category', "VARCHAR(80) NOT NULL DEFAULT 'Geral'");
+  await ensureColumn('cash_movements', 'source_type', "VARCHAR(30) NOT NULL DEFAULT 'manual'");
+  await ensureColumn('cash_movements', 'status', "ENUM('ativo', 'estornado') NOT NULL DEFAULT 'ativo'");
+  await ensureColumn('cash_movements', 'created_by', 'INT NULL');
+  await ensureColumn('cash_movements', 'reversed_at', 'TIMESTAMP NULL');
+  await ensureColumn('cash_movements', 'reversal_reason', 'VARCHAR(255) NULL');
 
   await run(
     `INSERT IGNORE INTO settings (id, business_name, phone, whatsapp, delivery_fee, is_open, estimated_delivery_minutes, allow_whatsapp_redirect)

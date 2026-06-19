@@ -10,6 +10,15 @@ function todaySql() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function dateRange(req) {
+  const valid = /^\d{4}-\d{2}-\d{2}$/;
+  const today = todaySql();
+  const monthStart = `${today.slice(0, 8)}01`;
+  const from = valid.test(String(req.query.from || '')) ? req.query.from : monthStart;
+  const to = valid.test(String(req.query.to || '')) ? req.query.to : today;
+  return from <= to ? { from, to } : { from: to, to: from };
+}
+
 async function getSettings() {
   const rows = await query('SELECT * FROM settings ORDER BY id ASC LIMIT 1');
   return rows[0] || null;
@@ -227,47 +236,143 @@ function registerPremiumRoutes(app) {
   app.get('/api/admin/finance/cash/current', authRequired, adminRequired, async (_req, res) => {
     const register = await getOpenCashRegister();
     if (!register) return res.json({ register: null, totals: null, movements: [] });
-    const movements = await query('SELECT * FROM cash_movements WHERE cash_register_id = ? ORDER BY created_at DESC, id DESC LIMIT 100', [register.id]);
+    const movements = await query("SELECT * FROM cash_movements WHERE cash_register_id = ? ORDER BY created_at DESC, id DESC LIMIT 200", [register.id]);
     const [totals] = await query(
       `SELECT COALESCE(SUM(CASE WHEN movement_type = 'entrada' THEN amount ELSE 0 END), 0) AS entradas,
               COALESCE(SUM(CASE WHEN movement_type = 'saida' THEN amount ELSE 0 END), 0) AS saidas
-       FROM cash_movements WHERE cash_register_id = ?`,
+       FROM cash_movements WHERE cash_register_id = ? AND status = 'ativo'`,
       [register.id]
     );
     return res.json({ register, totals: { ...totals, saldo: money(register.opening_amount + totals.entradas - totals.saidas) }, movements });
   });
 
   app.post('/api/admin/finance/cash/open', authRequired, adminRequired, async (req, res) => {
-    const schema = z.object({ opening_amount: z.number().nonnegative().default(0) });
+    const schema = z.object({ opening_amount: z.number().nonnegative().default(0), opening_notes: z.string().optional().default('') });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: 'Valor de abertura invalido.' });
     const open = await getOpenCashRegister();
     if (open) return res.status(400).json({ message: 'Ja existe um caixa aberto.' });
-    const result = await query('INSERT INTO cash_registers (opened_by, opening_amount) VALUES (?, ?)', [req.user?.id || null, money(parsed.data.opening_amount)]);
+    const result = await query('INSERT INTO cash_registers (opened_by, opening_amount, opening_notes) VALUES (?, ?, ?)', [req.user?.id || null, money(parsed.data.opening_amount), parsed.data.opening_notes]);
     return res.status(201).json({ message: 'Caixa aberto.', id: result.insertId });
   });
 
   app.post('/api/admin/finance/cash/close', authRequired, adminRequired, async (req, res) => {
-    const schema = z.object({ closing_amount: z.number().nonnegative() });
+    const schema = z.object({ closing_amount: z.number().nonnegative(), closing_notes: z.string().optional().default('') });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: 'Valor de fechamento invalido.' });
     const open = await getOpenCashRegister();
     if (!open) return res.status(400).json({ message: 'Nao existe caixa aberto.' });
-    await query("UPDATE cash_registers SET status = 'fechado', closed_by = ?, closing_amount = ?, closed_at = CURRENT_TIMESTAMP WHERE id = ?", [req.user?.id || null, money(parsed.data.closing_amount), open.id]);
-    return res.json({ message: 'Caixa fechado.' });
+    const [totals] = await query(
+      `SELECT COALESCE(SUM(CASE WHEN movement_type = 'entrada' AND status = 'ativo' THEN amount ELSE 0 END), 0) AS entradas,
+              COALESCE(SUM(CASE WHEN movement_type = 'saida' AND status = 'ativo' THEN amount ELSE 0 END), 0) AS saidas
+       FROM cash_movements WHERE cash_register_id = ?`, [open.id]
+    );
+    const expected = money(open.opening_amount + totals.entradas - totals.saidas);
+    const counted = money(parsed.data.closing_amount);
+    const difference = money(counted - expected);
+    await query(
+      "UPDATE cash_registers SET status = 'fechado', closed_by = ?, closing_amount = ?, expected_closing_amount = ?, difference_amount = ?, closing_notes = ?, closed_at = CURRENT_TIMESTAMP WHERE id = ?",
+      [req.user?.id || null, counted, expected, difference, parsed.data.closing_notes, open.id]
+    );
+    return res.json({ message: 'Caixa fechado e conferido.', expected_closing_amount: expected, difference_amount: difference });
   });
 
   app.post('/api/admin/finance/cash/movements', authRequired, adminRequired, async (req, res) => {
-    const schema = z.object({ movement_type: z.enum(['entrada', 'saida']), description: z.string().min(2), amount: z.number().positive(), payment_method: z.enum(['dinheiro', 'pix', 'cartao', 'fiado']).optional().default('dinheiro'), notes: z.string().optional().default('') });
+    const schema = z.object({ movement_type: z.enum(['entrada', 'saida']), description: z.string().min(2), amount: z.number().positive(), payment_method: z.enum(['dinheiro', 'pix', 'cartao', 'fiado']).optional().default('dinheiro'), category: z.string().optional().default('Geral'), notes: z.string().optional().default('') });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: 'Movimento invalido.' });
     const open = await getOpenCashRegister();
+    if (!open) return res.status(400).json({ message: 'Abra o caixa antes de registrar movimentos manuais.' });
     const result = await query(
-      `INSERT INTO cash_movements (cash_register_id, movement_type, description, amount, payment_method, notes)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [open?.id || null, parsed.data.movement_type, parsed.data.description, money(parsed.data.amount), parsed.data.payment_method, parsed.data.notes]
+      `INSERT INTO cash_movements (cash_register_id, movement_type, description, amount, payment_method, notes, category, source_type, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'manual', ?)`,
+      [open.id, parsed.data.movement_type, parsed.data.description, money(parsed.data.amount), parsed.data.payment_method, parsed.data.notes, parsed.data.category, req.user?.id || null]
     );
     return res.status(201).json({ message: 'Movimento registrado.', id: result.insertId });
+  });
+
+  app.get('/api/admin/finance/overview', authRequired, adminRequired, async (req, res) => {
+    const { from, to } = dateRange(req);
+    const [orders] = await query(
+      `SELECT COUNT(CASE WHEN status <> 'cancelado' THEN 1 END) AS orders_count,
+              COALESCE(SUM(CASE WHEN status <> 'cancelado' THEN total ELSE 0 END), 0) AS gross,
+              COALESCE(SUM(CASE WHEN payment_status = 'pago' AND status <> 'cancelado' THEN total ELSE 0 END), 0) AS paid,
+              COALESCE(SUM(CASE WHEN payment_status = 'pendente' AND status <> 'cancelado' THEN total ELSE 0 END), 0) AS pending
+       FROM orders WHERE DATE(created_at) BETWEEN ? AND ?`, [from, to]
+    );
+    const [expenseTotals] = await query('SELECT COALESCE(SUM(amount), 0) AS expenses FROM expenses WHERE is_active = 1 AND expense_date BETWEEN ? AND ?', [from, to]);
+    const [manualTotals] = await query(
+      `SELECT COALESCE(SUM(CASE WHEN movement_type = 'entrada' THEN amount ELSE 0 END), 0) AS manual_entries,
+              COALESCE(SUM(CASE WHEN movement_type = 'saida' AND source_type <> 'expense' THEN amount ELSE 0 END), 0) AS withdrawals
+       FROM cash_movements WHERE status = 'ativo' AND order_id IS NULL AND DATE(created_at) BETWEEN ? AND ?`, [from, to]
+    );
+    const payment_methods = await query(
+      `SELECT payment_method, COALESCE(SUM(total), 0) AS total, COUNT(*) AS quantity
+       FROM orders WHERE payment_status = 'pago' AND status <> 'cancelado' AND DATE(created_at) BETWEEN ? AND ?
+       GROUP BY payment_method ORDER BY total DESC`, [from, to]
+    );
+    const daily = await query(
+      `SELECT DATE(created_at) AS day,
+              COALESCE(SUM(CASE WHEN status <> 'cancelado' THEN total ELSE 0 END), 0) AS gross,
+              COALESCE(SUM(CASE WHEN payment_status = 'pago' AND status <> 'cancelado' THEN total ELSE 0 END), 0) AS paid,
+              COUNT(CASE WHEN status <> 'cancelado' THEN 1 END) AS orders_count
+       FROM orders WHERE DATE(created_at) BETWEEN ? AND ? GROUP BY DATE(created_at) ORDER BY day DESC`, [from, to]
+    );
+    const net = money(orders.paid + manualTotals.manual_entries - expenseTotals.expenses - manualTotals.withdrawals);
+    return res.json({ from, to, summary: { ...orders, ...expenseTotals, ...manualTotals, net }, payment_methods, daily });
+  });
+
+  app.get('/api/admin/finance/cash/history', authRequired, adminRequired, async (req, res) => {
+    const { from, to } = dateRange(req);
+    const rows = await query(
+      `SELECT cr.*,
+              opener.name AS opened_by_name, closer.name AS closed_by_name,
+              COALESCE(SUM(CASE WHEN cm.movement_type = 'entrada' AND cm.status = 'ativo' THEN cm.amount ELSE 0 END), 0) AS entradas,
+              COALESCE(SUM(CASE WHEN cm.movement_type = 'saida' AND cm.status = 'ativo' THEN cm.amount ELSE 0 END), 0) AS saidas,
+              COUNT(CASE WHEN cm.status = 'ativo' THEN 1 END) AS movement_count
+       FROM cash_registers cr
+       LEFT JOIN cash_movements cm ON cm.cash_register_id = cr.id
+       LEFT JOIN users opener ON opener.id = cr.opened_by
+       LEFT JOIN users closer ON closer.id = cr.closed_by
+       WHERE DATE(cr.opened_at) BETWEEN ? AND ?
+       GROUP BY cr.id ORDER BY cr.opened_at DESC, cr.id DESC LIMIT 180`, [from, to]
+    );
+    return res.json(rows.map((row) => ({ ...row, expected_amount: money(row.opening_amount + row.entradas - row.saidas), difference_amount: row.difference_amount == null && row.closing_amount != null ? money(row.closing_amount - (row.opening_amount + row.entradas - row.saidas)) : row.difference_amount })));
+  });
+
+  app.get('/api/admin/finance/ledger', authRequired, adminRequired, async (req, res) => {
+    const { from, to } = dateRange(req);
+    const allowedTypes = new Set(['entrada', 'saida']);
+    const allowedMethods = new Set(['dinheiro', 'pix', 'cartao', 'fiado']);
+    const params = [from, to];
+    let filters = '';
+    if (allowedTypes.has(req.query.type)) { filters += ' AND cm.movement_type = ?'; params.push(req.query.type); }
+    if (allowedMethods.has(req.query.payment_method)) { filters += ' AND cm.payment_method = ?'; params.push(req.query.payment_method); }
+    const rows = await query(
+      `SELECT cm.*, cr.status AS cash_status, cr.opened_at AS cash_opened_at, u.name AS created_by_name
+       FROM cash_movements cm
+       LEFT JOIN cash_registers cr ON cr.id = cm.cash_register_id
+       LEFT JOIN users u ON u.id = cm.created_by
+       WHERE DATE(cm.created_at) BETWEEN ? AND ? ${filters}
+       ORDER BY cm.created_at DESC, cm.id DESC LIMIT 600`, params
+    );
+    return res.json(rows);
+  });
+
+  app.post('/api/admin/finance/movements/:id/reverse', authRequired, adminRequired, async (req, res) => {
+    const schema = z.object({ reason: z.string().min(3).max(255) });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: 'Informe o motivo do estorno.' });
+    const rows = await query('SELECT * FROM cash_movements WHERE id = ? LIMIT 1', [req.params.id]);
+    const movement = rows[0];
+    if (!movement) return res.status(404).json({ message: 'Movimento nao encontrado.' });
+    if (movement.order_id) return res.status(400).json({ message: 'Recebimentos de pedidos devem ser corrigidos no proprio pedido.' });
+    if (movement.status === 'estornado') return res.status(400).json({ message: 'Movimento ja estornado.' });
+    await transaction(async (connection) => {
+      await connection.execute("UPDATE cash_movements SET status = 'estornado', reversed_at = CURRENT_TIMESTAMP, reversal_reason = ? WHERE id = ?", [parsed.data.reason, movement.id]);
+      if (movement.source_type === 'expense') await connection.execute('UPDATE expenses SET is_active = 0 WHERE cash_movement_id = ?', [movement.id]);
+    });
+    return res.json({ message: 'Movimento estornado com rastreabilidade.' });
   });
 
   app.get('/api/admin/reports/sales', authRequired, adminRequired, async (req, res) => {

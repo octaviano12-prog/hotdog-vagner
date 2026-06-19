@@ -72,6 +72,12 @@ const paymentLabels = {
   fiado: 'Fiado'
 };
 
+function currentMonthRange() {
+  const now = new Date();
+  const to = now.toISOString().slice(0, 10);
+  return { from: `${to.slice(0, 8)}01`, to, type: '', payment_method: '' };
+}
+
 const adminTabs = [
   ['dashboard', 'Dashboard', Home],
   ['orders', 'Pedidos', ShoppingBag],
@@ -636,6 +642,58 @@ function SettingsReference({ settings, setSettings, report, saveSettings, setTab
   );
 }
 
+function FinanceComplete({ cash, summary, overviewData, cashHistory, ledger, financeView, setFinanceView, financeFilters, setFinanceFilters, applyFilters, expense, setExpense, saveExpense, movement, setMovement, saveMovement, openValue, setOpenValue, openNotes, setOpenNotes, openCash, closeValue, setCloseValue, closeNotes, setCloseNotes, closeCash, reverseMovement }) {
+  const entries = Number(cash?.totals?.entradas || 0);
+  const exits = Number(cash?.totals?.saidas || 0);
+  const balance = Number(cash?.totals?.saldo || 0);
+  const overview = overviewData?.summary || {};
+  const net = Number(overview.net || summary?.net_today || 0);
+  const expectedCash = cash?.register ? Number(cash.register.opening_amount || 0) + entries - exits : 0;
+  const closeDifference = Number(closeValue || 0) - expectedCash;
+  const dateTime = (value) => value ? new Date(value).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+  const exportFinance = () => {
+    const rows = [['Data', 'Tipo', 'Descrição', 'Categoria', 'Pagamento', 'Caixa', 'Valor', 'Status'], ...ledger.map((item) => [dateTime(item.created_at), item.movement_type, item.description, item.category || 'Geral', paymentLabels[item.payment_method] || item.payment_method, item.cash_register_id || 'Sem caixa', Number(item.amount || 0).toFixed(2), item.status])];
+    const csv = rows.map((row) => row.map((cell) => `"${String(cell ?? '').replaceAll('"', '""')}"`).join(';')).join('\n');
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' }));
+    link.download = `financeiro-${financeFilters.from}-${financeFilters.to}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
+  return <section className="admin-finance-reference finance-complete">
+    <header className="finance-control-head">
+      <div><span>Gestão financeira</span><h2>Financeiro completo</h2><p>Caixa, despesas, resultados e auditoria em um só lugar.</p></div>
+      <form onSubmit={applyFilters} className="finance-period-form"><label>De<input type="date" value={financeFilters.from} onChange={(e) => setFinanceFilters({ ...financeFilters, from: e.target.value })} /></label><label>Até<input type="date" value={financeFilters.to} onChange={(e) => setFinanceFilters({ ...financeFilters, to: e.target.value })} /></label><button className="btn-secondary"><Search size={17} /> Aplicar</button><button type="button" className="btn-secondary" onClick={exportFinance}><Printer size={17} /> Exportar CSV</button></form>
+    </header>
+    <nav className="finance-view-tabs" aria-label="Seções financeiras">{[['overview', 'Visão geral'], ['cash', 'Caixa atual'], ['history', 'Histórico de caixas'], ['ledger', 'Extrato completo']].map(([key, label]) => <button type="button" key={key} className={financeView === key ? 'active' : ''} onClick={() => setFinanceView(key)}>{label}</button>)}</nav>
+    <div className="finance-reference-metrics">
+      <article className="balance"><span><WalletCards size={28} /></span><div><small>Saldo do caixa atual</small><strong>{formatMoney(balance)}</strong><em>{cash?.register ? `Caixa #${cash.register.id} aberto` : 'Nenhum caixa aberto'}</em></div></article>
+      <article className="entries"><span><RefreshCw size={28} /></span><div><small>Recebido no período</small><strong>{formatMoney(overview.paid)}</strong><em>{Number(overview.orders_count || 0)} pedidos válidos</em></div></article>
+      <article className="exits"><span><LogOut size={28} /></span><div><small>Despesas no período</small><strong>{formatMoney(overview.expenses)}</strong><em>Retiradas: {formatMoney(overview.withdrawals)}</em></div></article>
+      <article className="net"><span><DollarSign size={28} /></span><div><small>Resultado líquido</small><strong>{formatMoney(net)}</strong><em>A receber: {formatMoney(overview.pending)}</em></div></article>
+    </div>
+
+    {financeView === 'overview' && <div className="finance-overview-grid">
+      <section className="panel finance-performance-panel"><div className="panel-title"><h3><BarChart3 size={20} /> Fechamento do período</h3><span>{financeFilters.from} até {financeFilters.to}</span></div><div className="finance-summary-list"><span>Faturamento bruto<strong>{formatMoney(overview.gross)}</strong></span><span>Recebido<strong className="positive">{formatMoney(overview.paid)}</strong></span><span>A receber<strong className="warning">{formatMoney(overview.pending)}</strong></span><span>Entradas manuais<strong>{formatMoney(overview.manual_entries)}</strong></span><span>Despesas<strong className="negative">- {formatMoney(overview.expenses)}</strong></span><span>Retiradas<strong className="negative">- {formatMoney(overview.withdrawals)}</strong></span><b>Resultado líquido<strong>{formatMoney(net)}</strong></b></div></section>
+      <section className="panel finance-payment-panel"><div className="panel-title"><h3><WalletCards size={20} /> Formas de pagamento</h3></div><div className="finance-payment-list">{(overviewData.payment_methods || []).map((item) => <article key={item.payment_method}><span>{paymentLabels[item.payment_method] || item.payment_method}</span><div><i style={{ width: `${Math.min(100, Number(item.total || 0) / Math.max(1, Number(overview.paid || 0)) * 100)}%` }} /></div><strong>{formatMoney(item.total)}</strong><small>{item.quantity} pedidos</small></article>)}{!(overviewData.payment_methods || []).length && <p className="reference-empty">Nenhum recebimento no período.</p>}</div></section>
+      <section className="panel finance-daily-panel"><div className="panel-title"><h3><CalendarDays size={20} /> Movimento diário</h3></div><div className="finance-table-wrap"><table><thead><tr><th>Data</th><th>Pedidos</th><th>Faturamento</th><th>Recebido</th></tr></thead><tbody>{(overviewData.daily || []).map((day) => <tr key={day.day}><td>{new Date(`${String(day.day).slice(0, 10)}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{day.orders_count}</td><td>{formatMoney(day.gross)}</td><td className="positive">{formatMoney(day.paid)}</td></tr>)}</tbody></table>{!(overviewData.daily || []).length && <p className="reference-empty">Sem movimento no período.</p>}</div></section>
+    </div>}
+
+    {financeView === 'cash' && <div className="finance-reference-grid">
+      <section className="panel finance-cash-panel"><div className="panel-title"><h3><WalletCards size={20} /> {cash?.register ? `Caixa #${cash.register.id} em operação` : 'Abrir novo caixa'}</h3><span className={cash?.register ? 'cash-open-badge' : 'cash-closed-badge'}>{cash?.register ? 'Aberto' : 'Fechado'}</span></div>
+        {cash?.register ? <><div className="cash-live-summary"><span>Aberto em<strong>{dateTime(cash.register.opened_at)}</strong></span><span>Valor inicial<strong>{formatMoney(cash.register.opening_amount)}</strong></span><span>Entradas<strong className="positive">{formatMoney(entries)}</strong></span><span>Saídas<strong className="negative">{formatMoney(exits)}</strong></span><b>Saldo esperado<strong>{formatMoney(expectedCash)}</strong></b></div><form onSubmit={closeCash} className="finance-open-form"><label>Valor contado no fechamento<div><span>R$</span><input type="number" min="0" step="0.01" value={closeValue} onChange={(e) => setCloseValue(e.target.value)} required /></div></label><label>Observação do fechamento<textarea placeholder="Conferido com dinheiro, PIX e maquininha" value={closeNotes} onChange={(e) => setCloseNotes(e.target.value)} /></label><div className={`cash-difference ${Math.abs(closeDifference) < .01 ? 'ok' : 'attention'}`}><span>Diferença prevista</span><strong>{formatMoney(closeDifference)}</strong></div><button className="btn-primary"><WalletCards size={19} /> Conferir e fechar caixa</button></form></> : <form onSubmit={openCash} className="finance-open-form"><label>Fundo de troco inicial<div><span>R$</span><input type="number" min="0" step="0.01" value={openValue} onChange={(e) => setOpenValue(e.target.value)} required /></div></label><label>Observação da abertura<textarea placeholder="Ex.: caixa recebido do turno anterior" value={openNotes} onChange={(e) => setOpenNotes(e.target.value)} /></label><button className="btn-primary"><WalletCards size={19} /> Abrir caixa</button></form>}
+        <div className="finance-divider" /><div className="panel-title movement-title"><h3><RefreshCw size={20} /> Registrar movimento manual</h3></div><form onSubmit={saveMovement} className="finance-movement-form"><label>Tipo<select value={movement.movement_type} onChange={(e) => setMovement({ ...movement, movement_type: e.target.value })}><option value="entrada">Entrada</option><option value="saida">Saída</option></select></label><label>Descrição<input placeholder="Ex.: suprimento ou sangria" value={movement.description} onChange={(e) => setMovement({ ...movement, description: e.target.value })} required /></label><label>Categoria<select value={movement.category} onChange={(e) => setMovement({ ...movement, category: e.target.value })}><option>Geral</option><option>Suprimento</option><option>Sangria</option><option>Troco</option><option>Ajuste</option><option>Outros</option></select></label><label>Forma<select value={movement.payment_method} onChange={(e) => setMovement({ ...movement, payment_method: e.target.value })}>{Object.entries(paymentLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label><label className="movement-value">Valor<div><span>R$</span><input type="number" min="0.01" step="0.01" value={movement.amount} onChange={(e) => setMovement({ ...movement, amount: e.target.value })} required /></div></label><label className="movement-notes">Observações<input placeholder="Detalhes para auditoria" value={movement.notes} onChange={(e) => setMovement({ ...movement, notes: e.target.value })} /></label><button className="btn-secondary" disabled={!cash?.register}><Plus size={18} /> {cash?.register ? 'Registrar movimento' : 'Abra o caixa para lançar'}</button></form>
+      </section>
+      <div className="finance-reference-side"><section className="panel finance-expense-panel"><div className="panel-title"><h3><WalletCards size={20} /> Nova despesa</h3><span>Lançamento automático</span></div><form onSubmit={saveExpense} className="finance-expense-form"><label>Descrição<input placeholder="Ex.: compra de ingredientes" value={expense.description} onChange={(e) => setExpense({ ...expense, description: e.target.value })} required /></label><label>Valor<div><span>R$</span><input type="number" min="0.01" step="0.01" value={expense.amount} onChange={(e) => setExpense({ ...expense, amount: e.target.value })} required /></div></label><label>Categoria<select value={expense.category} onChange={(e) => setExpense({ ...expense, category: e.target.value })}><option>Ingredientes</option><option>Embalagens</option><option>Bebidas</option><option>Funcionários</option><option>Manutenção</option><option>Taxas</option><option>Aluguel</option><option>Geral</option></select></label><label>Pagamento<select value={expense.payment_method} onChange={(e) => setExpense({ ...expense, payment_method: e.target.value })}>{Object.entries(paymentLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label><label>Observações<input placeholder="Fornecedor, comprovante, detalhes..." value={expense.notes} onChange={(e) => setExpense({ ...expense, notes: e.target.value })} /></label><button className="btn-primary"><Plus size={18} /> Registrar despesa</button></form></section><section className="panel finance-movements-panel"><div className="panel-title"><h3><Clock size={20} /> Movimentações do caixa</h3><span>{cash.movements?.length || 0} itens</span></div><div className="finance-movement-list">{(cash.movements || []).slice(0, 8).map((item) => <article className={item.status === 'estornado' ? 'reversed' : ''} key={item.id}><span className={item.movement_type === 'saida' ? 'out' : 'in'}>{item.movement_type === 'saida' ? '↑' : '↓'}</span><div><strong>{item.description}</strong><small>{item.category || 'Geral'} • {paymentLabels[item.payment_method] || item.payment_method}</small></div><b className={item.movement_type === 'saida' ? 'out' : 'in'}>{item.movement_type === 'saida' ? '- ' : ''}{formatMoney(item.amount)}</b></article>)}{!(cash.movements || []).length && <p className="reference-empty">Nenhuma movimentação registrada.</p>}</div></section></div>
+    </div>}
+
+    {financeView === 'history' && <section className="panel finance-history-panel"><div className="panel-title"><h3><History size={20} /> Histórico de caixas</h3><span>{cashHistory.length} caixas no período</span></div><div className="finance-table-wrap"><table><thead><tr><th>Caixa</th><th>Abertura</th><th>Fechamento</th><th>Inicial</th><th>Entradas</th><th>Saídas</th><th>Esperado</th><th>Contado</th><th>Diferença</th><th>Status</th></tr></thead><tbody>{cashHistory.map((item) => <tr key={item.id}><td><strong>#{item.id}</strong><small>{item.opened_by_name || 'Administrador'}</small></td><td>{dateTime(item.opened_at)}</td><td>{dateTime(item.closed_at)}</td><td>{formatMoney(item.opening_amount)}</td><td className="positive">{formatMoney(item.entradas)}</td><td className="negative">{formatMoney(item.saidas)}</td><td>{formatMoney(item.expected_amount)}</td><td>{item.closing_amount == null ? '—' : formatMoney(item.closing_amount)}</td><td className={Math.abs(Number(item.difference_amount || 0)) < .01 ? 'positive' : 'negative'}>{item.closing_amount == null ? '—' : formatMoney(item.difference_amount)}</td><td><span className={`finance-status ${item.status}`}>{item.status}</span></td></tr>)}</tbody></table>{!cashHistory.length && <p className="reference-empty">Nenhum caixa encontrado no período.</p>}</div></section>}
+
+    {financeView === 'ledger' && <section className="panel finance-ledger-panel"><div className="ledger-head"><div className="panel-title"><h3><History size={20} /> Extrato financeiro completo</h3><span>{ledger.length} lançamentos</span></div><div className="ledger-filters"><select value={financeFilters.type} onChange={(e) => setFinanceFilters({ ...financeFilters, type: e.target.value })}><option value="">Entradas e saídas</option><option value="entrada">Somente entradas</option><option value="saida">Somente saídas</option></select><select value={financeFilters.payment_method} onChange={(e) => setFinanceFilters({ ...financeFilters, payment_method: e.target.value })}><option value="">Todas as formas</option>{Object.entries(paymentLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select><button type="button" onClick={applyFilters}><Search size={16} /> Filtrar</button></div></div><div className="finance-table-wrap"><table><thead><tr><th>Data</th><th>Descrição</th><th>Origem</th><th>Categoria</th><th>Pagamento</th><th>Caixa</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>{ledger.map((item) => <tr className={item.status === 'estornado' ? 'reversed' : ''} key={item.id}><td>{dateTime(item.created_at)}</td><td><strong>{item.description}</strong><small>{item.notes || ''}</small></td><td>{item.order_id ? `Pedido #${item.order_id}` : item.source_type === 'expense' ? 'Despesa' : 'Manual'}</td><td>{item.category || 'Geral'}</td><td>{paymentLabels[item.payment_method] || item.payment_method}</td><td>{item.cash_register_id ? `#${item.cash_register_id}` : 'Sem caixa'}</td><td className={item.movement_type === 'entrada' ? 'positive' : 'negative'}>{item.movement_type === 'entrada' ? '+ ' : '- '}{formatMoney(item.amount)}</td><td><span className={`finance-status ${item.status}`}>{item.status}</span></td><td>{!item.order_id && item.status !== 'estornado' && <button type="button" className="reverse-button" onClick={() => reverseMovement(item)}>Estornar</button>}</td></tr>)}</tbody></table>{!ledger.length && <p className="reference-empty">Nenhum lançamento encontrado.</p>}</div></section>}
+  </section>;
+}
+
 function AdminPremium() {
   const [tab, setTab] = useState('dashboard');
   const [orders, setOrders] = useState([]);
@@ -646,13 +704,20 @@ function AdminPremium() {
   const [expenses, setExpenses] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [cash, setCash] = useState({ register: null, totals: null, movements: [] });
+  const [financeOverview, setFinanceOverview] = useState({ summary: {}, payment_methods: [], daily: [] });
+  const [cashHistory, setCashHistory] = useState([]);
+  const [ledger, setLedger] = useState([]);
+  const [financeView, setFinanceView] = useState('overview');
+  const [financeFilters, setFinanceFilters] = useState(() => currentMonthRange());
   const [settings, setSettings] = useState(null);
   const [report, setReport] = useState(null);
   const [message, setMessage] = useState('');
-  const [expense, setExpense] = useState({ description: '', amount: '', category: 'Geral', payment_method: 'dinheiro' });
-  const [movement, setMovement] = useState({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
+  const [expense, setExpense] = useState({ description: '', amount: '', category: 'Ingredientes', payment_method: 'dinheiro', notes: '' });
+  const [movement, setMovement] = useState({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro', category: 'Geral', notes: '' });
   const [openValue, setOpenValue] = useState('0');
+  const [openNotes, setOpenNotes] = useState('');
   const [closeValue, setCloseValue] = useState('0');
+  const [closeNotes, setCloseNotes] = useState('');
   const [productForm, setProductForm] = useState({ category_id: '', name: '', description: '', image_url: '', price: '', product_type: 'hotdog', sort_order: 0, is_active: true });
   const [manualCustomer, setManualCustomer] = useState({ name: '', phone: '', address: '', reference: '', neighborhood: '' });
   const [manualOrder, setManualOrder] = useState({ delivery_type: 'entrega', payment_method: 'dinheiro', payment_status: 'pendente', order_source: 'balcao', notes: '', items: [{ product_id: '', quantity: 1, extras: [] }] });
@@ -661,7 +726,8 @@ function AdminPremium() {
 
   async function loadAdmin() {
     try {
-      const [orderData, productData, categoryData, summaryData, dashboardData, settingsData, expenseData, cashData, customerData, reportData] = await Promise.all([
+      const rangeQuery = `from=${financeFilters.from}&to=${financeFilters.to}`;
+      const [orderData, productData, categoryData, summaryData, dashboardData, settingsData, expenseData, cashData, customerData, reportData, overviewData, historyData, ledgerData] = await Promise.all([
         api.admin.get('/api/admin/orders'),
         api.admin.get('/api/admin/products'),
         api.admin.get('/api/admin/categories'),
@@ -671,7 +737,10 @@ function AdminPremium() {
         api.admin.get('/api/admin/finance/expenses'),
         api.admin.get('/api/admin/finance/cash/current'),
         api.admin.get('/api/admin/customers'),
-        api.admin.get('/api/admin/reports/sales')
+        api.admin.get('/api/admin/reports/sales'),
+        api.admin.get(`/api/admin/finance/overview?${rangeQuery}`),
+        api.admin.get(`/api/admin/finance/cash/history?${rangeQuery}`),
+        api.admin.get(`/api/admin/finance/ledger?${rangeQuery}`)
       ]);
       setOrders(orderData);
       setProducts(productData);
@@ -683,6 +752,9 @@ function AdminPremium() {
       setCash(cashData);
       setCustomers(customerData);
       setReport(reportData);
+      setFinanceOverview(overviewData);
+      setCashHistory(historyData);
+      setLedger(ledgerData);
     } catch (error) {
       setMessage(error.message);
     }
@@ -724,26 +796,50 @@ function AdminPremium() {
   async function saveExpense(event) {
     event.preventDefault();
     await api.admin.post('/api/admin/finance/expenses', { ...expense, amount: Number(expense.amount) });
-    setExpense({ description: '', amount: '', category: 'Geral', payment_method: 'dinheiro' });
+    setExpense({ description: '', amount: '', category: 'Ingredientes', payment_method: 'dinheiro', notes: '' });
     await loadAdmin();
   }
 
   async function saveMovement(event) {
     event.preventDefault();
     await api.admin.post('/api/admin/finance/cash/movements', { ...movement, amount: Number(movement.amount) });
-    setMovement({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro' });
+    setMovement({ movement_type: 'entrada', description: '', amount: '', payment_method: 'dinheiro', category: 'Geral', notes: '' });
     await loadAdmin();
   }
 
   async function openCash(event) {
     event.preventDefault();
-    await api.admin.post('/api/admin/finance/cash/open', { opening_amount: Number(openValue || 0) });
+    await api.admin.post('/api/admin/finance/cash/open', { opening_amount: Number(openValue || 0), opening_notes: openNotes });
+    setOpenNotes('');
     await loadAdmin();
   }
 
   async function closeCash(event) {
     event.preventDefault();
-    await api.admin.post('/api/admin/finance/cash/close', { closing_amount: Number(closeValue || 0) });
+    await api.admin.post('/api/admin/finance/cash/close', { closing_amount: Number(closeValue || 0), closing_notes: closeNotes });
+    setCloseNotes('');
+    await loadAdmin();
+  }
+
+  async function applyFinanceFilters(event) {
+    event?.preventDefault();
+    const query = new URLSearchParams({ from: financeFilters.from, to: financeFilters.to });
+    if (financeFilters.type) query.set('type', financeFilters.type);
+    if (financeFilters.payment_method) query.set('payment_method', financeFilters.payment_method);
+    const [overviewData, historyData, ledgerData] = await Promise.all([
+      api.admin.get(`/api/admin/finance/overview?from=${financeFilters.from}&to=${financeFilters.to}`),
+      api.admin.get(`/api/admin/finance/cash/history?from=${financeFilters.from}&to=${financeFilters.to}`),
+      api.admin.get(`/api/admin/finance/ledger?${query.toString()}`)
+    ]);
+    setFinanceOverview(overviewData);
+    setCashHistory(historyData);
+    setLedger(ledgerData);
+  }
+
+  async function reverseMovement(item) {
+    const reason = window.prompt(`Motivo do estorno de "${item.description}"?`);
+    if (!reason) return;
+    await api.admin.post(`/api/admin/finance/movements/${item.id}/reverse`, { reason });
     await loadAdmin();
   }
 
@@ -857,6 +953,9 @@ function AdminPremium() {
     }
 
     if (tab === 'finance') {
+      return <FinanceComplete cash={cash} summary={summary} overviewData={financeOverview} cashHistory={cashHistory} ledger={ledger} financeView={financeView} setFinanceView={setFinanceView} financeFilters={financeFilters} setFinanceFilters={setFinanceFilters} applyFilters={applyFinanceFilters} expense={expense} setExpense={setExpense} saveExpense={saveExpense} movement={movement} setMovement={setMovement} saveMovement={saveMovement} openValue={openValue} setOpenValue={setOpenValue} openNotes={openNotes} setOpenNotes={setOpenNotes} openCash={openCash} closeValue={closeValue} setCloseValue={setCloseValue} closeNotes={closeNotes} setCloseNotes={setCloseNotes} closeCash={closeCash} reverseMovement={reverseMovement} />;
+
+      /* Legacy finance markup kept below as a safe fallback during migration. */
       const entries = Number(cash?.totals?.entradas || summary?.paid_today || 0);
       const exits = Number(cash?.totals?.saidas || summary?.expenses_today || 0);
       const balance = Number(cash?.totals?.saldo || 0);
